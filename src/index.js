@@ -4,12 +4,6 @@ import './index.css';
 
 
 class App extends React.Component {
-  constructor(props){
-    super(props);
-    this.state = {
-      fullDeck: this.createDeck(),
-    }
-  }
 
   createDeck(){
     const faces = ['2', '3', '4', '5', '6', '7', '8', '9', '10', 'Jack', 'Queen', 'King', 'Ace'];
@@ -28,17 +22,22 @@ class App extends React.Component {
   render() {
     return(
       <div id='wrapper'>
-        <Game deck={this.state.fullDeck}/>
+        <Game createDeck={this.createDeck()}/>
       </div>
     );
   }
 }
 
 class Game extends React.Component {
-
-  createCards(){
+constructor(props){
+  super(props);
+  this.state = {
+    currentDeck: this.props.createDeck,
+  }
+}
+  showCards(){
     let cards = [];
-    this.props.deck.forEach(card => {
+    this.state.currentDeck.forEach(card => {
       cards.push(
         <div className='card' key={card}>
           <div className='cardText'>{card}</div>
@@ -50,11 +49,22 @@ class Game extends React.Component {
 
   render(){
     return(
-      <div id='cardDisplay'>
-        {this.createCards()}
-      </div>
+      <Deck show={this.showCards()}/>
     );
   }
+}
+
+class Deck extends React.Component{
+  constructor(props){
+    super(props);
+  }
+  render(){
+    return(
+      <div id='cardDisplay'>
+        {this.props.show}
+      </div>
+    );
+}
 }
 
 ReactDOM.render(
