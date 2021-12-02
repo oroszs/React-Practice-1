@@ -1,6 +1,15 @@
 #wrapper{
+  position: relative;
   background-color: #998899;
-  width: 1000px;
+  width: 100%;
   height: 1000px;
   text-align: center;
+}
+#cardDisplay{
+  position: relative;
+  margin: auto;
+  font-size: 15pt;
+  color: black;
+  width: 50%;
+  height: 900px;
 }

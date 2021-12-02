@@ -2,22 +2,45 @@ import React from 'react';
 import ReactDOM from 'react-dom';
 import './index.css';
 
-const days = ['Sunday', 'Monday', 'Tuesday', 'Wednesday', 'Thursday', 'Friday', 'Saturday'];
 
 class App extends React.Component {
   constructor(props){
     super(props);
     this.state = {
-      date: new Date(),
+      fullDeck: this.createDeck(),
     }
   }
 
+  createDeck(){
+    const faces = ['2', '3', '4', '5', '6', '7', '8', '9', '10', 'Jack', 'Queen', 'King', 'Ace'];
+    const suits = ['Spades', 'Clubs', 'Diamonds', 'Hearts'];
+    const fullDeck = [];
+    suits.forEach(suit => {
+      faces.forEach(face => {
+        fullDeck.push(`${face} of ${suit}, `);
+      });
+    });
+    return fullDeck;
+  }
+
   render() {
-    const day = days[this.state.date.getDay()];
     return(
       <div id='wrapper'>
-        <h1>Hello World!</h1>
-        <p>It's {day}</p>
+        <Game deck={this.state.fullDeck}/>
+      </div>
+    );
+  }
+}
+
+class Game extends React.Component {
+  constructor(props){
+    super(props);
+  }
+
+  render(){
+    return(
+      <div id='cardDisplay'>
+        {this.props.deck}
       </div>
     );
   }
