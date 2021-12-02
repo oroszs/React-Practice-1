@@ -8,8 +8,26 @@
 #cardDisplay{
   position: relative;
   margin: auto;
-  font-size: 15pt;
+  font-size: 20pt;
   color: black;
   width: 50%;
   height: 900px;
+}
+.card{
+  position: relative;
+  margin: 5px;
+  width: 60px;
+  height: 100px;
+  background-color: white;
+  border: solid black 2px;
+  border-radius: 5px;
+  float: left;
+}
+.cardText{
+  margin: 0px;
+  position: relative;
+  top: 2px;
+  left: 2px;
+  font-size: 12pt;
+  width: fit-content;
 }
