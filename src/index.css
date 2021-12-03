@@ -10,8 +10,54 @@
   margin: auto;
   font-size: 20pt;
   color: black;
+  top: 25px;
   width: 95%;
-  height: 500px;
+  height: 650px;
+  border: solid black 2px;
+  border-radius: 5px;
+  background: white;
+}
+.cardHolder{
+  display: flex;
+  flex-direction: row;
+  justify-content: center;
+  align-items: center;
+}
+#board{
+  position: relative;
+  top: 25px;
+  margin: auto;
+  width:50%;
+  height: 200px;
+  border: solid black 2px;
+  border-radius: 5px;
+  background: yellow;
+}
+#deckDisplay{
+  flex-wrap: wrap;
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  transform:translate(-50%, -50%);
+  width: 90%;
+  height: 175px;
+  border: solid black 2px;
+  border-radius: 5px;
+  background: grey;
+  opacity: 50%;
+}
+#playerArea{
+  font-size: 10pt;
+  position: absolute;
+  bottom: 25px;
+  left: 50%;
+  transform: translate(-50%, 0);
+  margin: auto;
+  width: 400px;
+  height: 200px;
+  background: green;
+  border: solid black 2px;
+  border-radius: 5px;
 }
 .card{
   position: relative;
@@ -21,7 +67,7 @@
   background-color: white;
   border: solid black 2px;
   border-radius: 5px;
-  float: left;
+  flex: none;
 }
 .cardText{
   margin: 0px;
@@ -31,15 +77,25 @@
   font-size: 12pt;
   width: fit-content;
 }
+.deckCard{
+  font-size: 6pt;
+  position: relative;
+  margin: 5px;
+  width: 40px;
+  height: 65px;
+  background-color: white;
+  border: solid black 2px;
+  border-radius: 5px;
+  flex: none;
+}
+.deckCardText{
+  margin: 0px;
+  position: relative;
+  top: 2px;
+  left: 2px;
+  font-size: 8pt;
+  width: fit-content;
+}
 .redSuit{
   color: red;
-}
-#playerArea{
-  font-size: 10pt;
-  width: 400px;
-  height: 500px;
-  top: 70%;
-  left: 50%;
-  transform: translate(-50%, 0);
-  position: absolute;
 }
