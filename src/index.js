@@ -5,36 +5,10 @@ import './index.css';
 
 class App extends React.Component {
 
-  createDeck(){
-    const faces = ['2', '3', '4', '5', '6', '7', '8', '9', '10', 'Jack', 'Queen', 'King', 'Ace'];
-    const suits = ['\u2660', '\u2663', '\u2665', '\u2666'];
-    const fullDeck = [];
-    suits.forEach(suit => {
-      faces.forEach(face => {
-        (suit === '\u2665' || suit === '\u2666') ?
-        fullDeck.push(<span>{face} <span className='redSuit'>{suit}</span></span>) :
-        fullDeck.push(`${face} ${suit}`);
-      });
-    });
-    return this.createCards(fullDeck);
-  }
-
-  createCards(deck){
-    let cards = [];
-    deck.forEach(card => {
-      cards.push(
-        <div className='card' key={card}>
-          <div className='cardText'>{card}</div>
-        </div>
-      );
-    });
-    return cards;
-  }
-
   render() {
     return(
       <div id='wrapper'>
-        <Game createDeck={this.createDeck()}/>
+        <Game />
       </div>
     );
   }
@@ -44,21 +18,28 @@ class Game extends React.Component {
   constructor(props){
     super(props);
     this.state = {
-      currentDeck: this.props.createDeck,
+      currentDeck: this.createDeck(),
     }
     this.dealHand = this.dealHand.bind(this);
   }
 
-  showCards(){
-    return this.state.currentDeck;
+  createDeck(){
+    const faces = ['2', '3', '4', '5', '6', '7', '8', '9', '10', 'Jack', 'Queen', 'King', 'Ace'];
+    const suits = ['\u2660', '\u2663', '\u2665', '\u2666'];
+    const fullDeck = [];
+    suits.forEach(suit => {
+      faces.forEach(face => {
+        fullDeck.push(`${face} ${suit}`);
+      });
+    });
+    return fullDeck;
   }
 
   dealHand(handSize){
     let hand = [];
     const deck = this.state.currentDeck;
-    console.log(deck.length);
     for(let x = 0; x < handSize; x++){
-      let index = Math.random() * deck.length;
+      let index = Math.floor(Math.random() * deck.length);
       let card = deck[index];
       deck.splice(index, 1);
       hand.push(card);
@@ -70,38 +51,40 @@ class Game extends React.Component {
   }
 
   componentDidMount(){
+    const deck = this.state.currentDeck;
+    const thisHand = this.createCards(this.dealHand(5));
+    const thisDeck = this.createCards(deck);
+
     this.setState({
-      hands: this.dealHand(5),
+      dispHand: thisHand,
+      dispDeck: thisDeck,
     });
   }
 
+  createCards(c){
+    let cards = [];
+    for(let x = 0; x < c.length; x++){
+      cards.push(
+        <div className='card' key={c[x]}>
+          {c[x].includes('\u2665') || c[x].includes('\u2666') ?
+          <div className='cardText'>{c[x].split(' ')[0]} <span style={{color: 'red'}}>{c[x].split(' ')[1]}</span></div> :
+          <div className='cardText'>{c[x]}</div>}
+        </div>
+      );
+    }
+    return cards;
+  }
+
   render(){
-    const hands = this.state.hands;
     return(
       <div>
         <div id='cardDisplay'>
-          {this.showCards()}
-        </div>
-        <div id='playerArea'>
-          <Player hand={hands} />
+          {this.state.dispDeck}
+          <div id='playerArea'>
+            {this.state.dispHand}
+          </div>
         </div>
       </div>
-    );
-  }
-}
-
-class Player extends React.Component {
-  constructor(props){
-    super(props);
-  }
-
-  showHand(){
-    return this.props.hand;
-  }
-
-  render(){
-    return(
-      <>{this.showHand()}</>
     );
   }
 }

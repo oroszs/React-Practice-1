@@ -2,7 +2,7 @@
   position: relative;
   background-color: #998899;
   width: 100%;
-  height: 1000px;
+  height: 700px;
   text-align: center;
 }
 #cardDisplay{
@@ -10,13 +10,13 @@
   margin: auto;
   font-size: 20pt;
   color: black;
-  width: 50%;
-  height: 900px;
+  width: 90%;
+  height: 500px;
 }
 .card{
   position: relative;
   margin: 5px;
-  width: 60px;
+  width: 70px;
   height: 100px;
   background-color: white;
   border: solid black 2px;
@@ -35,8 +35,11 @@
   color: red;
 }
 #playerArea{
-  width: 100%;
-  height: 5000px;
-  top: 1000px;
+  display: inline-block;
+  width: 500px;
+  height: 100px;
+  top: 100%;
+  left: 50%;
+  transform: translate(-50%, 0);
   position: absolute;
 }
