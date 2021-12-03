@@ -61,18 +61,18 @@ class Game extends React.Component {
     });
   }
 
-  createCards(c){
-    let cards = [];
-    for(let x = 0; x < c.length; x++){
-      cards.push(
-        <div className='card' key={c[x]}>
-          {c[x].includes('\u2665') || c[x].includes('\u2666') ?
-          <div className='cardText'>{c[x].split(' ')[0]} <span style={{color: 'red'}}>{c[x].split(' ')[1]}</span></div> :
-          <div className='cardText'>{c[x]}</div>}
+  createCards(cards){
+    let divCards = [];
+    for(let x = 0; x < cards.length; x++){
+      divCards.push(
+        <div className='card' key={cards[x]}>
+          {cards[x].includes('\u2665') || cards[x].includes('\u2666') ?
+          <div className='cardText'>{cards[x].split(' ')[0]} <span style={{color: 'red'}}>{cards[x].split(' ')[1]}</span></div> :
+          <div className='cardText'>{cards[x]}</div>}
         </div>
       );
     }
-    return cards;
+    return divCards;
   }
 
   render(){
