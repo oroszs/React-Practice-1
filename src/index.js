@@ -50,17 +50,6 @@ class Game extends React.Component {
     return hand;
   }
 
-  componentDidMount(){
-    const board = this.createCards(this.dealCards(5), false);
-    const p1 = this.createCards(this.dealCards(2), false);
-    const deck = this.createCards(this.state.currentDeck, true);
-    this.setState({
-      board: board,
-      p1Hand: p1,
-      deck: deck,
-    });
-  }
-
   createCards(cards, deck){
     let divCards = [];
     for(let x = 0; x < cards.length; x++){
@@ -73,6 +62,17 @@ class Game extends React.Component {
       );
     }
     return divCards;
+  }
+
+  componentDidMount(){
+    const board = this.createCards(this.dealCards(5), false);
+    const p1 = this.createCards(this.dealCards(2), false);
+    const deck = this.createCards(this.state.currentDeck, true);
+    this.setState({
+      board: board,
+      p1Hand: p1,
+      deck: deck,
+    });
   }
 
   render(){
