@@ -16,7 +16,19 @@ class App extends React.Component {
         fullDeck.push(`${face} ${suit}`);
       });
     });
-    return fullDeck;
+    return this.createCards(fullDeck);
+  }
+
+  createCards(deck){
+    let cards = [];
+    deck.forEach(card => {
+      cards.push(
+        <div className='card' key={card}>
+          <div className='cardText'>{card}</div>
+        </div>
+      );
+    });
+    return cards;
   }
 
   render() {
@@ -29,42 +41,69 @@ class App extends React.Component {
 }
 
 class Game extends React.Component {
-constructor(props){
-  super(props);
-  this.state = {
-    currentDeck: this.props.createDeck,
+  constructor(props){
+    super(props);
+    this.state = {
+      currentDeck: this.props.createDeck,
+    }
+    this.dealHand = this.dealHand.bind(this);
   }
-}
+
   showCards(){
-    let cards = [];
-    this.state.currentDeck.forEach(card => {
-      cards.push(
-        <div className='card' key={card}>
-          <div className='cardText'>{card}</div>
-        </div>
-      );
+    return this.state.currentDeck;
+  }
+
+  dealHand(handSize){
+    let hand = [];
+    const deck = this.state.currentDeck;
+    console.log(deck.length);
+    for(let x = 0; x < handSize; x++){
+      let index = Math.random() * deck.length;
+      let card = deck[index];
+      deck.splice(index, 1);
+      hand.push(card);
+    }
+    this.setState({
+      currentDeck: deck,
     });
-    return cards;
+    return hand;
+  }
+
+  componentDidMount(){
+    this.setState({
+      hands: this.dealHand(5),
+    });
   }
 
   render(){
+    const hands = this.state.hands;
     return(
-      <Deck show={this.showCards()}/>
+      <div>
+        <div id='cardDisplay'>
+          {this.showCards()}
+        </div>
+        <div id='playerArea'>
+          <Player hand={hands} />
+        </div>
+      </div>
     );
   }
 }
 
-class Deck extends React.Component{
+class Player extends React.Component {
   constructor(props){
     super(props);
   }
+
+  showHand(){
+    return this.props.hand;
+  }
+
   render(){
     return(
-      <div id='cardDisplay'>
-        {this.props.show}
-      </div>
+      <>{this.showHand()}</>
     );
-}
+  }
 }
 
 ReactDOM.render(

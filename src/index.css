@@ -34,3 +34,9 @@
 .redSuit{
   color: red;
 }
+#playerArea{
+  width: 100%;
+  height: 5000px;
+  top: 1000px;
+  position: absolute;
+}
