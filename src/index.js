@@ -52,11 +52,14 @@ class Game extends React.Component {
 
   componentDidMount(){
     const deck = this.state.currentDeck;
-    const thisHand = this.createCards(this.dealHand(5));
+    const hand1 = this.createCards(this.dealHand(5));
+    const hand2 = this.createCards(this.dealHand(5));
+    const hand3 = this.createCards(this.dealHand(5));
     const thisDeck = this.createCards(deck);
-
     this.setState({
-      dispHand: thisHand,
+      hand1: hand1,
+      hand2: hand2,
+      hand3: hand3,
       dispDeck: thisDeck,
     });
   }
@@ -65,7 +68,7 @@ class Game extends React.Component {
     let divCards = [];
     for(let x = 0; x < cards.length; x++){
       divCards.push(
-        <div className='card' key={cards[x]}>
+        <div className='card' key={cards[x]} >
           {cards[x].includes('\u2665') || cards[x].includes('\u2666') ?
           <div className='cardText'>{cards[x].split(' ')[0]} <span style={{color: 'red'}}>{cards[x].split(' ')[1]}</span></div> :
           <div className='cardText'>{cards[x]}</div>}
@@ -81,7 +84,9 @@ class Game extends React.Component {
         <div id='cardDisplay'>
           {this.state.dispDeck}
           <div id='playerArea'>
-            {this.state.dispHand}
+            <div>{this.state.hand1}</div>
+            <div>{this.state.hand2}</div>
+            <div>{this.state.hand3}</div>
           </div>
         </div>
       </div>
