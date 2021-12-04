@@ -24,7 +24,7 @@ class Game extends React.Component {
   }
 
   createDeck(){
-    const faces = ['2', '3', '4', '5', '6', '7', '8', '9', '10', 'Jack', 'Queen', 'King', 'Ace'];
+    const faces = ['2', '3', '4', '5', '6', '7', '8', '9', '10', 'J', 'Q', 'K', 'A'];
     const suits = ['\u2660', '\u2663', '\u2665', '\u2666'];
     const fullDeck = [];
     suits.forEach(suit => {
@@ -54,10 +54,12 @@ class Game extends React.Component {
     let divCards = [];
     for(let x = 0; x < cards.length; x++){
       divCards.push(
-        <div className={deck ? 'deckCard' : 'card'} key={cards[x]} >
-          {cards[x].includes('\u2665') || cards[x].includes('\u2666') ?
-          <div className={deck ? 'deckCardText' : 'cardText'}>{cards[x].split(' ')[0]} <span style={{color: 'red'}}>{cards[x].split(' ')[1]}</span></div> :
-          <div className={deck ? 'deckCardText' : 'cardText'}>{cards[x]}</div>}
+        <div className='cardContainer' >
+          <div className={deck ? 'deckCard' : 'card'} key={cards[x]} >
+            {cards[x].includes('\u2665') || cards[x].includes('\u2666') ?
+            <div className={deck ? 'deckCardText' : 'cardText'}>{cards[x].split(' ')[0]} <span style={{color: 'red'}}>{cards[x].split(' ')[1]}</span></div> :
+            <div className={deck ? 'deckCardText' : 'cardText'}>{cards[x]}</div>}
+          </div>
         </div>
       );
     }
