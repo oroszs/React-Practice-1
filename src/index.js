@@ -93,10 +93,18 @@ class Game extends React.Component {
           <div id='board' className='cardHolder'>{board}</div>
           <div id='deckDisplay' className='cardHolder'>{deck}</div>
           <div id='playersArea'>
-            <div className='playerArea cardHolder' key='player1'>{p1}</div>
-            <div className='playerArea cardHolder' key='player2'>{p2}</div>
-            <div className='playerArea cardHolder' key='player3'>{p3}</div>
-          </div>
+            <div className='playerArea' key='player1'>
+              <div className='playerInfo'>Player 1<br></br>$999</div>
+              <div className='cardHolder'>{p1}</div>
+            </div>
+            <div className='playerArea' key='player2'>
+              <div className='playerInfo'>Player 2<br></br>$999</div>
+              <div className='cardHolder'>{p2}</div>
+            </div>
+            <div className='playerArea' key='player3'>
+              <div className='playerInfo'>Player 3<br></br>$999</div>
+              <div className='cardHolder'>{p3}</div>
+            </div>          </div>
         </div>
       </div>
     );
