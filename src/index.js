@@ -69,24 +69,34 @@ class Game extends React.Component {
   componentDidMount(){
     const board = this.createCards(this.dealCards(5), false);
     const p1 = this.createCards(this.dealCards(2), false);
+    const p2 = this.createCards(this.dealCards(2), false);
+    const p3 = this.createCards(this.dealCards(2), false);
     const deck = this.createCards(this.state.currentDeck, true);
     this.setState({
       board: board,
-      p1Hand: p1,
+      p1: p1,
+      p2: p2,
+      p3: p3,
       deck: deck,
     });
   }
 
   render(){
     const board = this.state.board;
-    const p1Hand = this.state.p1Hand;
+    const p1 = this.state.p1;
+    const p2 = this.state.p2;
+    const p3 = this.state.p3;
     const deck = this.state.deck;
     return(
       <div>
         <div id='cardDisplay'>
           <div id='board' className='cardHolder'>{board}</div>
           <div id='deckDisplay' className='cardHolder'>{deck}</div>
-          <div id='playerArea' className='cardHolder'>{p1Hand}</div>
+          <div id='playersArea'>
+            <div className='playerArea cardHolder' key='player1'>{p1}</div>
+            <div className='playerArea cardHolder' key='player2'>{p2}</div>
+            <div className='playerArea cardHolder' key='player3'>{p3}</div>
+          </div>
         </div>
       </div>
     );

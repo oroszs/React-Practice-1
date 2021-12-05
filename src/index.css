@@ -47,17 +47,29 @@
   opacity: 60%;
   padding : 0px 5px 0px 5px;
 }
-#playerArea{
+#playersArea{
+  display: flex;
+  flex-direction: row;
+  align-items: center;
+  justify-content: space-evenly;
   font-size: 10pt;
   position: absolute;
   bottom: 15px;
   left: 50%;
   transform: translate(-50%, 0);
-  width: 400px;
-  height: 200px;
-  background: rgb(58, 175, 58);
+  width: 90%;
+  height: 250px;
+  background: rgb(136, 185, 136);
   border: solid black 2px;
   border-radius: 5px;
+}
+.playerArea{
+  position: relative;
+  width: 200px;
+  height: 200px;
+  background: green;
+  flex: none;
+  margin: 10px;
 }
 .card{
   position: relative;
