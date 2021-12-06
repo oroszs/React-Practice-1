@@ -8,7 +8,34 @@ class App extends React.Component {
   render() {
     return(
       <div id='wrapper'>
-        <Game />
+        <Menu />
+      </div>
+    );
+  }
+}
+
+class Menu extends React.Component{
+  constructor (props){
+    super (props);
+    this.state = {
+      game: false,
+    }
+  }
+
+  start() {
+    let but = document.getElementById('startButton');
+    but.style.display = 'none';
+    this.setState({
+      game: true,
+    });
+  }
+
+  render() {
+    const gameStart = this.state.game;
+    return(
+      <div>
+        <button id='startButton' onClick={() => this.start()}>Start Game</button>
+        {gameStart ? <Game/> : null}
       </div>
     );
   }
@@ -67,6 +94,7 @@ class Game extends React.Component {
   }
 
   componentDidMount(){
+    const startingMoney = 500;
     const board = this.createCards(this.dealCards(5), false);
     const p1 = this.createCards(this.dealCards(2), false);
     const p2 = this.createCards(this.dealCards(2), false);
@@ -78,6 +106,9 @@ class Game extends React.Component {
       p2: p2,
       p3: p3,
       deck: deck,
+      m1: startingMoney,
+      m2: startingMoney,
+      m3: startingMoney,
     });
   }
 
@@ -87,25 +118,39 @@ class Game extends React.Component {
     const p2 = this.state.p2;
     const p3 = this.state.p3;
     const deck = this.state.deck;
+    const m1 = this.state.m1;
+    const m2 = this.state.m2;
+    const m3 = this.state.m3;
     return(
       <div>
         <div id='cardDisplay'>
           <div id='board' className='cardHolder'>{board}</div>
           <div id='deckDisplay' className='cardHolder'>{deck}</div>
           <div id='playersArea'>
-            <div className='playerArea' key='player1'>
-              <div className='playerInfo'>Player 1<br></br>$999</div>
-              <div className='cardHolder'>{p1}</div>
-            </div>
-            <div className='playerArea' key='player2'>
-              <div className='playerInfo'>Player 2<br></br>$999</div>
-              <div className='cardHolder'>{p2}</div>
-            </div>
-            <div className='playerArea' key='player3'>
-              <div className='playerInfo'>Player 3<br></br>$999</div>
-              <div className='cardHolder'>{p3}</div>
-            </div>          </div>
+              <Player player='1' hand={p1} money={m1}/>
+              <Player player='2' hand={p2} money={m2}/>    
+              <Player player='3' hand={p3} money={m3}/>        
+          </div>
         </div>
+      </div>
+    );
+  }
+}
+
+class Player extends React.Component {
+  constructor (props){
+    super (props);
+  }
+
+  render(){
+    const player = this.props.player;
+    const hand = this.props.hand;
+    const money = this. props.money;
+    return (
+      <div className='playerArea'>
+        <span>Player {player}</span>
+        <div className='playerInfo'>{money}</div>
+        <div className='cardHolder'>{hand}</div>
       </div>
     );
   }
