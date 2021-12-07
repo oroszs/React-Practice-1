@@ -19,6 +19,7 @@ class Menu extends React.Component{
     super (props);
     this.state = {
       game: false,
+      players: 2,
     }
   }
 
@@ -30,11 +31,40 @@ class Menu extends React.Component{
     });
   }
 
+  less() {
+    let p = this.state.players;
+    if(p > 2){
+      p --;
+    }
+
+    this.setState({
+      players: p,
+    });
+  }
+
+  more() {
+    let p = this.state.players;
+    if(p < 4){
+      p ++;
+    }
+    this.setState({
+      players: p,
+    });
+  }
+
   render() {
     const gameStart = this.state.game;
+    const p = this.state.players;
     return(
       <div>
-        <button id='startButton' onClick={() => this.start()}>Start Game</button>
+        <div id='menu'>
+          <button id='startButton' onClick={() => this.start()}>Start Game</button>
+          <div id='pNumHolder'>
+            <button className='pNum' onClick={() => this.less()}>&lt;</button>
+            <span id='players'>{p} Players</span>
+            <button className='pNum' onClick={() => this.more()}>&gt;</button>
+          </div>
+        </div>
         {gameStart ? <Game/> : null}
       </div>
     );
@@ -95,13 +125,11 @@ class Game extends React.Component {
 
   componentDidMount(){
     const startingMoney = 500;
-    const board = this.createCards(this.dealCards(5), false);
     const p1 = this.createCards(this.dealCards(2), false);
     const p2 = this.createCards(this.dealCards(2), false);
     const p3 = this.createCards(this.dealCards(2), false);
     const deck = this.createCards(this.state.currentDeck, true);
     this.setState({
-      board: board,
       p1: p1,
       p2: p2,
       p3: p3,
