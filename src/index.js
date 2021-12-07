@@ -65,7 +65,7 @@ class Menu extends React.Component{
             <button className='pNum' onClick={() => this.more()}>&gt;</button>
           </div>
         </div>
-        {gameStart ? <Game/> : null}
+        {gameStart ? <Game players={p}/> : null}
       </div>
     );
   }
@@ -76,6 +76,7 @@ class Game extends React.Component {
     super(props);
     this.state = {
       currentDeck: this.createDeck(),
+      board: [],
     }
     this.dealCards = this.dealCards.bind(this);
   }
@@ -92,19 +93,19 @@ class Game extends React.Component {
     return fullDeck;
   }
 
-  dealCards(handSize){
-    let hand = [];
+  dealCards(num){
+    let cards = [];
     const deck = this.state.currentDeck;
-    for(let x = 0; x < handSize; x++){
+    for(let x = 0; x < num; x++){
       let index = Math.floor(Math.random() * deck.length);
       let card = deck[index];
       deck.splice(index, 1);
-      hand.push(card);
+      cards.push(card);
     }
     this.setState({
       currentDeck: deck,
     });
-    return hand;
+    return cards;
   }
 
   createCards(cards, deck){
@@ -125,18 +126,25 @@ class Game extends React.Component {
 
   componentDidMount(){
     const startingMoney = 500;
-    const p1 = this.createCards(this.dealCards(2), false);
-    const p2 = this.createCards(this.dealCards(2), false);
-    const p3 = this.createCards(this.dealCards(2), false);
+    let hands = [];
+    const players = this.props.players;
+    for(let i = 0; i < players; i++){
+      hands.push(this.createCards(this.dealCards(2), false));
+      console.log(hands[i]);
+    }
+    const board = this.createCards(this.dealCards(5), false);
     const deck = this.createCards(this.state.currentDeck, true);
     this.setState({
-      p1: p1,
-      p2: p2,
-      p3: p3,
+      p1: hands[0],
+      p2: hands[1],
+      p3: hands[2],
+      p4: hands[3],
       deck: deck,
       m1: startingMoney,
       m2: startingMoney,
       m3: startingMoney,
+      m4: startingMoney,
+      board: board,
     });
   }
 
@@ -145,19 +153,22 @@ class Game extends React.Component {
     const p1 = this.state.p1;
     const p2 = this.state.p2;
     const p3 = this.state.p3;
+    const p4 = this.state.p4;
     const deck = this.state.deck;
     const m1 = this.state.m1;
     const m2 = this.state.m2;
     const m3 = this.state.m3;
+    const m4 = this.state.m4;
     return(
       <div>
         <div id='cardDisplay'>
           <div id='board' className='cardHolder'>{board}</div>
           <div id='deckDisplay' className='cardHolder'>{deck}</div>
           <div id='playersArea'>
-              <Player player='1' hand={p1} money={m1}/>
-              <Player player='2' hand={p2} money={m2}/>    
-              <Player player='3' hand={p3} money={m3}/>        
+              {p1 ? <Player player='1' hand={p1} money={m1}/> : null}
+              {p2 ? <Player player='2' hand={p2} money={m2}/> : null}    
+              {p3 ? <Player player='3' hand={p3} money={m3}/> : null}
+              {p4 ? <Player player='4' hand={p4} money={m4}/> : null}        
           </div>
         </div>
       </div>
@@ -173,7 +184,7 @@ class Player extends React.Component {
   render(){
     const player = this.props.player;
     const hand = this.props.hand;
-    const money = this. props.money;
+    const money = this.props.money;
     return (
       <div className='playerArea'>
         <span>Player {player}</span>
