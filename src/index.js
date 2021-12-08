@@ -20,6 +20,7 @@ class Menu extends React.Component{
     this.state = {
       game: false,
       players: 2,
+      money: 500,
     }
   }
 
@@ -52,20 +53,33 @@ class Menu extends React.Component{
     });
   }
 
+  getVal(){
+    let el = document.getElementById('moneySlider');
+    let val = el.value;
+    el.value = val;
+    this.setState({
+      money: val,
+    });
+  }
+
   render() {
     const gameStart = this.state.game;
     const p = this.state.players;
+    let val = this.state.money;
     return(
       <div>
         <div id='menu'>
           <button id='startButton' onClick={() => this.start()}>Start Game</button>
+          <div id='moneyDiv'> Starting Chip Value: {val}
+            <input id='moneySlider' type='range' min='100' max='1000' step='50' onChange={() => {this.getVal()}}></input>
+          </div>
           <div id='pNumHolder'>
             <button className='pNum' onClick={() => this.less()}>&lt;</button>
             <span id='players'>{p} Players</span>
             <button className='pNum' onClick={() => this.more()}>&gt;</button>
           </div>
         </div>
-        {gameStart ? <Game players={p}/> : null}
+        {gameStart ? <Game players={p} money={val}/> : null}
       </div>
     );
   }
@@ -125,7 +139,6 @@ class Game extends React.Component {
   }
 
   componentDidMount(){
-    const startingMoney = 500;
     let hands = [];
     const players = this.props.players;
     for(let i = 0; i < players; i++){
@@ -140,10 +153,6 @@ class Game extends React.Component {
       p3: hands[2],
       p4: hands[3],
       deck: deck,
-      m1: startingMoney,
-      m2: startingMoney,
-      m3: startingMoney,
-      m4: startingMoney,
       board: board,
     });
   }
@@ -155,20 +164,16 @@ class Game extends React.Component {
     const p3 = this.state.p3;
     const p4 = this.state.p4;
     const deck = this.state.deck;
-    const m1 = this.state.m1;
-    const m2 = this.state.m2;
-    const m3 = this.state.m3;
-    const m4 = this.state.m4;
     return(
       <div>
         <div id='cardDisplay'>
           <div id='board' className='cardHolder'>{board}</div>
           <div id='deckDisplay' className='cardHolder'>{deck}</div>
           <div id='playersArea'>
-              {p1 ? <Player player='1' hand={p1} money={m1}/> : null}
-              {p2 ? <Player player='2' hand={p2} money={m2}/> : null}    
-              {p3 ? <Player player='3' hand={p3} money={m3}/> : null}
-              {p4 ? <Player player='4' hand={p4} money={m4}/> : null}        
+              {p1 ? <Player player='1' hand={p1} money={this.props.money}/> : null}
+              {p2 ? <Player player='2' hand={p2} money={this.props.money}/> : null}    
+              {p3 ? <Player player='3' hand={p3} money={this.props.money}/> : null}
+              {p4 ? <Player player='4' hand={p4} money={this.props.money}/> : null}        
           </div>
         </div>
       </div>
