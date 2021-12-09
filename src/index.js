@@ -161,6 +161,21 @@ class Game extends React.Component {
     });
   }
 
+  handleTurn(){
+    switch (round) {
+      case 'preFlop' :
+        break;
+      case 'flop' :
+        break;
+      case 'river' :
+        break;
+      case 'turn' :
+        break;
+      default :
+      break;
+    }
+  }
+
   render(){
     const board = this.state.board;
     const p1 = this.state.p1;
