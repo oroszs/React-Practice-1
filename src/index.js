@@ -56,10 +56,14 @@ class Menu extends React.Component{
   getVal(){
     let el = document.getElementById('moneySlider');
     let val = el.value;
-    el.value = val;
     this.setState({
       money: val,
     });
+  }
+
+  componentDidMount(){
+    let el = document.getElementById('moneySlider');
+    el.value = this.state.money;
   }
 
   render() {
