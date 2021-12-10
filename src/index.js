@@ -95,6 +95,8 @@ class Game extends React.Component {
     this.state = {
       currentDeck: this.createDeck(),
       board: [],
+      round: 'preFlop',
+      turn: 1,
     }
     this.dealCards = this.dealCards.bind(this);
   }
@@ -142,14 +144,71 @@ class Game extends React.Component {
     return divCards;
   }
 
+  bet(playerTurn){
+    const maxMoney = this.props.money;
+    const raiseTimes = 5;
+    const raiseMult = maxMoney / 10;
+    let turnIndex = playerTurn - 1;
+    const player = this.state.playerList[turnIndex];
+    let moneyList = this.state.moneyList.slice();
+    let money = moneyList[turnIndex];
+    let turnChoice;
+    let turnChoices = this.state.turnChoices.slice();
+    let currentBet = this.state.bet;
+    let pot = this.state.pot;
+    if(player === 'cpu'){
+      let choice = Math.floor(Math.random * 2);
+      switch (choice) {
+        case 0:
+          //Check / Call
+          if(currentBet === 0){
+            turnChoice = 'Check';
+          }
+          if(money < currentBet){
+            pot += money;
+            turnChoice = 'All In';
+          } else {
+            pot += currentBet;
+            money -= currentBet;
+            turnChoice = 'Call';
+          }
+          break;
+        case 1:
+          //Raise
+          let amt = Math.floor(Math.random() * raiseTimes) * raiseMult;
+          if(amt > money){
+            pot += money;
+            money = 0;
+            turnChoice = 'All In';
+          } else {
+            pot += amt;
+            money -= amt;
+            turnChoice = 'Raise';
+          }
+          break;
+        case 2:
+          //Fold
+          turnChoice = 'Fold';
+          break;
+        default:
+          break;
+      }
+      moneyList[turnIndex] = money;
+      turnChoices[turnIndex] = turnChoice;
+      this.setState({
+        playerList: playerList,
+        moneyList: moneyList,
+        turnChoices: turnChoices,
+      });
+    }
+  }
+
   componentDidMount(){
     let hands = [];
     const players = this.props.players;
     for(let i = 0; i < players; i++){
       hands.push(this.createCards(this.dealCards(2), false));
-      console.log(hands[i]);
     }
-    const board = this.createCards(this.dealCards(5), false);
     const deck = this.createCards(this.state.currentDeck, true);
     this.setState({
       p1: hands[0],
@@ -157,23 +216,52 @@ class Game extends React.Component {
       p3: hands[2],
       p4: hands[3],
       deck: deck,
-      board: board,
     });
   }
 
+  componentDidUpdate(){
+    this.handleTurn();
+  }
+
   handleTurn(){
+    let board = this.state.board;
+    let turn = this.state.turn;
+    let players = this.state.players;
+    let round = this.state.round;
+    if(turn < players) {
+      turn ++;
+    } else {
+      turn = 1;
+    }
     switch (round) {
       case 'preFlop' :
+        this.bet(turn);
+        round = 'flop';
         break;
       case 'flop' :
+        board.push(this.createCards(this.dealCards(3), false));
+        this.bet(turn);
+        round = 'river';
         break;
       case 'river' :
+        board.push(this.createCards(this.dealCards(1), false));
+        this.bet(turn);
+        round = 'turn';
         break;
       case 'turn' :
+        board.push(this.createCards(this.dealCards(1), false));
+        this.bet(turn);
+        round = null;
         break;
       default :
+        this.endRound();
+        round = 'preFlop';
       break;
     }
+    this.setState({
+      board: board,
+      round: round,
+    });
   }
 
   render(){
@@ -209,8 +297,10 @@ class Player extends React.Component {
     const player = this.props.player;
     const hand = this.props.hand;
     const money = this.props.money;
+    const title = this.props.title;
     return (
       <div className='playerArea'>
+        <span>{title ? title : null}</span>
         <span>Player {player}</span>
         <div className='playerInfo'>{money}</div>
         <div className='cardHolder'>{hand}</div>
