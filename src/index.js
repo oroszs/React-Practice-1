@@ -19,8 +19,8 @@ class Menu extends React.Component{
     super (props);
     this.state = {
       game: false,
-      players: 2,
-      money: 500,
+      players: 4,
+      money: 1000,
     }
   }
 
@@ -37,10 +37,10 @@ class Menu extends React.Component{
     if(p > 2){
       p --;
     }
-
     this.setState({
       players: p,
     });
+    this.list(p);
   }
 
   more() {
@@ -50,6 +50,17 @@ class Menu extends React.Component{
     }
     this.setState({
       players: p,
+    });
+    this.list(p);
+  }
+
+  list(p){
+    let list = [];
+    for(let i = 0; i < p; i++){
+      list.push('cpu');
+    }
+    this.setState({
+      playerList: list,
     });
   }
 
@@ -64,12 +75,15 @@ class Menu extends React.Component{
   componentDidMount(){
     let el = document.getElementById('moneySlider');
     el.value = this.state.money;
+    let p = this.state.players;
+    this.list(p);
   }
 
   render() {
     const gameStart = this.state.game;
     const p = this.state.players;
     let val = this.state.money;
+    const playerList = this.state.playerList;
     return(
       <div>
         <div id='menu'>
@@ -83,7 +97,7 @@ class Menu extends React.Component{
             <button className='pNum' onClick={() => this.more()}>&gt;</button>
           </div>
         </div>
-        {gameStart ? <Game players={p} money={val}/> : null}
+        {gameStart ? <Game players={p} money={val} playerList={playerList}/> : null}
       </div>
     );
   }
@@ -92,11 +106,19 @@ class Menu extends React.Component{
 class Game extends React.Component {
   constructor(props){
     super(props);
+    let list = [];
+    for(let i = 0; i < props.players; i++){
+      list.push(props.money);
+    }
     this.state = {
       currentDeck: this.createDeck(),
       board: [],
       round: 'preFlop',
       turn: 1,
+      moneyList: list,
+      turnChoices: Array(4).fill(null),
+      bet: 0,
+      pot: 0,
     }
     this.dealCards = this.dealCards.bind(this);
   }
@@ -132,8 +154,8 @@ class Game extends React.Component {
     let divCards = [];
     for(let x = 0; x < cards.length; x++){
       divCards.push(
-        <div className='cardContainer' >
-          <div className={deck ? 'deckCard' : 'card'} key={cards[x]} >
+        <div className='cardContainer' key={cards[x]} >
+          <div className={deck ? 'deckCard' : 'card'} >
             {cards[x].includes('\u2665') || cards[x].includes('\u2666') ?
             <div className={deck ? 'deckCardText' : 'cardText'}>{cards[x].split(' ')[0]} <span style={{color: 'red'}}>{cards[x].split(' ')[1]}</span></div> :
             <div className={deck ? 'deckCardText' : 'cardText'}>{cards[x]}</div>}
@@ -146,18 +168,19 @@ class Game extends React.Component {
 
   bet(playerTurn){
     const maxMoney = this.props.money;
-    const raiseTimes = 5;
+    const raiseTimes = 4;
     const raiseMult = maxMoney / 10;
     let turnIndex = playerTurn - 1;
-    const player = this.state.playerList[turnIndex];
-    let moneyList = this.state.moneyList.slice();
+    const player = this.props.playerList[turnIndex];
+    let moneyList = this.state.moneyList;
     let money = moneyList[turnIndex];
     let turnChoice;
-    let turnChoices = this.state.turnChoices.slice();
+    let turnChoices = this.state.turnChoices;
     let currentBet = this.state.bet;
+    console.log(`state bet: ${currentBet}`);
     let pot = this.state.pot;
     if(player === 'cpu'){
-      let choice = Math.floor(Math.random * 2);
+      let choice = Math.floor(Math.random() * 3);
       switch (choice) {
         case 0:
           //Check / Call
@@ -167,7 +190,7 @@ class Game extends React.Component {
           if(money < currentBet){
             pot += money;
             turnChoice = 'All In';
-          } else {
+          } if(currentBet > 0 && money > currentBet) {
             pot += currentBet;
             money -= currentBet;
             turnChoice = 'Call';
@@ -175,16 +198,19 @@ class Game extends React.Component {
           break;
         case 1:
           //Raise
-          let amt = Math.floor(Math.random() * raiseTimes) * raiseMult;
+          let amt = (Math.floor(Math.random() * raiseTimes) + 1) * raiseMult;
           if(amt > money){
+            currentBet = money;
             pot += money;
             money = 0;
             turnChoice = 'All In';
           } else {
+            currentBet = amt;
             pot += amt;
             money -= amt;
             turnChoice = 'Raise';
           }
+          console.log(`tmp bet: ${currentBet}`);
           break;
         case 2:
           //Fold
@@ -193,14 +219,17 @@ class Game extends React.Component {
         default:
           break;
       }
+      console.log(`choice: ${turnChoice}, money: ${money}`);
       moneyList[turnIndex] = money;
       turnChoices[turnIndex] = turnChoice;
       this.setState({
-        playerList: playerList,
         moneyList: moneyList,
         turnChoices: turnChoices,
+        pot: pot,
+        bet: currentBet,
       });
     }
+    console.log(`Pot: ${pot}`);
   }
 
   componentDidMount(){
@@ -217,25 +246,28 @@ class Game extends React.Component {
       p4: hands[3],
       deck: deck,
     });
-  }
 
-  componentDidUpdate(){
     this.handleTurn();
+    console.log(this.state.turnChoices);
   }
 
   handleTurn(){
     let board = this.state.board;
     let turn = this.state.turn;
-    let players = this.state.players;
+    const players = this.props.players;
     let round = this.state.round;
-    if(turn < players) {
-      turn ++;
-    } else {
-      turn = 1;
-    }
+    let turnNum = 0;
     switch (round) {
-      case 'preFlop' :
-        this.bet(turn);
+      case 'preFlop' : 
+        while(turnNum < players){
+          this.bet(turn);
+          turnNum++;
+          if(turn < players){
+            turn++;
+          } else {
+            turn = 1;
+          }
+        }
         round = 'flop';
         break;
       case 'flop' :
@@ -264,6 +296,10 @@ class Game extends React.Component {
     });
   }
 
+  endRound(){
+
+  }
+
   render(){
     const board = this.state.board;
     const p1 = this.state.p1;
@@ -271,16 +307,17 @@ class Game extends React.Component {
     const p3 = this.state.p3;
     const p4 = this.state.p4;
     const deck = this.state.deck;
+    const moneyList = this.state.moneyList;
     return(
       <div>
         <div id='cardDisplay'>
           <div id='board' className='cardHolder'>{board}</div>
           <div id='deckDisplay' className='cardHolder'>{deck}</div>
           <div id='playersArea'>
-              {p1 ? <Player player='1' hand={p1} money={this.props.money}/> : null}
-              {p2 ? <Player player='2' hand={p2} money={this.props.money}/> : null}    
-              {p3 ? <Player player='3' hand={p3} money={this.props.money}/> : null}
-              {p4 ? <Player player='4' hand={p4} money={this.props.money}/> : null}        
+              {p1 ? <Player player='1' hand={p1} money={moneyList[0]}/> : null}
+              {p2 ? <Player player='2' hand={p2} money={moneyList[1]}/> : null}    
+              {p3 ? <Player player='3' hand={p3} money={moneyList[2]}/> : null}
+              {p4 ? <Player player='4' hand={p4} money={moneyList[3]}/> : null}        
           </div>
         </div>
       </div>
@@ -289,9 +326,6 @@ class Game extends React.Component {
 }
 
 class Player extends React.Component {
-  constructor (props){
-    super (props);
-  }
 
   render(){
     const player = this.props.player;
