@@ -66,7 +66,7 @@ class Menu extends React.Component{
 
   getVal(){
     let el = document.getElementById('moneySlider');
-    let val = el.value;
+    let val = parseInt(el.value);
     this.setState({
       money: val,
     });
@@ -177,8 +177,9 @@ class Game extends React.Component {
     let turnChoice;
     let turnChoices = this.state.turnChoices;
     let currentBet = this.state.bet;
-    console.log(`state bet: ${currentBet}`);
     let pot = this.state.pot;
+    let amt;
+    console.log(`Pot: ${pot}, Ante: ${currentBet}`);
     if(player === 'cpu'){
       let choice = Math.floor(Math.random() * 3);
       switch (choice) {
@@ -198,19 +199,19 @@ class Game extends React.Component {
           break;
         case 1:
           //Raise
-          let amt = (Math.floor(Math.random() * raiseTimes) + 1) * raiseMult;
-          if(amt > money){
+          amt = (Math.floor(Math.random() * raiseTimes) + 1) * raiseMult;
+          if((currentBet + amt) > money){
             currentBet = money;
+            amt = money - currentBet;
             pot += money;
             money = 0;
             turnChoice = 'All In';
           } else {
-            currentBet = amt;
-            pot += amt;
-            money -= amt;
+            currentBet += amt;
+            pot += currentBet;
+            money -= currentBet;
             turnChoice = 'Raise';
           }
-          console.log(`tmp bet: ${currentBet}`);
           break;
         case 2:
           //Fold
@@ -219,7 +220,7 @@ class Game extends React.Component {
         default:
           break;
       }
-      console.log(`choice: ${turnChoice}, money: ${money}`);
+      amt ? console.log(`Player ${turnIndex + 1} choice: ${turnChoice} ${amt}`) : console.log(`Player ${turnIndex + 1} choice: ${turnChoice}`);
       moneyList[turnIndex] = money;
       turnChoices[turnIndex] = turnChoice;
       this.setState({
@@ -229,7 +230,6 @@ class Game extends React.Component {
         bet: currentBet,
       });
     }
-    console.log(`Pot: ${pot}`);
   }
 
   componentDidMount(){
@@ -248,7 +248,7 @@ class Game extends React.Component {
     });
 
     this.handleTurn();
-    console.log(this.state.turnChoices);
+
   }
 
   handleTurn(){
@@ -259,15 +259,18 @@ class Game extends React.Component {
     let turnNum = 0;
     switch (round) {
       case 'preFlop' : 
-        while(turnNum < players){
-          this.bet(turn);
-          turnNum++;
-          if(turn < players){
-            turn++;
-          } else {
-            turn = 1;
-          }
-        }
+          let id = setInterval(() => {
+            if(turnNum === players - 1){
+              clearInterval(id);
+            }
+            this.bet(turn);
+            turnNum++;
+            if(turn < players){
+              turn++;
+            } else {
+              turn = 1;
+            }
+          }, 1000);
         round = 'flop';
         break;
       case 'flop' :
