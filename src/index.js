@@ -116,7 +116,7 @@ class Game extends React.Component {
       round: 'preFlop',
       turn: 1,
       moneyList: list,
-      turnChoices: Array(4).fill('Thinking'),
+      turnChoices: Array(props.players).fill('Thinking'),
       bet: 0,
       pot: 0,
       contributions: [0, 0, 0, 0],
@@ -235,20 +235,22 @@ class Game extends React.Component {
             } else {
               if (lastBet !== turnIndex) {
                 lastBet = turnIndex;
-                  turnAmt = (Math.floor(Math.random() * raiseTimes) + 1) * raiseMult;
-                  if((diff + turnAmt) > money){
-                    ante += money;
+                  let raise = (Math.floor(Math.random() * raiseTimes) + 1) * raiseMult;
+                  if((diff + raise) > money){
+                    raise = (money - diff);
+                    ante += raise;
                     turnAmt = money;
                     pot += money;
                     money = 0;
                     turnChoice = 'Raise All In';
                     roundAmt += turnAmt;
                   } else {
-                    ante += turnAmt;
-                    pot += (diff + turnAmt);
-                    money -= (diff + turnAmt);
+                    ante += raise;
+                    turnAmt = diff + raise;
+                    pot += turnAmt;
+                    money -= turnAmt;
                     turnChoice = 'Raise';
-                    roundAmt += (diff + turnAmt);
+                    roundAmt += turnAmt;
                   }
               } else {
                 turnChoice = 'Check';
