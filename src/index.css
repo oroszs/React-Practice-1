@@ -103,6 +103,19 @@
   left: 50%;
   transform: translate(-50%, 0);
 }
+#pot{
+  position: absolute;
+  top: 45%;
+  left: 50%;
+  transform: translate(-50%, -45%);
+  width: 30%;
+  height: 100px;
+  background:rgb(103, 255, 148);
+  border: solid black 2px;
+  border-radius: 5px;
+  box-shadow: black 5px 5px 5px;
+  line-height: 100px;
+}
 #deckDisplay{
   position: absolute;
   top: 45%;

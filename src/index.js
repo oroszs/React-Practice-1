@@ -116,9 +116,11 @@ class Game extends React.Component {
       round: 'preFlop',
       turn: 1,
       moneyList: list,
-      turnChoices: Array(4).fill(null),
+      turnChoices: Array(4).fill('Thinking'),
       bet: 0,
       pot: 0,
+      contributions: [0, 0, 0, 0],
+      lastBet: null,
     }
     this.dealCards = this.dealCards.bind(this);
   }
@@ -174,60 +176,97 @@ class Game extends React.Component {
     const player = this.props.playerList[turnIndex];
     let moneyList = this.state.moneyList;
     let money = moneyList[turnIndex];
-    let turnChoice;
+    let cons = this.state.contributions;
+    let roundAmt = cons[turnIndex];
+    let turnAmt = 0;
     let turnChoices = this.state.turnChoices;
-    let currentBet = this.state.bet;
+    let turnChoice = turnChoices[turnIndex];
+    let ante = this.state.bet;
     let pot = this.state.pot;
-    let amt;
-    console.log(`Pot: ${pot}, Ante: ${currentBet}`);
+    let diff = ante - roundAmt;
+    let lastBet = this.state.lastBet;
+    console.log(`Player: ${playerTurn} - Total: ${roundAmt}, Ante: ${ante}, Diff: ${diff}`);
+
     if(player === 'cpu'){
-      let choice = Math.floor(Math.random() * 3);
-      switch (choice) {
-        case 0:
-          //Check / Call
-          if(currentBet === 0){
-            turnChoice = 'Check';
-          }
-          if(money < currentBet){
-            pot += money;
-            turnChoice = 'All In';
-          } if(currentBet > 0 && money > currentBet) {
-            pot += currentBet;
-            money -= currentBet;
-            turnChoice = 'Call';
-          }
-          break;
-        case 1:
-          //Raise
-          amt = (Math.floor(Math.random() * raiseTimes) + 1) * raiseMult;
-          if((currentBet + amt) > money){
-            currentBet = money;
-            amt = money - currentBet;
-            pot += money;
-            money = 0;
-            turnChoice = 'All In';
-          } else {
-            currentBet += amt;
-            pot += currentBet;
-            money -= currentBet;
-            turnChoice = 'Raise';
-          }
-          break;
-        case 2:
-          //Fold
-          turnChoice = 'Fold';
-          break;
-        default:
-          break;
+      if(diff === 0 && turnChoice !== 'Fold' && turnChoice !== 'Good'){
+        if(turnChoice === 'Check' || turnChoice === 'Call'){
+          turnChoice = 'Good';
+        }
       }
-      amt ? console.log(`Player ${turnIndex + 1} choice: ${turnChoice} ${amt}`) : console.log(`Player ${turnIndex + 1} choice: ${turnChoice}`);
+      if(diff !== 0 && turnChoice !== 'Fold'){
+        turnChoice = '';
+      }
+      if(turnChoice !== 'Good' && turnChoice !== 'Fold'){
+        let choice = Math.floor(Math.random() * 3);
+        switch (choice) {
+          case 0:
+            //Check / Call
+            if(diff === 0){
+              turnChoice = 'Check';
+            }
+            else if(money <= diff){
+              turnAmt = money;
+              pot += money;
+              money = 0;
+              turnChoice = 'Call';
+              ante += turnAmt;
+            } else if(diff > 0 && money > diff) {
+              pot += diff;
+              money -= diff;
+              turnChoice = 'Call';
+              turnAmt = diff;
+            }
+            break;
+          case 1:
+            //Raise
+            if(money === 0){
+              if(diff === 0){
+                turnChoice = 'Check';
+              } else {
+                turnChoice = 'Call';
+              }
+            } else if (lastBet !== turnIndex) {
+              lastBet = turnIndex;
+                turnAmt = (Math.floor(Math.random() * raiseTimes) + 1) * raiseMult;
+                if((diff + turnAmt) > money){
+                  ante += money;
+                  turnAmt = money;
+                  pot += money;
+                  money = 0;
+                  turnChoice = 'Raise All In';
+                } else {
+                  ante += turnAmt;
+                  pot += turnAmt;
+                  money -= (diff + turnAmt);
+                  turnChoice = 'Raise';
+                }
+              }
+            break;
+          case 2:
+            //Fold
+            if(diff === 0){
+              turnChoice = 'Check';
+            } else {
+              turnChoice = 'Fold';
+            }
+            break;
+          default:
+            break;
+        }
+      }
       moneyList[turnIndex] = money;
       turnChoices[turnIndex] = turnChoice;
+      roundAmt += turnAmt;
+      diff = ante - turnAmt;
+      console.log(`${turnChoice} ${turnAmt} Diff: ${diff}`);
+      cons[turnIndex] = roundAmt;
       this.setState({
         moneyList: moneyList,
         turnChoices: turnChoices,
         pot: pot,
-        bet: currentBet,
+        bet: ante,
+        contributions: cons,
+        lastBet: lastBet,
       });
     }
   }
@@ -252,25 +291,33 @@ class Game extends React.Component {
   }
 
   handleTurn(){
+    let turnTime = 1;
+    turnTime *= 1000;
     let board = this.state.board;
     let turn = this.state.turn;
     const players = this.props.players;
     let round = this.state.round;
-    let turnNum = 0;
     switch (round) {
       case 'preFlop' : 
           let id = setInterval(() => {
-            if(turnNum === players - 1){
+            const choices = this.state.turnChoices;
+            let stopTheRound= true;
+            choices.forEach((choice) => {
+              if(choice !== 'Good' && choice !== 'Fold'){
+                stopTheRound = false;
+              }
+            });
+            if(stopTheRound){
               clearInterval(id);
+              return;
             }
             this.bet(turn);
-            turnNum++;
             if(turn < players){
               turn++;
             } else {
               turn = 1;
             }
-          }, 1000);
+          }, turnTime);
         round = 'flop';
         break;
       case 'flop' :
@@ -304,6 +351,7 @@ class Game extends React.Component {
   }
 
   render(){
+    const showDeck = false;
     const board = this.state.board;
     const p1 = this.state.p1;
     const p2 = this.state.p2;
@@ -311,16 +359,20 @@ class Game extends React.Component {
     const p4 = this.state.p4;
     const deck = this.state.deck;
     const moneyList = this.state.moneyList;
+    const pot = this.state.pot;
+    const ante = this.state.bet;
+    const choices = this.state.turnChoices;
     return(
       <div>
         <div id='cardDisplay'>
           <div id='board' className='cardHolder'>{board}</div>
-          <div id='deckDisplay' className='cardHolder'>{deck}</div>
+          {showDeck ? <div id='deckDisplay' className='cardHolder'>{deck}</div> : null}
+          <div id='pot'>Pot: {pot} Ante: {ante}</div>
           <div id='playersArea'>
-              {p1 ? <Player player='1' hand={p1} money={moneyList[0]}/> : null}
-              {p2 ? <Player player='2' hand={p2} money={moneyList[1]}/> : null}    
-              {p3 ? <Player player='3' hand={p3} money={moneyList[2]}/> : null}
-              {p4 ? <Player player='4' hand={p4} money={moneyList[3]}/> : null}        
+              {p1 ? <Player player='1' hand={p1} money={moneyList[0]} choice={choices[0]}/> : null}
+              {p2 ? <Player player='2' hand={p2} money={moneyList[1]} choice={choices[1]}/> : null}    
+              {p3 ? <Player player='3' hand={p3} money={moneyList[2]} choice={choices[2]}/> : null}
+              {p4 ? <Player player='4' hand={p4} money={moneyList[3]} choice={choices[3]}/> : null}        
           </div>
         </div>
       </div>
@@ -335,10 +387,12 @@ class Player extends React.Component {
     const hand = this.props.hand;
     const money = this.props.money;
     const title = this.props.title;
+    const choice = this.props.choice;
     return (
       <div className='playerArea'>
         <span>{title ? title : null}</span>
-        <span>Player {player}</span>
+        <span style={{display: 'block'}}>Player {player}</span>
+        <span>{choice}</span>
         <div className='playerInfo'>{money}</div>
         <div className='cardHolder'>{hand}</div>
       </div>
