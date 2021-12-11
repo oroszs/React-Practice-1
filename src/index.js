@@ -188,6 +188,13 @@ class Game extends React.Component {
     console.log(`Player: ${playerTurn} - Total: ${roundAmt}, Ante: ${ante}, Diff: ${diff}`);
 
     if(player === 'cpu'){
+      if(money === 0){
+        if(diff > 0){
+          turnChoice = 'Fold';
+        } else {
+          turnChoice = 'Check';
+        }
+      }
       if(diff === 0 && turnChoice !== 'Fold' && turnChoice !== 'Good'){
         if(turnChoice === 'Check' || turnChoice === 'Call'){
           turnChoice = 'Good';
@@ -216,16 +223,11 @@ class Game extends React.Component {
               turnChoice = 'Call';
               turnAmt = diff;
             }
+            roundAmt += turnAmt;
             break;
           case 1:
             //Raise
-            if(money === 0){
-              if(diff === 0){
-                turnChoice = 'Check';
-              } else {
-                turnChoice = 'Call';
-              }
-            } else if (lastBet !== turnIndex) {
+            if (lastBet !== turnIndex) {
               lastBet = turnIndex;
                 turnAmt = (Math.floor(Math.random() * raiseTimes) + 1) * raiseMult;
                 if((diff + turnAmt) > money){
@@ -236,11 +238,13 @@ class Game extends React.Component {
                   turnChoice = 'Raise All In';
                 } else {
                   ante += turnAmt;
-                  pot += turnAmt;
+                  pot += (diff + turnAmt);
                   money -= (diff + turnAmt);
                   turnChoice = 'Raise';
                 }
-              }
+            } else {
+              turnChoice = 'Check';
+            }
             break;
           case 2:
             //Fold
@@ -256,8 +260,7 @@ class Game extends React.Component {
       }
       moneyList[turnIndex] = money;
       turnChoices[turnIndex] = turnChoice;
-      roundAmt += turnAmt;
-      diff = ante - turnAmt;
+      diff = ante - roundAmt;
       console.log(`${turnChoice} ${turnAmt} Diff: ${diff}`);
       cons[turnIndex] = roundAmt;
       this.setState({
