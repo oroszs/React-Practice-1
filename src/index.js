@@ -216,7 +216,6 @@ class Game extends React.Component {
               pot += money;
               money = 0;
               turnChoice = 'Call';
-              ante += turnAmt;
             } else if(diff > 0 && money > diff) {
               pot += diff;
               money -= diff;
@@ -227,25 +226,33 @@ class Game extends React.Component {
             break;
           case 1:
             //Raise
-            if (lastBet !== turnIndex) {
-              lastBet = turnIndex;
-                turnAmt = (Math.floor(Math.random() * raiseTimes) + 1) * raiseMult;
-                if((diff + turnAmt) > money){
-                  ante += money;
-                  turnAmt = money;
-                  pot += money;
-                  money = 0;
-                  turnChoice = 'Raise All In';
-                  roundAmt += turnAmt;
-                } else {
-                  ante += turnAmt;
-                  pot += (diff + turnAmt);
-                  money -= (diff + turnAmt);
-                  turnChoice = 'Raise';
-                  roundAmt += (diff + turnAmt);
-                }
+            if(diff > 0 && diff === money){
+              turnChoice = 'Call';
+              turnAmt = money;
+              pot += money;
+              money = 0;
+              roundAmt += turnAmt;
             } else {
-              turnChoice = 'Check';
+              if (lastBet !== turnIndex) {
+                lastBet = turnIndex;
+                  turnAmt = (Math.floor(Math.random() * raiseTimes) + 1) * raiseMult;
+                  if((diff + turnAmt) > money){
+                    ante += money;
+                    turnAmt = money;
+                    pot += money;
+                    money = 0;
+                    turnChoice = 'Raise All In';
+                    roundAmt += turnAmt;
+                  } else {
+                    ante += turnAmt;
+                    pot += (diff + turnAmt);
+                    money -= (diff + turnAmt);
+                    turnChoice = 'Raise';
+                    roundAmt += (diff + turnAmt);
+                  }
+              } else {
+                turnChoice = 'Check';
+              }
             }
             break;
           case 2:
