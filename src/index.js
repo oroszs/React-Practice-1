@@ -236,11 +236,13 @@ class Game extends React.Component {
                   pot += money;
                   money = 0;
                   turnChoice = 'Raise All In';
+                  roundAmt += turnAmt;
                 } else {
                   ante += turnAmt;
                   pot += (diff + turnAmt);
                   money -= (diff + turnAmt);
                   turnChoice = 'Raise';
+                  roundAmt += (diff + turnAmt);
                 }
             } else {
               turnChoice = 'Check';
