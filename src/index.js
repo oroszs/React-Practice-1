@@ -338,6 +338,7 @@ class Game extends React.Component {
         break;
 
       case 'flop' :
+        board.push(this.createCards(this.dealCards(3)), false);
         id = setInterval(() => {
           const choices = this.state.turnChoices;
           let stopTheRound= true;
@@ -355,13 +356,13 @@ class Game extends React.Component {
             });
             return;
           }
-          board.push(this.createCards(this.dealCards(3)), false);
           this.bet(turn);
           (turn < players) ? turn++ : turn = 1;
         }, turnTime);
         break;
 
       case 'river' :
+        board.push(this.createCards(this.dealCards(1)), false);
         id = setInterval(() => {
           const choices = this.state.turnChoices;
           let stopTheRound= true;
@@ -379,13 +380,13 @@ class Game extends React.Component {
             });
             return;
           }
-          board.push(this.createCards(this.dealCards(1)), false);
           this.bet(turn);
           (turn < players) ? turn++ : turn = 1;
         }, turnTime);
         break;
 
       case 'turn' :
+        board.push(this.createCards(this.dealCards(1)), false);
         id = setInterval(() => {
           const choices = this.state.turnChoices;
           let stopTheRound= true;
@@ -403,7 +404,6 @@ class Game extends React.Component {
             });
             return;
           }
-          board.push(this.createCards(this.dealCards(1)), false);
           this.bet(turn);
           (turn < players) ? turn++ : turn = 1;
         }, turnTime);
