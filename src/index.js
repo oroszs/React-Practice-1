@@ -121,6 +121,7 @@ class Game extends React.Component {
       pot: 0,
       contributions: [0, 0, 0, 0],
       lastBet: null,
+      pause: true,
     }
     this.dealCards = this.dealCards.bind(this);
   }
@@ -286,7 +287,7 @@ class Game extends React.Component {
   }
 
   componentDidMount(){
-    let hands = [];
+    let hands = []; 
     const players = this.props.players;
     for(let i = 0; i < players; i++){
       hands.push(this.createCards(this.dealCards(2), false));
@@ -299,10 +300,6 @@ class Game extends React.Component {
       p4: hands[3],
       deck: deck,
     });
-
-    for(let rounds = 1; rounds < 6; rounds++){
-      this.handleTurn();
-    }
   }
 
   handleTurn(){
@@ -313,6 +310,9 @@ class Game extends React.Component {
     const players = this.props.players;
     let round = this.state.round;
     let id;
+    this.setState({
+      pause: false,
+    })
     switch (round) {
       case 'preFlop' : 
           id = setInterval(() => {
@@ -328,6 +328,7 @@ class Game extends React.Component {
               clearInterval(id);
               this.setState({
                 round: 'flop',
+                pause: true,
               });
               return;
             }
@@ -350,6 +351,7 @@ class Game extends React.Component {
             clearInterval(id);
             this.setState({
               round: 'river',
+              pause: true,
             });
             return;
           }
@@ -373,6 +375,7 @@ class Game extends React.Component {
             clearInterval(id);
             this.setState({
               round: 'turn',
+              pause: true,
             });
             return;
           }
@@ -396,6 +399,7 @@ class Game extends React.Component {
             clearInterval(id);
             this.setState({
               round: null,
+              pause: true,
             });
             return;
           }
@@ -456,9 +460,11 @@ class Game extends React.Component {
     const pot = this.state.pot;
     const ante = this.state.bet;
     const choices = this.state.turnChoices;
+    const paused = this.state.pause;
     return(
       <div>
         <div id='cardDisplay'>
+          {paused ? <button id='startRoundButton' onClick={()=>{this.handleTurn()}}>Start Round</button> : null}
           <div id='board' className='cardHolder'>{board}</div>
           {showDeck ? <div id='deckDisplay' className='cardHolder'>{deck}</div> : null}
           <div id='pot'>Pot: {pot} Ante: {ante}</div>
