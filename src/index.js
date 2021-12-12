@@ -300,8 +300,9 @@ class Game extends React.Component {
       deck: deck,
     });
 
-    this.handleTurn();
-
+    for(let rounds = 1; rounds < 6; rounds++){
+      this.handleTurn();
+    }
   }
 
   handleTurn(){
@@ -311,9 +312,10 @@ class Game extends React.Component {
     let turn = this.state.turn;
     const players = this.props.players;
     let round = this.state.round;
+    let id;
     switch (round) {
       case 'preFlop' : 
-          let id = setInterval(() => {
+          id = setInterval(() => {
             const choices = this.state.turnChoices;
             let stopTheRound= true;
             choices.forEach((choice) => {
@@ -322,33 +324,87 @@ class Game extends React.Component {
               }
             });
             if(stopTheRound){
+              this.endBettingRound();
               clearInterval(id);
+              this.setState({
+                round: 'flop',
+              });
               return;
             }
             this.bet(turn);
-            if(turn < players){
-              turn++;
-            } else {
-              turn = 1;
-            }
+            (turn < players) ? turn++ : turn = 1;
           }, turnTime);
-        round = 'flop';
         break;
+
       case 'flop' :
-        board.push(this.createCards(this.dealCards(3), false));
-        this.bet(turn);
-        round = 'river';
+        id = setInterval(() => {
+          const choices = this.state.turnChoices;
+          let stopTheRound= true;
+          choices.forEach((choice) => {
+            if(choice !== 'Good' && choice !== 'Fold'){
+              stopTheRound = false;
+            }
+          });
+          if(stopTheRound){
+            this.endBettingRound();
+            clearInterval(id);
+            this.setState({
+              round: 'river',
+            });
+            return;
+          }
+          board.push(this.createCards(this.dealCards(3)), false);
+          this.bet(turn);
+          (turn < players) ? turn++ : turn = 1;
+        }, turnTime);
         break;
+
       case 'river' :
-        board.push(this.createCards(this.dealCards(1), false));
-        this.bet(turn);
-        round = 'turn';
+        id = setInterval(() => {
+          const choices = this.state.turnChoices;
+          let stopTheRound= true;
+          choices.forEach((choice) => {
+            if(choice !== 'Good' && choice !== 'Fold'){
+              stopTheRound = false;
+            }
+          });
+          if(stopTheRound){
+            this.endBettingRound();
+            clearInterval(id);
+            this.setState({
+              round: 'turn',
+            });
+            return;
+          }
+          board.push(this.createCards(this.dealCards(1)), false);
+          this.bet(turn);
+          (turn < players) ? turn++ : turn = 1;
+        }, turnTime);
         break;
+
       case 'turn' :
-        board.push(this.createCards(this.dealCards(1), false));
-        this.bet(turn);
-        round = null;
+        id = setInterval(() => {
+          const choices = this.state.turnChoices;
+          let stopTheRound= true;
+          choices.forEach((choice) => {
+            if(choice !== 'Good' && choice !== 'Fold'){
+              stopTheRound = false;
+            }
+          });
+          if(stopTheRound){
+            this.endBettingRound();
+            clearInterval(id);
+            this.setState({
+              round: null,
+            });
+            return;
+          }
+          board.push(this.createCards(this.dealCards(1)), false);
+          this.bet(turn);
+          (turn < players) ? turn++ : turn = 1;
+        }, turnTime);
         break;
+
       default :
         this.endRound();
         round = 'preFlop';
@@ -360,8 +416,32 @@ class Game extends React.Component {
     });
   }
 
-  endRound(){
+  endBettingRound(){
+    let choices = this.state.turnChoices;
+    let pot = this.state.pot;
+    let bet = this.state.bet;
+    let con = this.state.contributions;
+    let last = this.state.lastBet;
+    const players = this.props.players;
+    let turn = this.state.turn;
+    choices = Array(players).fill('Thinking');
+    pot = 0;
+    bet = 0;
+    con = Array(players).fill(0);
+    last = null;
+    turn = 1;
+    this.setState({
+      turnChoices: choices,
+      pot: pot,
+      bet: bet,
+      contributions: con,
+      lastBet: last,
+      turn: turn,
+    });
+  }
 
+  endRound(){
+    console.log('Round Over!');
   }
 
   render(){
