@@ -124,7 +124,7 @@ class Game extends React.Component {
       lastBet: null,
       pause: true,
       blindTitles: Array(props.players).fill(null),
-      activePlayers = Array(props.players).fill('Active'),
+      activePlayers: Array(props.players).fill('Active'),
     }
     this.dealCards = this.dealCards.bind(this);
   }
@@ -189,12 +189,19 @@ class Game extends React.Component {
     let pot = this.state.pot;
     let diff = ante - roundAmt;
     let lastBet = this.state.lastBet;
-    console.log(`Player: ${playerTurn} - Total: ${roundAmt}, Ante: ${ante}, Diff: ${diff}`);
+    let actives = this.state.activePlayers;
+    let status = actives[turnIndex];
+    console.log(`Player: ${playerTurn} (${status}) - Total: ${roundAmt}, Ante: ${ante}, Diff: ${diff}`);
 
     if(player === 'cpu'){
+      if(status === 'Inactive') {
+        turnChoice = 'Fold';
+      }
       if(money === 0){
-        if(diff > 0){
+        if(diff > 0 && status === 'Active'){
           turnChoice = 'Fold';
+          status = 'Inactive';
+          actives[turnIndex] = status;
         } else {
           turnChoice = 'Check';
         }
@@ -267,6 +274,8 @@ class Game extends React.Component {
               turnChoice = 'Check';
             } else {
               turnChoice = 'Fold';
+              status = 'Inactive';
+              actives[turnIndex] = status;
             }
             break;
           default:
@@ -285,6 +294,7 @@ class Game extends React.Component {
         bet: ante,
         contributions: cons,
         lastBet: lastBet,
+        activePlayers: actives,
       });
     }
   }
@@ -313,8 +323,8 @@ class Game extends React.Component {
     const players = this.props.players;
     let round = this.state.round;
     let id;
-    const dealer = this.state.dealer;
-    const dealerIndex = dealer - 1;
+    let dealer = this.state.dealer;
+    let dealerIndex = dealer - 1;
     const playerIndex = players - 1;
     let blindTitles = this.state.blindTitles;
     const actives = this.state.activePlayers;
@@ -323,46 +333,54 @@ class Game extends React.Component {
       if(player === 'Active'){
         activeNum ++;
       }
-
     });
     this.setState({
       pause: false,
-    })
+    });
     switch (round) {
       case 'blinds' :
-        let blindIndex;
-        if(activeNum === 2){
-          blindTitles[dealerIndex] = 'Dealer / Small Blind';
-          for(let x = 1; x < players; x++){
-            blindIndex = dealerIndex + x;
-            if(blindIndex > playerIndex){
-              blindIndex -= players;
-            }
-            if(blindTitles[blindIndex] === 'Active'){
-              blindTitles[blindIndex] = 'Big Blind';
-              return;
-            }
-          }
-        } else {
-            let small = false;
-            blindTitles[dealerIndex] = 'Dealer';
+        let blinds = false;
+        setTimeout(() => {
+          let blindIndex;
+          if(activeNum === 2){
+            blindTitles[dealerIndex] = 'Dealer / Small Blind';
             for(let x = 1; x < players; x++){
               blindIndex = dealerIndex + x;
-              if(blindIndex > playerIndex) {
+              if(blindIndex > playerIndex){
                 blindIndex -= players;
               }
-              if(blindTitles[blindIndex] === 'Active'){
-                if(!small){
-                  blindTitles[blindIndex] = 'Small Blind';
-                  small = true;
-                } else {
-                  blindTitles[blindIndex] = 'Big Blind';
-                  round = 'preFlop';
-                  return;
-                }
+              if(actives[blindIndex] === 'Active' && !blinds){
+                blindTitles[blindIndex] = 'Big Blind';
+                round = 'preFlop';
+                blinds = true;
               }
             }
-        }
+          } else {
+              let small = false;
+              blindTitles[dealerIndex] = 'Dealer';
+              for(let x = 1; x < players; x++){
+                blindIndex = dealerIndex + x;
+                if(blindIndex > playerIndex) {
+                  blindIndex -= players;
+                }
+                if(actives[blindIndex] === 'Active' && !blinds){
+                  if(!small){
+                    blindTitles[blindIndex] = 'Small Blind';
+                    small = true;
+                  } else {
+                    blindTitles[blindIndex] = 'Big Blind';
+                    round = 'preFlop';
+                    blinds = true;
+                  }
+                }
+              }
+          }
+          this.setState({
+            blindTitles: blindTitles,
+            round: round,
+            pause: true,
+          });
+        }, turnTime);
         break;
 
       case 'preFlop' : 
@@ -377,6 +395,7 @@ class Game extends React.Component {
             if(stopTheRound){
               this.endBettingRound();
               clearInterval(id);
+              board.push(this.createCards(this.dealCards(3)), false);
               this.setState({
                 round: 'flop',
                 pause: true,
@@ -389,7 +408,6 @@ class Game extends React.Component {
         break;
 
       case 'flop' :
-        board.push(this.createCards(this.dealCards(3)), false);
         id = setInterval(() => {
           const choices = this.state.turnChoices;
           let stopTheRound = true;
@@ -401,6 +419,7 @@ class Game extends React.Component {
           if(stopTheRound){
             this.endBettingRound();
             clearInterval(id);
+            board.push(this.createCards(this.dealCards(1)), false);
             this.setState({
               round: 'river',
               pause: true,
@@ -413,7 +432,6 @@ class Game extends React.Component {
         break;
 
       case 'river' :
-        board.push(this.createCards(this.dealCards(1)), false);
         id = setInterval(() => {
           const choices = this.state.turnChoices;
           let stopTheRound = true;
@@ -425,6 +443,7 @@ class Game extends React.Component {
           if(stopTheRound){
             this.endBettingRound();
             clearInterval(id);
+            board.push(this.createCards(this.dealCards(1)), false);
             this.setState({
               round: 'turn',
               pause: true,
@@ -437,7 +456,6 @@ class Game extends React.Component {
         break;
 
       case 'turn' :
-        board.push(this.createCards(this.dealCards(1)), false);
         id = setInterval(() => {
           const choices = this.state.turnChoices;
           let stopTheRound = true;
@@ -461,33 +479,44 @@ class Game extends React.Component {
         break;
 
       default :
+      setTimeout(() => {
         this.endRound();
-        round = 'preFlop';
+        let nextDealerIndex;
+        for(let x = 1; x < players; x++){
+          nextDealerIndex = dealerIndex + x;
+          if(nextDealerIndex >  playerIndex){
+            nextDealerIndex -= players;
+          }
+          if(actives[nextDealerIndex] === 'Active'){
+            dealer = nextDealerIndex + 1;
+            round = 'blinds';
+            this.setState({
+              round: round,
+              dealer: dealer,
+              turn: dealer,
+            });
+            return;
+          }
+        }
+      }, turnTime);
       break;
     }
-    this.setState({
-      board: board,
-      round: round,
-    });
   }
 
   endBettingRound(){
     let choices = this.state.turnChoices;
-    let pot = this.state.pot;
     let bet = this.state.bet;
     let con = this.state.contributions;
     let last = this.state.lastBet;
     const players = this.props.players;
     let turn = this.state.turn;
     choices = Array(players).fill('Thinking');
-    pot = 0;
     bet = 0;
     con = Array(players).fill(0);
     last = null;
     turn = 1;
     this.setState({
       turnChoices: choices,
-      pot: pot,
       bet: bet,
       contributions: con,
       lastBet: last,
@@ -543,7 +572,7 @@ class Player extends React.Component {
     const blind = this.props.blindTitle;
     return (
       <div>
-        <span id='blindTitle'>{blind}</span>
+        {blind ? <span className='blindTitle'>{blind}</span> : null}
         <div className='playerArea'>
           <span>{title ? title : null}</span>
           <span style={{display: 'block'}}>Player {player}</span>

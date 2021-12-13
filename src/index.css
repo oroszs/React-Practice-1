@@ -75,7 +75,7 @@
 }
 #startRoundButton{
   position: absolute;
-  top: 50%;
+  top: 37.5%;
   left: 50%;
   transform: translate(-50%, -50%);
   z-index: 50;
@@ -116,12 +116,12 @@
   left: 50%;
   transform: translate(-50%, -45%);
   width: 30%;
-  height: 100px;
+  height: 50px;
   background:rgb(103, 255, 148);
   border: solid black 2px;
   border-radius: 5px;
   box-shadow: black 5px 5px 5px;
-  line-height: 100px;
+  line-height: 50px;
 }
 #deckDisplay{
   position: absolute;
@@ -139,7 +139,7 @@
 #playersArea{
   display: flex;
   flex-direction: row;
-  align-items: center;
+  align-items: flex-end;
   justify-content: space-evenly;
   font-size: 10pt;
   position: absolute;
@@ -147,17 +147,18 @@
   left: 50%;
   transform: translate(-50%, 0);
   width: 90%;
-  height: 250px;
+  height: 280px;
   background: rgb(136, 185, 136);
   border: solid black 2px;
   border-radius: 5px;
   min-width: 1000px;
 }
-#blindTitle{
-  font-size: 18pt;
+.blindTitle{
+  font-size: 15pt;
   color: black;
   background:rgb(185, 253, 255);
   border-radius: 5px;
+  padding: 5px;
 }
 .playerArea{
   position: relative;
