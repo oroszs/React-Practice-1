@@ -341,7 +341,7 @@ class Game extends React.Component {
         board.push(this.createCards(this.dealCards(3)), false);
         id = setInterval(() => {
           const choices = this.state.turnChoices;
-          let stopTheRound= true;
+          let stopTheRound = true;
           choices.forEach((choice) => {
             if(choice !== 'Good' && choice !== 'Fold'){
               stopTheRound = false;
@@ -365,7 +365,7 @@ class Game extends React.Component {
         board.push(this.createCards(this.dealCards(1)), false);
         id = setInterval(() => {
           const choices = this.state.turnChoices;
-          let stopTheRound= true;
+          let stopTheRound = true;
           choices.forEach((choice) => {
             if(choice !== 'Good' && choice !== 'Fold'){
               stopTheRound = false;
@@ -389,7 +389,7 @@ class Game extends React.Component {
         board.push(this.createCards(this.dealCards(1)), false);
         id = setInterval(() => {
           const choices = this.state.turnChoices;
-          let stopTheRound= true;
+          let stopTheRound = true;
           choices.forEach((choice) => {
             if(choice !== 'Good' && choice !== 'Fold'){
               stopTheRound = false;
