@@ -153,6 +153,12 @@
   border-radius: 5px;
   min-width: 1000px;
 }
+#blindTitle{
+  font-size: 18pt;
+  color: black;
+  background:rgb(185, 253, 255);
+  border-radius: 5px;
+}
 .playerArea{
   position: relative;
   width: 200px;

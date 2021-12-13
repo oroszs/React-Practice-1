@@ -113,8 +113,9 @@ class Game extends React.Component {
     this.state = {
       currentDeck: this.createDeck(),
       board: [],
-      round: 'preFlop',
+      round: 'blinds',
       turn: 1,
+      dealer: 1,
       moneyList: list,
       turnChoices: Array(props.players).fill('Thinking'),
       bet: 0,
@@ -122,6 +123,8 @@ class Game extends React.Component {
       contributions: [0, 0, 0, 0],
       lastBet: null,
       pause: true,
+      blindTitles: Array(props.players).fill(null),
+      activePlayers = Array(props.players).fill('Active'),
     }
     this.dealCards = this.dealCards.bind(this);
   }
@@ -310,10 +313,58 @@ class Game extends React.Component {
     const players = this.props.players;
     let round = this.state.round;
     let id;
+    const dealer = this.state.dealer;
+    const dealerIndex = dealer - 1;
+    const playerIndex = players - 1;
+    let blindTitles = this.state.blindTitles;
+    const actives = this.state.activePlayers;
+    let activeNum = 0;
+    actives.forEach(player => {
+      if(player === 'Active'){
+        activeNum ++;
+      }
+
+    });
     this.setState({
       pause: false,
     })
     switch (round) {
+      case 'blinds' :
+        let blindIndex;
+        if(activeNum === 2){
+          blindTitles[dealerIndex] = 'Dealer / Small Blind';
+          for(let x = 1; x < players; x++){
+            blindIndex = dealerIndex + x;
+            if(blindIndex > playerIndex){
+              blindIndex -= players;
+            }
+            if(blindTitles[blindIndex] === 'Active'){
+              blindTitles[blindIndex] = 'Big Blind';
+              return;
+            }
+          }
+        } else {
+            let small = false;
+            blindTitles[dealerIndex] = 'Dealer';
+            for(let x = 1; x < players; x++){
+              blindIndex = dealerIndex + x;
+              if(blindIndex > playerIndex) {
+                blindIndex -= players;
+              }
+              if(blindTitles[blindIndex] === 'Active'){
+                if(!small){
+                  blindTitles[blindIndex] = 'Small Blind';
+                  small = true;
+                } else {
+                  blindTitles[blindIndex] = 'Big Blind';
+                  round = 'preFlop';
+                  return;
+                }
+              }
+            }
+        }
+        break;
+
       case 'preFlop' : 
           id = setInterval(() => {
             const choices = this.state.turnChoices;
@@ -461,6 +512,7 @@ class Game extends React.Component {
     const ante = this.state.bet;
     const choices = this.state.turnChoices;
     const paused = this.state.pause;
+    const blindTitles = this.state.blindTitles;
     return(
       <div>
         <div id='cardDisplay'>
@@ -469,10 +521,10 @@ class Game extends React.Component {
           {showDeck ? <div id='deckDisplay' className='cardHolder'>{deck}</div> : null}
           <div id='pot'>Pot: {pot} Ante: {ante}</div>
           <div id='playersArea'>
-              {p1 ? <Player player='1' hand={p1} money={moneyList[0]} choice={choices[0]}/> : null}
-              {p2 ? <Player player='2' hand={p2} money={moneyList[1]} choice={choices[1]}/> : null}    
-              {p3 ? <Player player='3' hand={p3} money={moneyList[2]} choice={choices[2]}/> : null}
-              {p4 ? <Player player='4' hand={p4} money={moneyList[3]} choice={choices[3]}/> : null}        
+              {p1 ? <Player player='1' hand={p1} money={moneyList[0]} choice={choices[0]} blindTitle={blindTitles[0]}/> : null}
+              {p2 ? <Player player='2' hand={p2} money={moneyList[1]} choice={choices[1]} blindTitle={blindTitles[1]}/> : null}    
+              {p3 ? <Player player='3' hand={p3} money={moneyList[2]} choice={choices[2]} blindTitle={blindTitles[2]}/> : null}
+              {p4 ? <Player player='4' hand={p4} money={moneyList[3]} choice={choices[3]} blindTitle={blindTitles[3]}/> : null}        
           </div>
         </div>
       </div>
@@ -488,13 +540,17 @@ class Player extends React.Component {
     const money = this.props.money;
     const title = this.props.title;
     const choice = this.props.choice;
+    const blind = this.props.blindTitle;
     return (
-      <div className='playerArea'>
-        <span>{title ? title : null}</span>
-        <span style={{display: 'block'}}>Player {player}</span>
-        <span>{choice}</span>
-        <div className='playerInfo'>{money}</div>
-        <div className='cardHolder'>{hand}</div>
+      <div>
+        <span id='blindTitle'>{blind}</span>
+        <div className='playerArea'>
+          <span>{title ? title : null}</span>
+          <span style={{display: 'block'}}>Player {player}</span>
+          <span>{choice}</span>
+          <div className='playerInfo'>{money}</div>
+          <div className='cardHolder'>{hand}</div>
+        </div>
       </div>
     );
   }
