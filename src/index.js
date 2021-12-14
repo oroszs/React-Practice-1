@@ -323,6 +323,7 @@ class Game extends React.Component {
     turnTime *= 1000;
     let board = this.state.board;
     let turn = this.state.turn;
+    let turnIndex = turn - 1;
     let round = this.state.round;
     let id;
     let dealer = this.state.dealer;
@@ -334,6 +335,7 @@ class Game extends React.Component {
     });
     switch (round) {
       case 'blinds' :
+        //TODO blinds go to the left of the dealer, not the right
         setTimeout(() => {
           if(actives.length === 2){
             blindTitles[actives[actives.indexOf(dealerIndex)]] = 'Dealer / Small Blind';
@@ -385,7 +387,7 @@ class Game extends React.Component {
               return;
             }
             this.bet(turn);
-            (turn < actives.length) ? turn++ : turn = actives[0];
+            turn = this.findNextTurn(turn);
           }, turnTime);
         break;
 
@@ -409,7 +411,7 @@ class Game extends React.Component {
             return;
           }
           this.bet(turn);
-          (turn < actives.length) ? turn++ : turn = actives[0];
+          turn = this.findNextTurn(turn);
         }, turnTime);
         break;
 
@@ -433,7 +435,7 @@ class Game extends React.Component {
             return;
           }
           this.bet(turn);
-          (turn < actives.length) ? turn++ : turn = actives[0];
+          turn = this.findNextTurn(turn);
         }, turnTime);
         break;
 
@@ -456,7 +458,7 @@ class Game extends React.Component {
             return;
           }
           this.bet(turn);
-          (turn < actives.length) ? turn++ : turn = actives[0];
+          turn = this.findNextTurn(turn);
         }, turnTime);
         break;
 
@@ -474,11 +476,18 @@ class Game extends React.Component {
         this.setState({
           round: round,
           dealer: dealer,
+          //TODO set turn properly here
           turn: dealer,
         });
       }, turnTime);
       break;
     }
+  }
+
+  findNextTurn(turn){
+    let turnIndex = turn - 1;
+    (actives.indexOf(turnIndex) < actives.length - 1) ? turnIndex = actives[actives.indexOf(turnIndex + 1)] : turnIndex = actives[0];
+    return turnIndex + 1;
   }
 
   endBettingRound(){
