@@ -199,18 +199,13 @@ class Game extends React.Component {
     let diff = ante - roundAmt;
     let lastBet = this.state.lastBet;
     let actives = this.state.activePlayers;
-    let status = actives[turnIndex];
     console.log(`Player: ${playerTurn} (${status}) - Total: ${roundAmt}, Ante: ${ante}, Diff: ${diff}`);
 
     if(player === 'cpu'){
-      if(status === 'Inactive') {
-        turnChoice = 'Fold';
-      }
       if(money === 0){
-        if(diff > 0 && status === 'Active'){
+        if(diff > 0){
           turnChoice = 'Fold';
-          status = 'Inactive';
-          actives[turnIndex] = status;
+          actives.splice(actives.indexOf(turnIndex), 1);
         } else {
           turnChoice = 'Check';
         }
@@ -283,8 +278,7 @@ class Game extends React.Component {
               turnChoice = 'Check';
             } else {
               turnChoice = 'Fold';
-              status = 'Inactive';
-              actives[turnIndex] = status;
+              actives.splice(actives.indexOf(turnIndex), 1);
             }
             break;
           default:
@@ -329,23 +323,20 @@ class Game extends React.Component {
     turnTime *= 1000;
     let board = this.state.board;
     let turn = this.state.turn;
-    const players = this.props.players;
     let round = this.state.round;
     let id;
     let dealer = this.state.dealer;
     let dealerIndex = dealer - 1;
-    const playerIndex = players - 1;
     let blindTitles = this.state.blindTitles;
     const actives = this.state.activePlayers;
-    let activeNum = actives.length;
     this.setState({
       pause: false,
     });
     switch (round) {
       case 'blinds' :
         setTimeout(() => {
-          if(activeNum === 2){
-            blindTitles[actives[dealerIndex]] = 'Dealer / Small Blind';
+          if(actives.length === 2){
+            blindTitles[actives[actives.indexOf(dealerIndex)]] = 'Dealer / Small Blind';
             if(actives.indexOf(dealerIndex) === actives.length - 1){
               blindTitles[actives[0]] = 'Big Blind';
             } else {
@@ -353,7 +344,7 @@ class Game extends React.Component {
             }
             round = 'preFlop';
           } else {
-              blindTitles[actives[dealerIndex]] = 'Dealer';
+              blindTitles[actives[actives.indexOf(dealerIndex)]] = 'Dealer';
               let smallIndex = dealerIndex + 1;
               let bigIndex = dealerIndex + 2;
               if(smallIndex > actives.length - 1){
@@ -362,8 +353,8 @@ class Game extends React.Component {
               if(bigIndex > actives.length - 1){
                 bigIndex -= actives.length;
               }
-              blindTitles[actives[smallIndex]] = 'Small Blind';
-              blindTitles[actives[bigIndex]] = 'Big Blind';
+              blindTitles[actives[actives.indexOf(smallIndex)]] = 'Small Blind';
+              blindTitles[actives[actives.indexOf(bigIndex)]] = 'Big Blind';
               round = 'preFlop';
           }
           this.setState({
@@ -501,6 +492,7 @@ class Game extends React.Component {
     bet = 0;
     con = Array(players).fill(0);
     last = null;
+    //TODO track UTG and set back to that player
     turn = 1;
     this.setState({
       turnChoices: choices,
