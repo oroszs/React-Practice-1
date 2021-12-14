@@ -107,8 +107,10 @@ class Game extends React.Component {
   constructor(props){
     super(props);
     let list = [];
+    let actives = [];
     for(let i = 0; i < props.players; i++){
       list.push(props.money);
+      actives.push(i);
     }
     this.state = {
       currentDeck: this.createDeck(),
@@ -124,7 +126,7 @@ class Game extends React.Component {
       lastBet: null,
       pause: true,
       blindTitles: Array(props.players).fill(null),
-      activePlayers: [0, 1, 2, 3],
+      activePlayers: actives,
     }
     this.dealCards = this.dealCards.bind(this);
   }
@@ -328,52 +330,34 @@ class Game extends React.Component {
     const playerIndex = players - 1;
     let blindTitles = this.state.blindTitles;
     const actives = this.state.activePlayers;
-    let activeNum = 0;
-    actives.forEach(player => {
-      if(player === 'Active'){
-        activeNum ++;
-      }
-    });
+    let activeNum = actives.length;
     this.setState({
       pause: false,
     });
     switch (round) {
       case 'blinds' :
-        let blinds = false;
         setTimeout(() => {
-          let blindIndex;
           if(activeNum === 2){
-            blindTitles[dealerIndex] = 'Dealer / Small Blind';
-            for(let x = 1; x < players; x++){
-              blindIndex = dealerIndex + x;
-              if(blindIndex > playerIndex){
-                blindIndex -= players;
-              }
-              if(actives[blindIndex] === 'Active' && !blinds){
-                blindTitles[blindIndex] = 'Big Blind';
-                round = 'preFlop';
-                blinds = true;
-              }
+            blindTitles[actives[dealerIndex]] = 'Dealer / Small Blind';
+            if(actives.indexOf(dealerIndex) === actives.length - 1){
+              blindTitles[actives[0]] = 'Big Blind';
+            } else {
+              blindTitles[actives[dealerIndex + 1]] = 'Big Blind';
             }
+            round = 'preFlop';
           } else {
-              let small = false;
-              blindTitles[dealerIndex] = 'Dealer';
-              for(let x = 1; x < players; x++){
-                blindIndex = dealerIndex + x;
-                if(blindIndex > playerIndex) {
-                  blindIndex -= players;
-                }
-                if(actives[blindIndex] === 'Active' && !blinds){
-                  if(!small){
-                    blindTitles[blindIndex] = 'Small Blind';
-                    small = true;
-                  } else {
-                    blindTitles[blindIndex] = 'Big Blind';
-                    round = 'preFlop';
-                    blinds = true;
-                  }
-                }
+              blindTitles[actives[dealerIndex]] = 'Dealer';
+              let smallIndex = dealerIndex + 1;
+              let bigIndex = dealerIndex + 2;
+              if(smallIndex > actives.length - 1){
+                smallIndex -= actives.length;
               }
+              if(bigIndex > actives.length - 1){
+                bigIndex -= actives.length;
+              }
+              blindTitles[actives[smallIndex]] = 'Small Blind';
+              blindTitles[actives[bigIndex]] = 'Big Blind';
+              round = 'preFlop';
           }
           this.setState({
             blindTitles: blindTitles,
