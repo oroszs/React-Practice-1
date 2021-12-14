@@ -106,17 +106,24 @@ class Menu extends React.Component{
 class Game extends React.Component {
   constructor(props){
     super(props);
-    let list = [];
+    let list = Array(props.players).fill(props.money);
     let actives = [];
+    let turn;
+    if(props.players === 2) {
+      turn = 1;
+    } else if (props.players === 3){
+      turn = 1;
+    } else if (props.players === 4){
+      turn = 4;
+    }
     for(let i = 0; i < props.players; i++){
-      list.push(props.money);
       actives.push(i);
     }
     this.state = {
       currentDeck: this.createDeck(),
       board: [],
       round: 'blinds',
-      turn: 1,
+      turn: turn,
       dealer: 1,
       moneyList: list,
       turnChoices: Array(props.players).fill('Thinking'),
@@ -387,35 +394,11 @@ class Game extends React.Component {
               return;
             }
             this.bet(turn);
-            (turn < players) ? turn++ : turn = 1;
+            (turn < actives.length) ? turn++ : turn = actives[0];
           }, turnTime);
         break;
 
       case 'flop' :
-        id = setInterval(() => {
-          const choices = this.state.turnChoices;
-          let stopTheRound = true;
-          choices.forEach((choice) => {
-            if(choice !== 'Good' && choice !== 'Fold'){
-              stopTheRound = false;
-            }
-          });
-          if(stopTheRound){
-            this.endBettingRound();
-            clearInterval(id);
-            board.push(this.createCards(this.dealCards(1)), false);
-            this.setState({
-              round: 'river',
-              pause: true,
-            });
-            return;
-          }
-          this.bet(turn);
-          (turn < players) ? turn++ : turn = 1;
-        }, turnTime);
-        break;
-
-      case 'river' :
         id = setInterval(() => {
           const choices = this.state.turnChoices;
           let stopTheRound = true;
@@ -435,11 +418,35 @@ class Game extends React.Component {
             return;
           }
           this.bet(turn);
-          (turn < players) ? turn++ : turn = 1;
+          (turn < actives.length) ? turn++ : turn = actives[0];
         }, turnTime);
         break;
 
       case 'turn' :
+        id = setInterval(() => {
+          const choices = this.state.turnChoices;
+          let stopTheRound = true;
+          choices.forEach((choice) => {
+            if(choice !== 'Good' && choice !== 'Fold'){
+              stopTheRound = false;
+            }
+          });
+          if(stopTheRound){
+            this.endBettingRound();
+            clearInterval(id);
+            board.push(this.createCards(this.dealCards(1)), false);
+            this.setState({
+              round: 'river',
+              pause: true,
+            });
+            return;
+          }
+          this.bet(turn);
+          (turn < actives.length) ? turn++ : turn = actives[0];
+        }, turnTime);
+        break;
+
+      case 'river' :
         id = setInterval(() => {
           const choices = this.state.turnChoices;
           let stopTheRound = true;
@@ -458,7 +465,7 @@ class Game extends React.Component {
             return;
           }
           this.bet(turn);
-          (turn < players) ? turn++ : turn = 1;
+          (turn < actives.length) ? turn++ : turn = actives[0];
         }, turnTime);
         break;
 
@@ -466,22 +473,18 @@ class Game extends React.Component {
       setTimeout(() => {
         this.endRound();
         let nextDealerIndex;
-        for(let x = 1; x < players; x++){
-          nextDealerIndex = dealerIndex + x;
-          if(nextDealerIndex >  playerIndex){
-            nextDealerIndex -= players;
-          }
-          if(actives[nextDealerIndex] === 'Active'){
-            dealer = nextDealerIndex + 1;
-            round = 'blinds';
-            this.setState({
-              round: round,
-              dealer: dealer,
-              turn: dealer,
-            });
-            return;
-          }
+        if(actives.indexOf(dealerIndex) === actives.length - 1){
+          nextDealerIndex = actives[0];
+        } else {
+          nextDealerIndex = actives[actives.indexOf(dealerIndex) + 1];
         }
+        dealer = nextDealerIndex + 1;
+        round = 'blinds';
+        this.setState({
+          round: round,
+          dealer: dealer,
+          turn: dealer,
+        });
       }, turnTime);
       break;
     }
