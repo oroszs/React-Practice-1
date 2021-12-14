@@ -124,7 +124,7 @@ class Game extends React.Component {
       lastBet: null,
       pause: true,
       blindTitles: Array(props.players).fill(null),
-      activePlayers: Array(props.players).fill('Active'),
+      activePlayers: [0, 1, 2, 3],
     }
     this.dealCards = this.dealCards.bind(this);
   }
