@@ -323,7 +323,6 @@ class Game extends React.Component {
     turnTime *= 1000;
     let board = this.state.board;
     let turn = this.state.turn;
-    let turnIndex = turn - 1;
     let round = this.state.round;
     let id;
     let dealer = this.state.dealer;
@@ -335,25 +334,24 @@ class Game extends React.Component {
     });
     switch (round) {
       case 'blinds' :
-        //TODO blinds go to the left of the dealer, not the right
         setTimeout(() => {
           if(actives.length === 2){
             blindTitles[actives[actives.indexOf(dealerIndex)]] = 'Dealer / Small Blind';
-            if(actives.indexOf(dealerIndex) === actives.length - 1){
-              blindTitles[actives[0]] = 'Big Blind';
+            if(actives.indexOf(dealerIndex) === 0){
+              blindTitles[actives[actives.length - 1]] = 'Big Blind';
             } else {
-              blindTitles[actives[dealerIndex + 1]] = 'Big Blind';
+              blindTitles[actives[dealerIndex - 1]] = 'Big Blind';
             }
             round = 'preFlop';
           } else {
               blindTitles[actives[actives.indexOf(dealerIndex)]] = 'Dealer';
-              let smallIndex = dealerIndex + 1;
-              let bigIndex = dealerIndex + 2;
-              if(smallIndex > actives.length - 1){
-                smallIndex -= actives.length;
+              let smallIndex = dealerIndex - 1;
+              let bigIndex = dealerIndex - 2;
+              if(smallIndex < 0){
+                smallIndex += actives.length;
               }
-              if(bigIndex > actives.length - 1){
-                bigIndex -= actives.length;
+              if(bigIndex < 0){
+                bigIndex += actives.length;
               }
               blindTitles[actives[actives.indexOf(smallIndex)]] = 'Small Blind';
               blindTitles[actives[actives.indexOf(bigIndex)]] = 'Big Blind';
