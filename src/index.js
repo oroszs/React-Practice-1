@@ -114,7 +114,7 @@ class Game extends React.Component {
     } else if (props.players === 3){
       turn = 1;
     } else if (props.players === 4){
-      turn = 4;
+      turn = 2;
     }
     for(let i = 0; i < props.players; i++){
       actives.push(i);
@@ -385,7 +385,13 @@ class Game extends React.Component {
               return;
             }
             this.bet(turn);
-            turn = this.findNextTurn(turn);
+            let flopTurnIndex = actives.indexOf(dealerIndex) - 1;
+            if(flopTurnIndex < 0) {
+              flopTurnIndex = actives[actives.length - 1];
+            } else {
+              flopTurnIndex = actives[actives.indexOf(dealerIndex - 1)];
+            }
+            turn = flopTurnIndex + 1;
           }, turnTime);
         break;
 
@@ -484,7 +490,7 @@ class Game extends React.Component {
 
   findNextTurn(turn){
     let turnIndex = turn - 1;
-    (actives.indexOf(turnIndex) < actives.length - 1) ? turnIndex = actives[actives.indexOf(turnIndex + 1)] : turnIndex = actives[0];
+    (actives.indexOf(turnIndex) === 0) ? turnIndex = actives[actives.length - 1] : turnIndex = actives[actives.indexOf(turnIndex) - 1];
     return turnIndex + 1;
   }
 
