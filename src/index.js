@@ -134,6 +134,7 @@ class Game extends React.Component {
       pause: true,
       blindTitles: Array(props.players).fill(null),
       activePlayers: actives,
+      utgI: null,
     }
     this.dealCards = this.dealCards.bind(this);
   }
@@ -385,13 +386,7 @@ class Game extends React.Component {
               return;
             }
             this.bet(turn);
-            let flopTurnIndex = actives.indexOf(dealerIndex) - 1;
-            if(flopTurnIndex < 0) {
-              flopTurnIndex = actives[actives.length - 1];
-            } else {
-              flopTurnIndex = actives[actives.indexOf(dealerIndex - 1)];
-            }
-            turn = flopTurnIndex + 1;
+            turn = this.findNextTurn();
           }, turnTime);
         break;
 
@@ -469,7 +464,7 @@ class Game extends React.Component {
       default :
       setTimeout(() => {
         this.endRound();
-        let nextDealerIndex;
+        let nextDealerIndex ;
         if(actives.indexOf(dealerIndex) === actives.length - 1){
           nextDealerIndex = actives[0];
         } else {
@@ -500,13 +495,21 @@ class Game extends React.Component {
     let con = this.state.contributions;
     let last = this.state.lastBet;
     const players = this.props.players;
-    let turn = this.state.turn;
+    const round = this.state.round;
     choices = Array(players).fill('Thinking');
     bet = 0;
     con = Array(players).fill(0);
     last = null;
-    //TODO track UTG and set back to that player
-    turn = 1;
+    let utgI = this.state.utgI;
+    let activeIndex;
+    if(round === 'preFlop'){
+      activeIndex = actives.indexOf(dealerIndex) - 1;
+      //utgI = Under The Gun (First Player to bet post-flop) Index
+    } else {
+      activeIndex = actives.indexOf(utgI) - 1;
+    }
+    utgI = (activeIndex < 0) ? actives[actives.length - 1] : actives[actives.indexOf(activeIndex)];
+    turn = utgI + 1;
     this.setState({
       turnChoices: choices,
       bet: bet,
