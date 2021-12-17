@@ -108,16 +108,17 @@ class Game extends React.Component {
     super(props);
     let list = Array(props.players).fill(props.money);
     let actives = [];
+    const dealer = 1;
     for(let i = 0; i < props.players; i++){
       actives.push(i);
     }
-    let turn = this.preFlopFirstTurn(actives);
+    let turn = this.preFlopFirstTurn(actives, dealer);
     this.state = {
       currentDeck: this.createDeck(),
       board: [],
       round: 'blinds',
       turn: turn,
-      dealer: 1,
+      dealer: dealer,
       moneyList: list,
       turnChoices: Array(props.players).fill('Thinking'),
       bet: 0,
@@ -133,16 +134,25 @@ class Game extends React.Component {
     this.dealCards = this.dealCards.bind(this);
   }
 
-  preFlopFirstTurn(actives) {
+  preFlopFirstTurn(actives, dealer) {
     const x = actives.length;
     let turn;
     if(x === 2) {
-      turn = 1;
+      turn = dealer;
     } else if (x === 3){
-      turn = 1;
+      turn = dealer;
     } else if (x === 4){
-      turn = 2;
+      if(dealer < x) {
+        let tempTurn = dealer + 1;
+        turn = actives[actives.indexOf(tempTurn - 1)];
+        turn++;
+      } else {
+        let tempTurn = 1;
+        turn = actives[actives.indexOf(tempTurn - 1)];
+        turn++;
+      }
     }
+    console.log(`Turn: ${turn}`);
     return turn;
   }
 
@@ -333,7 +343,7 @@ class Game extends React.Component {
   }
 
   handleTurn(){
-    let turnTime = 1;
+    let turnTime = .5;
     turnTime *= 1000;
     let board = this.state.board;
     let turn = this.state.turn;
@@ -359,8 +369,8 @@ class Game extends React.Component {
             round = 'preFlop';
           } else {
               blindTitles[actives[actives.indexOf(dealerIndex)]] = 'Dealer';
-              let smallIndex = dealerIndex - 1;
-              let bigIndex = dealerIndex - 2;
+              let smallIndex = actives.indexOf(dealerIndex) - 1;
+              let bigIndex = actives.indexOf(dealerIndex) - 2;
               if(smallIndex < 0){
                 smallIndex += actives.length;
               }
@@ -497,9 +507,10 @@ class Game extends React.Component {
         actives.push(x);
       }
     }
+    console.log(`Active Players: ${actives}`);
     const currentDealer = this.state.dealer;
     const nextDealer = this.findNextTurn(currentDealer, actives);
-    const turn = this.preFlopFirstTurn(actives);
+    const turn = this.preFlopFirstTurn(actives, nextDealer);
     const round = 'blinds';
     const nullArray = Array(4).fill(null);
     const choices = Array(4).fill('Thinking');
@@ -513,7 +524,7 @@ class Game extends React.Component {
       bet: 0,
       pot: 0,
       lastBet: null,
-      contributions: nullArray,
+      contributions: Array(4).fill(0),
       blindTitles: nullArray,
       turnChoices: choices,
       activePlayers: actives,
