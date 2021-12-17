@@ -516,6 +516,7 @@ class Game extends React.Component {
       contributions: nullArray,
       blindTitles: nullArray,
       turnChoices: choices,
+      activePlayers: actives,
     });
   }
 
