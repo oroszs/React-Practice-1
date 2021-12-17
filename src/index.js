@@ -313,10 +313,14 @@ class Game extends React.Component {
   }
 
   componentDidMount(){
-    let hands = []; 
-    const players = this.props.players;
-    for(let i = 0; i < players; i++){
-      hands.push(this.createCards(this.dealCards(2), false));
+    this.initialDeal();
+  }
+
+  initialDeal(){
+    let hands = Array(4).fill(null);
+    const actives = this.state.activePlayers;
+    for(let x = 0; x < actives.length; x++){
+      hands[actives[x]] = this.createCards(this.dealCards(2), false);
     }
     const deck = this.createCards(this.state.currentDeck, true);
     this.setState({
@@ -478,20 +482,40 @@ class Game extends React.Component {
       setTimeout(() => {
         this.endRound();
       }, turnTime);
+      setTimeout(() => {
+        this.initialDeal();
+      }, turnTime);
       break;
     }
   }
 
   endRound(){
-    let currentDealer = this.state.dealer;
-    let actives = this.state.activePlayers;
-    let nextDealer = this.findNextTurn(currentDealer, actives);
-    let turn = this.preFlopFirstTurn(actives);
-    round = 'blinds';
+    let actives = [];
+    const moneyList = this.state.moneyList;
+    for(let x = 0; x < moneyList.length; x++){
+      if(moneyList[x] > 0){
+        actives.push(x);
+      }
+    }
+    const currentDealer = this.state.dealer;
+    const nextDealer = this.findNextTurn(currentDealer, actives);
+    const turn = this.preFlopFirstTurn(actives);
+    const round = 'blinds';
+    const nullArray = Array(4).fill(null);
+    const choices = Array(4).fill('Thinking');
     this.setState({
       dealer: nextDealer,
       turn: turn,
       round: round,
+      pause: true,
+      currentDeck: this.createDeck(),
+      board: [],
+      bet: 0,
+      pot: 0,
+      lastBet: null,
+      contributions: nullArray,
+      blindTitles: nullArray,
+      turnChoices: choices,
     });
   }
 
