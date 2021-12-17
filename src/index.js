@@ -108,17 +108,10 @@ class Game extends React.Component {
     super(props);
     let list = Array(props.players).fill(props.money);
     let actives = [];
-    let turn;
-    if(props.players === 2) {
-      turn = 1;
-    } else if (props.players === 3){
-      turn = 1;
-    } else if (props.players === 4){
-      turn = 2;
-    }
     for(let i = 0; i < props.players; i++){
       actives.push(i);
     }
+    let turn = this.preFlopFirstTurn(actives);
     this.state = {
       currentDeck: this.createDeck(),
       board: [],
@@ -138,6 +131,19 @@ class Game extends React.Component {
       foldIndex: null,
     }
     this.dealCards = this.dealCards.bind(this);
+  }
+
+  preFlopFirstTurn(actives) {
+    const x = actives.length;
+    let turn;
+    if(x === 2) {
+      turn = 1;
+    } else if (x === 3){
+      turn = 1;
+    } else if (x === 4){
+      turn = 2;
+    }
+    return turn;
   }
 
   createDeck(){
@@ -380,7 +386,7 @@ class Game extends React.Component {
               }
             });
             if(stopTheRound){
-              this.endBettingRound(dealerIndex);
+              this.endBettingRound();
               clearInterval(id);
               board.push(this.createCards(this.dealCards(3)), false);
               this.setState({
@@ -405,7 +411,7 @@ class Game extends React.Component {
             }
           });
           if(stopTheRound){
-            this.endBettingRound(dealerIndex);
+            this.endBettingRound();
             clearInterval(id);
             board.push(this.createCards(this.dealCards(1)), false);
             this.setState({
@@ -430,7 +436,7 @@ class Game extends React.Component {
             }
           });
           if(stopTheRound){
-            this.endBettingRound(dealerIndex);
+            this.endBettingRound();
             clearInterval(id);
             board.push(this.createCards(this.dealCards(1)), false);
             this.setState({
@@ -455,7 +461,7 @@ class Game extends React.Component {
             }
           });
           if(stopTheRound){
-            this.endBettingRound(dealerIndex);
+            this.endBettingRound();
             clearInterval(id);
             this.setState({
               round: null,
@@ -470,26 +476,23 @@ class Game extends React.Component {
 
       default :
       setTimeout(() => {
-        let actives = this.state.activePlayers;
-        //TODO Unfinished end of round code
         this.endRound();
-        let nextDealerIndex;
-        if(actives.indexOf(dealerIndex) === actives.length - 1){
-          nextDealerIndex = actives[0];
-        } else {
-          nextDealerIndex = actives[actives.indexOf(dealerIndex) + 1];
-        }
-        dealer = nextDealerIndex + 1;
-        round = 'blinds';
-        this.setState({
-          round: round,
-          dealer: dealer,
-          //TODO set turn properly here
-          turn: dealer,
-        });
       }, turnTime);
       break;
     }
+  }
+
+  endRound(){
+    let currentDealer = this.state.dealer;
+    let actives = this.state.activePlayers;
+    let nextDealer = this.findNextTurn(currentDealer, actives);
+    let turn = this.preFlopFirstTurn(actives);
+    round = 'blinds';
+    this.setState({
+      dealer: nextDealer,
+      turn: turn,
+      round: round,
+    });
   }
 
   findNextTurn(turn, actives){
@@ -508,7 +511,8 @@ class Game extends React.Component {
     return turnIndex + 1;
   }
 
-  endBettingRound(dealerIndex){
+  endBettingRound(){
+    let dealerIndex = this.state.dealer - 1;
     let choices = this.state.turnChoices;
     let bet = this.state.bet;
     let con = this.state.contributions;
@@ -541,10 +545,6 @@ class Game extends React.Component {
       lastBet: last,
       turn: turn,
     });
-  }
-
-  endRound(){
-    console.log('Round Over!');
   }
 
   render(){
