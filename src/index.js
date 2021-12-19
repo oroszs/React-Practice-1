@@ -129,6 +129,7 @@ class Game extends React.Component {
       contributions: [0, 0, 0, 0],
       lastBet: null,
       pause: true,
+      finish: false,
       blindTitles: Array(props.players).fill(null),
       activePlayers: actives,
       utgI: null,
@@ -361,8 +362,12 @@ class Game extends React.Component {
     let pot = this.state.pot;
     let cons = this.state.contributions;
     let ante = this.state.bet;
+    const actives = this.state.activePlayers;
+    let choices = this.state.turnChoices;
+    actives.forEach((index)=>{choices[index] = 'Thinking'});
     this.setState({
       pause: false,
+      turnChoices: choices,
     });
     switch (round) {
       case 'blinds' :
@@ -440,14 +445,8 @@ class Game extends React.Component {
 
       case 'preFlop' : 
           id = setInterval(() => {
-            const choices = this.state.turnChoices;
             let actives = this.state.activePlayers;
-            let stopTheRound= true;
-            actives.forEach((index) => {
-              if(choices[index] !== 'Good' && choices[index] !== 'Fold'){
-                stopTheRound = false;
-              }
-            });
+            let stopTheRound = this.stopCheck();
             if(stopTheRound){
               this.endBettingRound();
               clearInterval(id);
@@ -466,13 +465,7 @@ class Game extends React.Component {
       case 'flop' :
         id = setInterval(() => {
           let actives = this.state.activePlayers;
-          const choices = this.state.turnChoices;
-          let stopTheRound = true;
-          actives.forEach((index) => {
-            if(choices[index] !== 'Good' && choices[index] !== 'Fold'){
-              stopTheRound = false;
-            }
-          });
+          let stopTheRound = this.stopCheck();
           if(stopTheRound){
             this.endBettingRound();
             clearInterval(id);
@@ -491,13 +484,7 @@ class Game extends React.Component {
       case 'turn' :
         id = setInterval(() => {
           let actives = this.state.activePlayers;
-          const choices = this.state.turnChoices;
-          let stopTheRound = true;
-          actives.forEach((index) => {
-            if(choices[index] !== 'Good' && choices[index] !== 'Fold'){
-              stopTheRound = false;
-            }
-          });
+          let stopTheRound = this.stopCheck();
           if(stopTheRound){
             this.endBettingRound();
             clearInterval(id);
@@ -516,13 +503,7 @@ class Game extends React.Component {
       case 'river' :
         id = setInterval(() => {
           let actives = this.state.activePlayers;
-          const choices = this.state.turnChoices;
-          let stopTheRound = true;
-          actives.forEach((index) => {
-            if(choices[index] !== 'Good' && choices[index] !== 'Fold'){
-              stopTheRound = false;
-            }
-          });
+          let stopTheRound = this.stopCheck();
           if(stopTheRound){
             this.endBettingRound();
             clearInterval(id);
@@ -546,6 +527,17 @@ class Game extends React.Component {
       }, turnTime);
       break;
     }
+  }
+
+  stopCheck(){
+    const actives = this.state.activePlayers;
+    const choices = this.state.turnChoices;
+    actives.forEach((index) => {
+      if(choices[index] !== 'Good' && choices[index] !== 'Fold'){
+        return false;
+      }
+    });
+    return true;
   }
 
   endRound(){
@@ -598,16 +590,12 @@ class Game extends React.Component {
 
   endBettingRound(){
     let dealerIndex = this.state.dealer - 1;
-    let choices = this.state.turnChoices;
     let bet = this.state.bet;
     let con = this.state.contributions;
     let last = this.state.lastBet;
     const players = this.props.players;
     const round = this.state.round;
     const actives = this.state.activePlayers;
-    actives.forEach((index) => {
-      choices[index] = 'Thinking';
-    });
     bet = 0;
     con = Array(players).fill(0);
     last = null;
@@ -624,7 +612,6 @@ class Game extends React.Component {
     utgI = (activeIndex < 0) ? actives[actives.length - 1] : actives[actives.indexOf(activeIndex)];
     turn = utgI + 1;
     this.setState({
-      turnChoices: choices,
       bet: bet,
       contributions: con,
       lastBet: last,
@@ -645,10 +632,12 @@ class Game extends React.Component {
     const ante = this.state.bet;
     const choices = this.state.turnChoices;
     const paused = this.state.pause;
+    const finished = this.state.finish;
     const blindTitles = this.state.blindTitles;
     return(
       <div>
         <div id='cardDisplay'>
+          {finished ? <button id='finishRoundButton' onClick={() => {this.finishRound()}}>Finish Round</button> : null}
           {paused ? <button id='startRoundButton' onClick={()=>{this.handleTurn()}}>Start Round</button> : null}
           <div id='board' className='cardHolder'>{board}</div>
           {showDeck ? <div id='deckDisplay' className='cardHolder'>{deck}</div> : null}
