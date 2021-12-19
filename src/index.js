@@ -360,7 +360,11 @@ class Game extends React.Component {
     let ante = this.state.bet;
     const actives = this.state.activePlayers;
     let choices = this.state.turnChoices;
-    actives.forEach((index)=>{choices[index] = 'Thinking'});
+    actives.forEach((index)=>{
+      if(choices[index] !== 'All In'){
+        choices[index] = 'Thinking';
+      }
+    });
     this.setState({
       pause: false,
       turnChoices: choices,
@@ -376,7 +380,7 @@ class Game extends React.Component {
             if(actives.indexOf(dealerIndex) === 0){
               finalBigIndex = actives[actives.length - 1];
             } else {
-              finalBigIndex = actives[dealerIndex - 1];
+              finalBigIndex = actives[actives.indexOf(dealerIndex - 1)];
             }
             blindTitles[finalSmallIndex] = 'Dealer / Small Blind';
             blindTitles[finalBigIndex] = 'Big Blind';
@@ -446,7 +450,9 @@ class Game extends React.Component {
             if(stopTheRound){
               this.endBettingRound();
               clearInterval(id);
-              board.push(this.createCards(this.dealCards(3)), false);
+              if(!finish) {
+                board.push(this.createCards(this.dealCards(3)), false);
+              }
               this.setState({
                 finish: finish,
                 round: 'flop',
@@ -467,7 +473,7 @@ class Game extends React.Component {
           if(stopTheRound){
             this.endBettingRound();
             clearInterval(id);
-            board.push(this.createCards(this.dealCards(1)), false);
+            if(!finish){board.push(this.createCards(this.dealCards(1)), false);}
             this.setState({
               finish: finish,
               round: 'turn',
@@ -488,7 +494,7 @@ class Game extends React.Component {
           if(stopTheRound){
             this.endBettingRound();
             clearInterval(id);
-            board.push(this.createCards(this.dealCards(1)), false);
+            if(!finish){board.push(this.createCards(this.dealCards(1)), false);}
             this.setState({
               finish: finish,
               round: 'river',
@@ -591,35 +597,44 @@ class Game extends React.Component {
 
   finishRoundEarly(){
     let round = this.state.round;
-    const time = this.props.turnTime;
+    let time = this.props.turnTime;
+    time *= 3;
     let board = this.state.board;
     let but = document.getElementById('finishRoundButton');
     but.style.display = 'none';
-    switch (round) {
-      case 'flop' :
-        setTimeout(() => {
+    const id = setInterval(() => {
+      switch (round) {
+        case 'flop' :
+          board.push(this.createCards(this.dealCards(3)), false);
+          round = 'turn';
+          break;
+        case 'turn' :
           board.push(this.createCards(this.dealCards(1)), false);
-        }, time * 2);
-      case 'turn' :
-        setTimeout(() => {
+          round = 'river';
+          break;
+        case 'river' :
           board.push(this.createCards(this.dealCards(1)), false);
+          let startBut = document.getElementById('startAgain');
+          startBut.style.display = 'block';
           round = null;
-          but.style.display = 'block';
-        }, time * 2);
-        break;
-      default:
-        setTimeout(() => {
-          this.endRound();
-        }, time);
-        setTimeout(() => {
-          this.initialDeal();
-        }, time);
-        break;
-    }
-    this.setState({
-      round: round,
-      finish: false,
-    });
+          break;
+        default:
+          clearInterval(id);
+          break;
+      }
+    }, time);
+  }
+
+  startNextRound(){
+    const time = this.props.turnTime;
+    let startBut = document.getElementById('startAgain');
+    startBut.style.display = 'none';
+    setTimeout(() => {
+      this.endRound();
+    }, time);
+    setTimeout(() => {
+      this.initialDeal();
+    }, time);
   }
 
   findNextTurn(turn, actives){
@@ -684,6 +699,7 @@ class Game extends React.Component {
     return(
       <div>
         <div id='cardDisplay'>
+          <button id='startAgain' onClick={()=>{this.startNextRound()}} style={{display:'none'}}>Start Next Round</button>
           {finished ? <button id='finishRoundButton' onClick={() => {this.finishRoundEarly()}}>Finish Round</button> : null}
           {(paused  && !finished) ? <button id='startRoundButton' onClick={()=>{this.handleTurn()}}>Start Round</button> : null}
           <div id='board' className='cardHolder'>{board}</div>
