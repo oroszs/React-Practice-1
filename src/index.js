@@ -352,6 +352,10 @@ class Game extends React.Component {
     let dealer = this.state.dealer;
     let dealerIndex = dealer - 1;
     let blindTitles = this.state.blindTitles;
+    let moneyList = this.state.moneyList;
+    const big = this.props.bigBlind;
+    const small = this.props.smallBlind;
+    let pot = this.state.pot;
     this.setState({
       pause: false,
     });
@@ -359,13 +363,33 @@ class Game extends React.Component {
       case 'blinds' :
         setTimeout(() => {
           let actives = this.state.activePlayers;
+          let smallIndex;
+          let bigIndex;
           if(actives.length === 2){
-            blindTitles[actives[actives.indexOf(dealerIndex)]] = 'Dealer / Small Blind';
+            smallIndex = actives[actives.indexOf(dealerIndex)];
             if(actives.indexOf(dealerIndex) === 0){
-              blindTitles[actives[actives.length - 1]] = 'Big Blind';
+              bigIndex = actives[actives.length - 1];
             } else {
-              blindTitles[actives[dealerIndex - 1]] = 'Big Blind';
+              bigIndex = actives[dealerIndex - 1];
             }
+
+            if(moneyList[smallIndex] <= small) {
+              pot += moneyList[smallIndex];
+              moneyList[smallIndex] = 0;
+            } else {
+              pot += small;
+              moneyList[smallIndex] -= small;
+            }
+
+            if(moneyList[bigIndex] <= big) {
+              pot += moneyList[bigIndex];
+              moneyList[bigIndex] = 0;
+            } else {
+              pot += big;
+              moneyList[bigIndex] -= big;
+            }
+            blindTitles[smallIndex] = 'Dealer / Small Blind';
+            blindTitles[bigIndex] = 'Big Blind';
             round = 'preFlop';
           } else {
               blindTitles[actives[actives.indexOf(dealerIndex)]] = 'Dealer';
@@ -626,7 +650,7 @@ class Player extends React.Component {
     const choice = this.props.choice;
     const blind = this.props.blindTitle;
     return (
-      <div>
+      <div className = {(choice === 'Fold') ? 'foldFade' : null}>
         {blind ? <span className='blindTitle'>{blind}</span> : null}
         <div className='playerArea'>
           <span>{title ? title : null}</span>
