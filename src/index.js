@@ -84,6 +84,8 @@ class Menu extends React.Component{
     const p = this.state.players;
     let val = this.state.money;
     const playerList = this.state.playerList;
+    const small = (val <= 500 ? 25 : 50);
+    const big = (val <= 500 ? 50 : 100);
     return(
       <div>
         <div id='menu'>
@@ -97,7 +99,7 @@ class Menu extends React.Component{
             <button className='pNum' onClick={() => this.more()}>&gt;</button>
           </div>
         </div>
-        {gameStart ? <Game players={p} money={val} playerList={playerList}/> : null}
+        {gameStart ? <Game players={p} money={val} playerList={playerList} smallBlind={small} bigBlind={big}/> : null}
       </div>
     );
   }
@@ -356,12 +358,15 @@ class Game extends React.Component {
     const big = this.props.bigBlind;
     const small = this.props.smallBlind;
     let pot = this.state.pot;
+    let cons = this.state.contributions;
+    let ante = this.state.bet;
     this.setState({
       pause: false,
     });
     switch (round) {
       case 'blinds' :
         setTimeout(() => {
+          console.log(`Small Blind: ${small}, Big Blind: ${big}`);
           let actives = this.state.activePlayers;
           let finalSmallIndex;
           let finalBigIndex;
@@ -376,8 +381,8 @@ class Game extends React.Component {
             blindTitles[finalBigIndex] = 'Big Blind';
           } else {
               blindTitles[actives[actives.indexOf(dealerIndex)]] = 'Dealer';
-              smallIndex = actives.indexOf(dealerIndex) - 1;
-              bigIndex = actives.indexOf(dealerIndex) - 2;
+              let smallIndex = actives.indexOf(dealerIndex) - 1;
+              let bigIndex = actives.indexOf(dealerIndex) - 2;
               if(smallIndex < 0){
                 smallIndex += actives.length;
               }
@@ -391,17 +396,29 @@ class Game extends React.Component {
           }
 
           if(moneyList[finalSmallIndex] <= small) {
-            pot += moneyList[finalSmallIndex];
+            let amt = moneyList[finalSmallIndex];
+            cons[finalSmallIndex] = amt;
+            ante = amt;
+            pot += amt;
             moneyList[finalSmallIndex] = 0;
           } else {
             pot += small;
             moneyList[finalSmallIndex] -= small;
+            cons[finalSmallIndex] = small;
+            ante = small;
           }
 
           if(moneyList[finalBigIndex] <= big){
-            pot += moneyList[finalBigIndex];
+            let amt = moneyList[finalBigIndex];
+            cons[finalBigIndex] = amt;
+            if(ante < amt) {
+              ante = amt;
+            }
+            pot += amt;
             moneyList[finalBigIndex] = 0;
           } else {
+            cons[finalBigIndex] = big;
+            ante = big;
             pot += big;
             moneyList[finalBigIndex] -= big;
           }
@@ -414,6 +431,8 @@ class Game extends React.Component {
             pause: true,
             moneyList: moneyList,
             pot: pot,
+            contributions: cons,
+            bet: ante,
           });
         }, turnTime);
         break;

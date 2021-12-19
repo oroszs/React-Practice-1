@@ -154,7 +154,7 @@
   min-width: 1000px;
 }
 .blindTitle{
-  font-size: 15pt;
+  font-size: 13pt;
   color: black;
   background:rgb(185, 253, 255);
   border-radius: 5px;
@@ -167,7 +167,6 @@
   background: green;
   flex: none;
   margin: 10px;
-  border: solid black 2px;
   border-radius: 5px;
   padding: 10px;
 }
