@@ -363,52 +363,57 @@ class Game extends React.Component {
       case 'blinds' :
         setTimeout(() => {
           let actives = this.state.activePlayers;
-          let smallIndex;
-          let bigIndex;
+          let finalSmallIndex;
+          let finalBigIndex;
           if(actives.length === 2){
-            smallIndex = actives[actives.indexOf(dealerIndex)];
+            finalSmallIndex = actives[actives.indexOf(dealerIndex)];
             if(actives.indexOf(dealerIndex) === 0){
-              bigIndex = actives[actives.length - 1];
+              finalBigIndex = actives[actives.length - 1];
             } else {
-              bigIndex = actives[dealerIndex - 1];
+              finalBigIndex = actives[dealerIndex - 1];
             }
-
-            if(moneyList[smallIndex] <= small) {
-              pot += moneyList[smallIndex];
-              moneyList[smallIndex] = 0;
-            } else {
-              pot += small;
-              moneyList[smallIndex] -= small;
-            }
-
-            if(moneyList[bigIndex] <= big) {
-              pot += moneyList[bigIndex];
-              moneyList[bigIndex] = 0;
-            } else {
-              pot += big;
-              moneyList[bigIndex] -= big;
-            }
-            blindTitles[smallIndex] = 'Dealer / Small Blind';
-            blindTitles[bigIndex] = 'Big Blind';
-            round = 'preFlop';
+            blindTitles[finalSmallIndex] = 'Dealer / Small Blind';
+            blindTitles[finalBigIndex] = 'Big Blind';
           } else {
               blindTitles[actives[actives.indexOf(dealerIndex)]] = 'Dealer';
-              let smallIndex = actives.indexOf(dealerIndex) - 1;
-              let bigIndex = actives.indexOf(dealerIndex) - 2;
+              smallIndex = actives.indexOf(dealerIndex) - 1;
+              bigIndex = actives.indexOf(dealerIndex) - 2;
               if(smallIndex < 0){
                 smallIndex += actives.length;
               }
               if(bigIndex < 0){
                 bigIndex += actives.length;
               }
-              blindTitles[actives[actives.indexOf(smallIndex)]] = 'Small Blind';
-              blindTitles[actives[actives.indexOf(bigIndex)]] = 'Big Blind';
-              round = 'preFlop';
+              finalSmallIndex = actives[actives.indexOf(smallIndex)];
+              finalBigIndex = actives[actives.indexOf(bigIndex)];
+              blindTitles[finalSmallIndex] = 'Small Blind';
+              blindTitles[finalBigIndex] = 'Big Blind';
           }
+
+          if(moneyList[finalSmallIndex] <= small) {
+            pot += moneyList[finalSmallIndex];
+            moneyList[finalSmallIndex] = 0;
+          } else {
+            pot += small;
+            moneyList[finalSmallIndex] -= small;
+          }
+
+          if(moneyList[finalBigIndex] <= big){
+            pot += moneyList[finalBigIndex];
+            moneyList[finalBigIndex] = 0;
+          } else {
+            pot += big;
+            moneyList[finalBigIndex] -= big;
+          }
+
+          round = 'preFlop';
+
           this.setState({
             blindTitles: blindTitles,
             round: round,
             pause: true,
+            moneyList: moneyList,
+            pot: pot,
           });
         }, turnTime);
         break;
