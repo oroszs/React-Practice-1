@@ -2,8 +2,6 @@ import React from 'react';
 import ReactDOM from 'react-dom';
 import './index.css';
 
-//BRANCH 2
-
 class App extends React.Component {
 
   render() {
@@ -380,7 +378,7 @@ class Game extends React.Component {
             if(actives.indexOf(dealerIndex) === 0){
               finalBigIndex = actives[actives.length - 1];
             } else {
-              finalBigIndex = actives[actives.indexOf(dealerIndex - 1)];
+              finalBigIndex = actives[actives.indexOf(dealerIndex) - 1];
             }
             blindTitles[finalSmallIndex] = 'Dealer / Small Blind';
             blindTitles[finalBigIndex] = 'Big Blind';
@@ -619,9 +617,14 @@ class Game extends React.Component {
           round = null;
           break;
         default:
-          clearInterval(id);
+          setTimeout(() => {
+            clearInterval(id);
+          }, time);
           break;
       }
+      this.setState({
+        board: board,
+      });
     }, time);
   }
 
@@ -699,9 +702,9 @@ class Game extends React.Component {
     return(
       <div>
         <div id='cardDisplay'>
-          <button id='startAgain' onClick={()=>{this.startNextRound()}} style={{display:'none'}}>Start Next Round</button>
-          {finished ? <button id='finishRoundButton' onClick={() => {this.finishRoundEarly()}}>Finish Round</button> : null}
-          {(paused  && !finished) ? <button id='startRoundButton' onClick={()=>{this.handleTurn()}}>Start Round</button> : null}
+          <button id='startAgain' onClick={()=>{this.startNextRound()}} style={{display:'none'}} className='roundButton'>Start Next Round</button>
+          {finished ? <button id='finishRoundButton' onClick={() => {this.finishRoundEarly()}} className='roundButton'>Finish Round</button> : null}
+          {(paused  && !finished) ? <button onClick={()=>{this.handleTurn()}} className='roundButton'>Start Round</button> : null}
           <div id='board' className='cardHolder'>{board}</div>
           {showDeck ? <div id='deckDisplay' className='cardHolder'>{deck}</div> : null}
           <div id='pot'>Pot: {pot} Ante: {ante}</div>
