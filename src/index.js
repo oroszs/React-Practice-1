@@ -19,7 +19,7 @@ class Menu extends React.Component{
     this.state = {
       game: false,
       players: 4,
-      money: 1000,
+      money: 500,
     }
   }
 
@@ -79,6 +79,7 @@ class Menu extends React.Component{
   }
 
   render() {
+    const time = 500;
     const gameStart = this.state.game;
     const p = this.state.players;
     let val = this.state.money;
@@ -98,7 +99,7 @@ class Menu extends React.Component{
             <button className='pNum' onClick={() => this.more()}>&gt;</button>
           </div>
         </div>
-        {gameStart ? <Game players={p} money={val} playerList={playerList} smallBlind={small} bigBlind={big} turnTime={500}/> : null}
+        {gameStart ? <Game players={p} money={val} playerList={playerList} smallBlind={small} bigBlind={big} turnTime={time}/> : null}
       </div>
     );
   }
@@ -259,36 +260,41 @@ class Game extends React.Component {
             break;
           case 1:
             //Raise
-            if(diff > 0 && diff === money){
-              turnChoice = 'All In';
-              turnAmt = money;
-              pot += money;
-              money = 0;
-              roundAmt += turnAmt;
-            } else {
-              if (lastBet !== turnIndex) {
-                lastBet = turnIndex;
-                  let raise = (Math.floor(Math.random() * raiseTimes) + 1) * raiseMult;
-                  if((diff + raise) >= money){
-                    raise = (money - diff);
-                    ante += raise;
-                    turnAmt = money;
-                    pot += money;
-                    money = 0;
-                    turnChoice = 'All In';
-                    roundAmt += turnAmt;
-                  } else {
-                    ante += raise;
-                    turnAmt = diff + raise;
-                    pot += turnAmt;
-                    money -= turnAmt;
-                    turnChoice = 'Raise';
-                    roundAmt += turnAmt;
-                  }
+              if(diff >= money){
+                turnAmt = money;
+                pot += money;
+                money = 0;
+                turnChoice = 'All In';
               } else {
-                turnChoice = 'Check';
-              }
-            }
+                  if (lastBet !== turnIndex) {
+                    lastBet = turnIndex;
+                    let raise = (Math.floor(Math.random() * raiseTimes) + 1) * raiseMult;
+                    if((diff + raise) >= money){
+                      raise = (money - diff);
+                      ante += raise;
+                      turnAmt = money;
+                      pot += money;
+                      money = 0;
+                      turnChoice = 'All In';
+                    } else {
+                      ante += raise;
+                      turnAmt = diff + raise;
+                      pot += turnAmt;
+                      money -= turnAmt;
+                      turnChoice = 'Raise';
+                      }
+                    } else {
+                      if(diff === 0) {
+                        turnChoice = 'Check';
+                      } else {
+                        turnAmt = diff;
+                        money -= diff;
+                        pot += diff;
+                        turnChoice = 'Call';
+                      }
+                    }
+                  }
+                  roundAmt += turnAmt;
             break;
           case 2:
             //Fold
@@ -526,8 +532,6 @@ class Game extends React.Component {
       default :
       setTimeout(() => {
         this.endRound();
-      }, turnTime);
-      setTimeout(() => {
         this.initialDeal();
       }, turnTime);
       break;
@@ -590,13 +594,14 @@ class Game extends React.Component {
       blindTitles: nullArray,
       turnChoices: choices,
       activePlayers: actives,
+      finish: false,
     });
   }
 
   finishRoundEarly(){
     let round = this.state.round;
     let time = this.props.turnTime;
-    time *= 3;
+    time *= 2;
     let board = this.state.board;
     let but = document.getElementById('finishRoundButton');
     but.style.display = 'none';
@@ -634,8 +639,6 @@ class Game extends React.Component {
     startBut.style.display = 'none';
     setTimeout(() => {
       this.endRound();
-    }, time);
-    setTimeout(() => {
       this.initialDeal();
     }, time);
   }
@@ -691,7 +694,7 @@ class Game extends React.Component {
     const p2 = this.state.p2;
     const p3 = this.state.p3;
     const p4 = this.state.p4;
-    const deck = this.state.deck;
+    const deck = this.createCards(this.state.currentDeck, true);
     const moneyList = this.state.moneyList;
     const pot = this.state.pot;
     const ante = this.state.bet;
