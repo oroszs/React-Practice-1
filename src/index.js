@@ -532,7 +532,6 @@ class Game extends React.Component {
       default :
       setTimeout(() => {
         this.endRound();
-        this.initialDeal();
       }, turnTime);
       break;
     }
@@ -566,6 +565,7 @@ class Game extends React.Component {
   }
 
   endRound(){
+    const board = [];
     let actives = [];
     const moneyList = this.state.moneyList;
     for(let x = 0; x < moneyList.length; x++){
@@ -573,6 +573,12 @@ class Game extends React.Component {
         actives.push(x);
       }
     }
+    let hands = Array(4).fill(null);
+    for(let x = 0; x < actives.length; x++){
+      hands[actives[x]] = this.createCards(this.dealCards(2), false);
+    }
+    const currentDeck = this.createDeck();
+    const deck = this.createCards(currentDeck, true);
     console.log(`Active Players: ${actives}`);
     const currentDealer = this.state.dealer;
     const nextDealer = this.findNextTurn(currentDealer, actives);
@@ -585,8 +591,9 @@ class Game extends React.Component {
       turn: turn,
       round: round,
       pause: true,
-      currentDeck: this.createDeck(),
-      board: [],
+      currentDeck: currentDeck,
+      deck: deck,
+      board: board,
       bet: 0,
       pot: 0,
       lastBet: null,
@@ -595,6 +602,10 @@ class Game extends React.Component {
       turnChoices: choices,
       activePlayers: actives,
       finish: false,
+      p1: hands[0],
+      p2: hands[1],
+      p3: hands[2],
+      p4: hands[3],
     });
   }
 
@@ -637,9 +648,8 @@ class Game extends React.Component {
     const time = this.props.turnTime;
     let startBut = document.getElementById('startAgain');
     startBut.style.display = 'none';
-    setTimeout(() => {
+    setTimeout(()=>{
       this.endRound();
-      this.initialDeal();
     }, time);
   }
 
