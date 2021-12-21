@@ -705,7 +705,6 @@ class Game extends React.Component {
     let p2 = this.state.p2;
     let p3 = this.state.p3;
     let p4 = this.state.p4;
-    console.log(`P1: ${p1}, P2: ${p2}, P3: ${p3}, P4: ${p4}`);
     if(p1 && p1.length === 0) {
       p1 = null;
     }
