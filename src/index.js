@@ -2,8 +2,6 @@ import React from 'react';
 import ReactDOM from 'react-dom';
 import './index.css';
 
-//Branch 3
-
 class App extends React.Component {
 
   render() {
