@@ -2,6 +2,8 @@ import React from 'react';
 import ReactDOM from 'react-dom';
 import './index.css';
 
+//Branch 3
+
 class App extends React.Component {
 
   render() {
@@ -373,168 +375,177 @@ class Game extends React.Component {
     this.setState({
       pause: false,
       turnChoices: choices,
-    });
-    switch (round) {
-      case 'blinds' :
-        setTimeout(() => {
-          let actives = this.state.activePlayers;
-          let finalSmallIndex;
-          let finalBigIndex;
-          if(actives.length === 2){
-            finalSmallIndex = actives[actives.indexOf(dealerIndex)];
-            if(actives.indexOf(dealerIndex) === 0){
-              finalBigIndex = actives[actives.length - 1];
-            } else {
-              finalBigIndex = actives[actives.indexOf(dealerIndex) - 1];
-            }
-            blindTitles[finalSmallIndex] = 'Dealer / Small Blind';
-            blindTitles[finalBigIndex] = 'Big Blind';
-            console.log(`Dealer Index: ${dealerIndex}, Small Index: ${finalSmallIndex}, Big Index: ${finalBigIndex}`);
-          } else {
-              blindTitles[actives[actives.indexOf(dealerIndex)]] = 'Dealer';
-              let smallIndex = actives.indexOf(dealerIndex) - 1;
-              let bigIndex = actives.indexOf(dealerIndex) - 2;
-              if(smallIndex < 0){
-                smallIndex += actives.length;
+    }, () => {
+      switch (round) {
+        case 'blinds' :
+          setTimeout(() => {
+            let actives = this.state.activePlayers;
+            let finalSmallIndex;
+            let finalBigIndex;
+            if(actives.length === 2){
+              finalSmallIndex = actives[actives.indexOf(dealerIndex)];
+              if(actives.indexOf(dealerIndex) === 0){
+                finalBigIndex = actives[actives.length - 1];
+              } else {
+                finalBigIndex = actives[actives.indexOf(dealerIndex) - 1];
               }
-              if(bigIndex < 0){
-                bigIndex += actives.length;
-              }
-              finalSmallIndex = actives[actives.indexOf(smallIndex)];
-              finalBigIndex = actives[actives.indexOf(bigIndex)];
-              blindTitles[finalSmallIndex] = 'Small Blind';
+              blindTitles[finalSmallIndex] = 'Dealer / Small Blind';
               blindTitles[finalBigIndex] = 'Big Blind';
-          }
-
-          if(moneyList[finalSmallIndex] <= small) {
-            let amt = moneyList[finalSmallIndex];
-            cons[finalSmallIndex] = amt;
-            ante = amt;
-            pot += amt;
-            moneyList[finalSmallIndex] = 0;
-          } else {
-            pot += small;
-            moneyList[finalSmallIndex] -= small;
-            cons[finalSmallIndex] = small;
-            ante = small;
-          }
-
-          if(moneyList[finalBigIndex] <= big){
-            let amt = moneyList[finalBigIndex];
-            cons[finalBigIndex] = amt;
-            if(ante < amt) {
-              ante = amt;
+              console.log(`Dealer Index: ${dealerIndex}, Small Index: ${finalSmallIndex}, Big Index: ${finalBigIndex}`);
+            } else {
+                blindTitles[actives[actives.indexOf(dealerIndex)]] = 'Dealer';
+                let smallIndex = actives.indexOf(dealerIndex) - 1;
+                let bigIndex = actives.indexOf(dealerIndex) - 2;
+                if(smallIndex < 0){
+                  smallIndex += actives.length;
+                }
+                if(bigIndex < 0){
+                  bigIndex += actives.length;
+                }
+                finalSmallIndex = actives[actives.indexOf(smallIndex)];
+                finalBigIndex = actives[actives.indexOf(bigIndex)];
+                blindTitles[finalSmallIndex] = 'Small Blind';
+                blindTitles[finalBigIndex] = 'Big Blind';
             }
-            pot += amt;
-            moneyList[finalBigIndex] = 0;
-          } else {
-            cons[finalBigIndex] = big;
-            ante = big;
-            pot += big;
-            moneyList[finalBigIndex] -= big;
-          }
-
-          round = 'preFlop';
-
-          this.setState({
-            blindTitles: blindTitles,
-            round: round,
-            pause: true,
-            moneyList: moneyList,
-            pot: pot,
-            contributions: cons,
-            bet: ante,
-          });
-        }, turnTime);
-        break;
-
-      case 'preFlop' : 
+  
+            if(moneyList[finalSmallIndex] <= small) {
+              let amt = moneyList[finalSmallIndex];
+              cons[finalSmallIndex] = amt;
+              ante = amt;
+              pot += amt;
+              moneyList[finalSmallIndex] = 0;
+            } else {
+              pot += small;
+              moneyList[finalSmallIndex] -= small;
+              cons[finalSmallIndex] = small;
+              ante = small;
+            }
+  
+            if(moneyList[finalBigIndex] <= big){
+              let amt = moneyList[finalBigIndex];
+              cons[finalBigIndex] = amt;
+              if(ante < amt) {
+                ante = amt;
+              }
+              pot += amt;
+              moneyList[finalBigIndex] = 0;
+            } else {
+              cons[finalBigIndex] = big;
+              ante = big;
+              pot += big;
+              moneyList[finalBigIndex] -= big;
+            }
+  
+            round = 'preFlop';
+  
+            this.setState({
+              blindTitles: blindTitles,
+              round: round,
+              pause: true,
+              moneyList: moneyList,
+              pot: pot,
+              contributions: cons,
+              bet: ante,
+            });
+          }, turnTime);
+          break;
+  
+        case 'preFlop' : 
+            id = setInterval(() => {
+              let actives = this.state.activePlayers;
+              const finish = this.finishCheck();
+              let stopTheRound = this.stopCheck();
+              if(stopTheRound){
+                this.endBettingRound();
+                clearInterval(id);
+                if(!finish) {
+                  board.push(this.createCards(this.dealCards(3), false));
+                }
+                this.setState({
+                  finish: finish,
+                  round: 'flop',
+                  pause: true,
+                }, () => {
+                  return;
+                });
+              } else {
+              this.bet(turn);
+              turn = this.findNextTurn(turn, actives);
+              }
+            }, turnTime);
+          break;
+  
+        case 'flop' :
           id = setInterval(() => {
             let actives = this.state.activePlayers;
-            const finish = this.finishCheck();
+            const finish = this.finishCheck(); 
             let stopTheRound = this.stopCheck();
             if(stopTheRound){
               this.endBettingRound();
               clearInterval(id);
-              if(!finish) {
-                board.push(this.createCards(this.dealCards(3)), false);
-              }
+              if(!finish){board.push(this.createCards(this.dealCards(1), false));}
               this.setState({
                 finish: finish,
-                round: 'flop',
+                round: 'turn',
                 pause: true,
+              }, () => {
+                return;
               });
-              return;
+            } else {
+              this.bet(turn);
+              turn = this.findNextTurn(turn, actives);
             }
-            this.bet(turn);
-            turn = this.findNextTurn(turn, actives);
           }, turnTime);
+          break;
+  
+        case 'turn' :
+          id = setInterval(() => {
+            const finish = this.finishCheck();
+            let actives = this.state.activePlayers;
+            let stopTheRound = this.stopCheck();
+            if(stopTheRound){
+              this.endBettingRound();
+              clearInterval(id);
+              if(!finish){board.push(this.createCards(this.dealCards(1), false));}
+              this.setState({
+                finish: finish,
+                round: 'river',
+                pause: true,
+              }, () => {
+                return;
+              });
+            } else {
+              this.bet(turn);
+              turn = this.findNextTurn(turn, actives);
+            }
+          }, turnTime);
+          break;
+  
+        case 'river' :
+          id = setInterval(() => {
+            let actives = this.state.activePlayers;
+            let stopTheRound = this.stopCheck();
+            if(stopTheRound){
+              this.endBettingRound();
+              clearInterval(id);
+              this.setState({
+                round: null,
+              }, () => {
+                let startBut = document.getElementById('startAgain');
+                startBut.style.display = 'block';
+                return;
+              });
+            } else {
+              this.bet(turn);
+              turn = this.findNextTurn(turn, actives);
+            }
+          }, turnTime);
+          break;
+  
+        default :
         break;
-
-      case 'flop' :
-        id = setInterval(() => {
-          let actives = this.state.activePlayers;
-          const finish = this.finishCheck(); 
-          let stopTheRound = this.stopCheck();
-          if(stopTheRound){
-            this.endBettingRound();
-            clearInterval(id);
-            if(!finish){board.push(this.createCards(this.dealCards(1)), false);}
-            this.setState({
-              finish: finish,
-              round: 'turn',
-              pause: true,
-            });
-            return;
-          }
-          this.bet(turn);
-          turn = this.findNextTurn(turn, actives);
-        }, turnTime);
-        break;
-
-      case 'turn' :
-        id = setInterval(() => {
-          const finish = this.finishCheck();
-          let actives = this.state.activePlayers;
-          let stopTheRound = this.stopCheck();
-          if(stopTheRound){
-            this.endBettingRound();
-            clearInterval(id);
-            if(!finish){board.push(this.createCards(this.dealCards(1)), false);}
-            this.setState({
-              finish: finish,
-              round: 'river',
-              pause: true,
-            });
-            return;
-          }
-          this.bet(turn);
-          turn = this.findNextTurn(turn, actives);
-        }, turnTime);
-        break;
-
-      case 'river' :
-        id = setInterval(() => {
-          let actives = this.state.activePlayers;
-          let stopTheRound = this.stopCheck();
-          if(stopTheRound){
-            this.endBettingRound();
-            clearInterval(id);
-            let startBut = document.getElementById('startAgain');
-            startBut.style.display = 'block';
-            this.setState({
-              round: null,
-            });
-            return;
-          }
-          this.bet(turn);
-          turn = this.findNextTurn(turn, actives);
-        }, turnTime);
-        break;
-
-      default :
-      break;
-    }
+      }
+    });
   }
 
   stopCheck(){
@@ -621,27 +632,28 @@ class Game extends React.Component {
     const id = setInterval(() => {
       switch (round) {
         case 'flop' :
-          board.push(this.createCards(this.dealCards(3)), false);
+          board.push(this.createCards(this.dealCards(3), false));
           round = 'turn';
           break;
         case 'turn' :
-          board.push(this.createCards(this.dealCards(1)), false);
+          board.push(this.createCards(this.dealCards(1), false));
           round = 'river';
           break;
         case 'river' :
-          board.push(this.createCards(this.dealCards(1)), false);
-          let startBut = document.getElementById('startAgain');
-          startBut.style.display = 'block';
+          board.push(this.createCards(this.dealCards(1), false));
           round = null;
+          clearInterval(id);
           break;
         default:
-          setTimeout(() => {
-            clearInterval(id);
-          }, time);
           break;
       }
       this.setState({
         board: board,
+      }, () => {
+        if(round === null){
+          let startBut = document.getElementById('startAgain');
+          startBut.style.display = 'block';
+        }
       });
     }, time);
   }
@@ -718,6 +730,7 @@ class Game extends React.Component {
           {finished ? <button id='finishRoundButton' onClick={() => {this.finishRoundEarly()}} className='roundButton'>Finish Round</button> : null}
           {(paused  && !finished) ? <button onClick={()=>{this.handleTurn()}} className='roundButton'>Start Round</button> : null}
           <div id='board' className='cardHolder'>{board}</div>
+          {console.log(board)}
           {showDeck ? <div id='deckDisplay' className='cardHolder'>{deck}</div> : null}
           <div id='pot'>Pot: {pot} Ante: {ante}</div>
           <div id='playersArea'>
