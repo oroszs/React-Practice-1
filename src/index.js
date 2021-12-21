@@ -177,22 +177,19 @@ class Game extends React.Component {
     let index = Math.floor(Math.random() * deck.length);
     let card = deck[index];
     deck.splice(index, 1);
-    console.log(card);
 
     this.setState({
       currentDeck: deck,
-    }, () => {
-      return (
-        <div className='cardContainer' key={card}>
-          <div className='card'>
-            {card.includes('\u2665') || card.includes('\u2666') ?
-            <div className='cardText'>{card.split(' ')[0]} <span style={{color: 'red'}}>{card.split(' ')[1]}</span></div> :
-            <div className='cardText'>{card}</div>}
-          </div>
-        </div>
-      );
     });
-
+    return (
+      <div className='cardContainer' key={card}>
+        <div className='card'>
+          {card.includes('\u2665') || card.includes('\u2666') ?
+          <div className='cardText'>{card.split(' ')[0]} <span style={{color: 'red'}}>{card.split(' ')[1]}</span></div> :
+          <div className='cardText'>{card}</div>}
+        </div>
+      </div>
+    );
   }
 
   bet(playerTurn){
@@ -326,11 +323,11 @@ class Game extends React.Component {
   }
 
   initialDeal(){
-    let hands = Array(4).fill(null);
+    let hands = [[],[],[],[]];
     const actives = this.state.activePlayers;
     for(let x = 0; x < actives.length; x++){
       for(let y = 0; y < 2; y++){
-        hands[actives[x]].push(this.dealCard);
+        hands[actives[x]].push(this.dealCard());
       }
     }
     this.setState({
@@ -338,6 +335,7 @@ class Game extends React.Component {
       p2: hands[1],
       p3: hands[2],
       p4: hands[3],
+    }, () => {
     });
   }
 
@@ -577,12 +575,13 @@ class Game extends React.Component {
         actives.push(x);
       }
     }
-    let hands = Array(4).fill(null);
+    let hands = [[],[],[],[]];
     for(let x = 0; x < actives.length; x++){
       for(let y = 0; y < 2; y++){
         hands[actives[x]].push(this.dealCard());
       }
     }
+    console.log(hands);
     const currentDeck = this.createDeck();
     console.log(`Active Players: ${actives}`);
     const currentDealer = this.state.dealer;
@@ -611,7 +610,6 @@ class Game extends React.Component {
       p3: hands[2],
       p4: hands[3],
     }, () => {
-      console.log(`Board: ${board}`);
     });
   }
 
@@ -705,10 +703,23 @@ class Game extends React.Component {
 
   render(){
     const board = this.state.board;
-    const p1 = this.state.p1;
-    const p2 = this.state.p2;
-    const p3 = this.state.p3;
-    const p4 = this.state.p4;
+    let p1 = this.state.p1;
+    let p2 = this.state.p2;
+    let p3 = this.state.p3;
+    let p4 = this.state.p4;
+    console.log(`P1: ${p1}, P2: ${p2}, P3: ${p3}, P4: ${p4}`);
+    if(p1 && p1.length === 0) {
+      p1 = null;
+    }
+    if(p2 && p2.length === 0) {
+      p2 = null;
+    }
+    if(p3 && p3.length === 0) {
+      p3 = null;
+    }
+    if(p4 && p4.length === 0) {
+      p4 = null;
+    }
     const moneyList = this.state.moneyList;
     const pot = this.state.pot;
     const ante = this.state.bet;
@@ -723,7 +734,6 @@ class Game extends React.Component {
           {finished ? <button id='finishRoundButton' onClick={() => {this.finishRoundEarly()}} className='roundButton'>Finish Round</button> : null}
           {(paused  && !finished) ? <button onClick={()=>{this.handleTurn()}} className='roundButton'>Start Round</button> : null}
           <div id='board' className='cardHolder'>{board}</div>
-          {console.log(board)}
           <div id='pot'>Pot: {pot} Ante: {ante}</div>
           <div id='playersArea'>
               {p1 ? <Player player='1' hand={p1} money={moneyList[0]} choice={choices[0]} blindTitle={blindTitles[0]}/> : null}
