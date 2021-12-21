@@ -178,6 +178,7 @@ class Game extends React.Component {
       let card = deck[index];
       deck.splice(index, 1);
       cards.push(card);
+      console.log(card);
     }
     this.setState({
       currentDeck: deck,
@@ -388,6 +389,7 @@ class Game extends React.Component {
             }
             blindTitles[finalSmallIndex] = 'Dealer / Small Blind';
             blindTitles[finalBigIndex] = 'Big Blind';
+            console.log(`Dealer Index: ${dealerIndex}, Small Index: ${finalSmallIndex}, Big Index: ${finalBigIndex}`);
           } else {
               blindTitles[actives[actives.indexOf(dealerIndex)]] = 'Dealer';
               let smallIndex = actives.indexOf(dealerIndex) - 1;
@@ -518,9 +520,10 @@ class Game extends React.Component {
           if(stopTheRound){
             this.endBettingRound();
             clearInterval(id);
+            let startBut = document.getElementById('startAgain');
+            startBut.style.display = 'block';
             this.setState({
               round: null,
-              pause: true,
             });
             return;
           }
@@ -530,9 +533,6 @@ class Game extends React.Component {
         break;
 
       default :
-      setTimeout(() => {
-        this.endRound();
-      }, turnTime);
       break;
     }
   }
@@ -606,13 +606,15 @@ class Game extends React.Component {
       p2: hands[1],
       p3: hands[2],
       p4: hands[3],
+    }, () => {
+      console.log(`Board: ${board}`);
     });
   }
 
   finishRoundEarly(){
     let round = this.state.round;
     let time = this.props.turnTime;
-    time *= 2;
+    time *= 1.5;
     let board = this.state.board;
     let but = document.getElementById('finishRoundButton');
     but.style.display = 'none';
@@ -645,12 +647,9 @@ class Game extends React.Component {
   }
 
   startNextRound(){
-    const time = this.props.turnTime;
     let startBut = document.getElementById('startAgain');
     startBut.style.display = 'none';
-    setTimeout(()=>{
-      this.endRound();
-    }, time);
+    this.endRound();
   }
 
   findNextTurn(turn, actives){
