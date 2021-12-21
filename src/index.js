@@ -579,9 +579,7 @@ class Game extends React.Component {
         hands[actives[x]].push(this.dealCard());
       }
     }
-    console.log(hands);
     const currentDeck = this.createDeck();
-    console.log(`Active Players: ${actives}`);
     const currentDealer = this.state.dealer;
     const nextDealer = this.findNextTurn(currentDealer, actives);
     const turn = this.preFlopFirstTurn(actives, nextDealer);
@@ -607,7 +605,6 @@ class Game extends React.Component {
       p2: hands[1],
       p3: hands[2],
       p4: hands[3],
-    }, () => {
     });
   }
 
@@ -666,6 +663,36 @@ class Game extends React.Component {
       });
     }
     return turnIndex + 1;
+  }
+
+  findNextDealer(){
+    const currentDealerIndex = this.state.dealer - 1;
+    const actives = this.state.activePlayers;
+    let nextDealerIndex;
+
+    if(actives.indexOf(currentDealerIndex === -1)){
+      if(currentDealerIndex === 0) {
+        nextDealerIndex = actives[actives.length - 1];
+      } else {
+        nextDealerIndex = currentDealerIndex - 1;
+      }
+    }
+
+    if(actives.indexOf(currentDealerIndex === -1)){
+      if(currentDealerIndex === 0) {
+        nextDealerIndex = actives[actives.length - 1];
+      } else {
+        nextDealerIndex  = currentDealerIndex - 1;
+      }
+    }
+
+    if(!nextDealerIndex) {
+      if(actives.indexOf(currentDealerIndex) === 0) {
+        nextDealerIndex = actives[actives.length - 1];
+      } else {
+        nextDealerIndex = actives[actives.indexOf(currentDealerIndex) - 1];
+      }
+    }
   }
 
   endBettingRound(){
