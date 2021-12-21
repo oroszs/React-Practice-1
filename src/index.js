@@ -704,13 +704,11 @@ class Game extends React.Component {
   }
 
   render(){
-    const showDeck = false;
     const board = this.state.board;
     const p1 = this.state.p1;
     const p2 = this.state.p2;
     const p3 = this.state.p3;
     const p4 = this.state.p4;
-    const deck = this.createCards(this.state.currentDeck, true);
     const moneyList = this.state.moneyList;
     const pot = this.state.pot;
     const ante = this.state.bet;
@@ -726,7 +724,6 @@ class Game extends React.Component {
           {(paused  && !finished) ? <button onClick={()=>{this.handleTurn()}} className='roundButton'>Start Round</button> : null}
           <div id='board' className='cardHolder'>{board}</div>
           {console.log(board)}
-          {showDeck ? <div id='deckDisplay' className='cardHolder'>{deck}</div> : null}
           <div id='pot'>Pot: {pot} Ante: {ante}</div>
           <div id='playersArea'>
               {p1 ? <Player player='1' hand={p1} money={moneyList[0]} choice={choices[0]} blindTitle={blindTitles[0]}/> : null}
