@@ -579,7 +579,7 @@ class Game extends React.Component {
     }
     let hands = Array(4).fill(null);
     for(let x = 0; x < actives.length; x++){
-      for(y = 0; y < 2; y++){
+      for(let y = 0; y < 2; y++){
         hands[actives[x]].push(this.dealCard());
       }
     }
