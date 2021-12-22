@@ -131,7 +131,6 @@ class Game extends React.Component {
       finish: false,
       blindTitles: Array(props.players).fill(null),
       activePlayers: actives,
-      utgI: null,
       foldIndex: null,
     }
     this.dealCard = this.dealCard.bind(this);
@@ -389,8 +388,8 @@ class Game extends React.Component {
                 if(bigIndex < 0){
                   bigIndex += actives.length;
                 }
-                finalSmallIndex = actives[actives.indexOf(smallIndex)];
-                finalBigIndex = actives[actives.indexOf(bigIndex)];
+                finalSmallIndex = actives[smallIndex];
+                finalBigIndex = actives[bigIndex];
                 blindTitles[finalSmallIndex] = 'Small Blind';
                 blindTitles[finalBigIndex] = 'Big Blind';
             }
@@ -710,39 +709,16 @@ class Game extends React.Component {
   }
 
   endBettingRound(){
-    let dealerIndex = this.state.dealer - 1;
     let bet = this.state.bet;
     let con = this.state.contributions;
     let last = this.state.lastBet;
     const players = this.props.players;
-    const round = this.state.round;
     const actives = this.state.activePlayers;
     bet = 0;
     con = Array(players).fill(0);
     last = null;
-    let utgI = this.state.utgI;
-    let activeIndex;
-    let turn = this.state.turn;
-    //if ENDING preFlop Round
-    if(round === 'preFlop'){
-      activeIndex = actives.indexOf(dealerIndex) - 1;
-      //utgI = Under The Gun (First Player to bet post-flop) Index
-    } else {
-      if(actives.includes(utgI)){
-        activeIndex = actives.indexOf(utgI) - 1;
-      } else {
-        utgI --;
-        if(actives.includes(utgI)) {
-          activeIndex = utgI;
-        } else {
-          utgI -- ;
-          activeIndex = utgI;
-        }
-      }
-    }
-    utgI = (activeIndex < 0) ? actives[actives.length - 1] : actives[actives.indexOf(activeIndex)];
-    turn = utgI + 1;
-    console.log(`Under The Gun Index: ${utgI}`);
+    const turn = this.findNextDealer(actives);
+    console.log(`Under The Gun Index: ${turn - 1}`);
     this.setState({
       bet: bet,
       contributions: con,
