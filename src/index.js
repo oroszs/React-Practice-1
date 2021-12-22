@@ -192,7 +192,7 @@ class Game extends React.Component {
 
   bet(playerTurn){
     const maxMoney = this.props.money;
-    const raiseTimes = 4;
+    const raiseTimes = 3;
     const raiseMult = maxMoney / 10;
     let turnIndex = playerTurn - 1;
     const player = this.props.playerList[turnIndex];
@@ -580,8 +580,8 @@ class Game extends React.Component {
       }
     }
     const currentDeck = this.createDeck();
-    const currentDealer = this.state.dealer;
-    const nextDealer = this.findNextTurn(currentDealer, actives);
+    console.log(`New Actives (in End Round): ${actives}`);
+    const nextDealer = this.findNextDealer(actives);
     const turn = this.preFlopFirstTurn(actives, nextDealer);
     const round = 'blinds';
     const nullArray = Array(4).fill(null);
@@ -665,34 +665,48 @@ class Game extends React.Component {
     return turnIndex + 1;
   }
 
-  findNextDealer(){
+  findNextDealer(actives){
+    console.log(`new Actives (in Find Dealer): ${actives}`);
     const currentDealerIndex = this.state.dealer - 1;
-    const actives = this.state.activePlayers;
     let nextDealerIndex;
+    console.log(`---Current Dealer Index: ${currentDealerIndex}---`);
 
-    if(actives.indexOf(currentDealerIndex === -1)){
-      if(currentDealerIndex === 0) {
-        nextDealerIndex = actives[actives.length - 1];
-      } else {
-        nextDealerIndex = currentDealerIndex - 1;
-      }
-    }
-
-    if(actives.indexOf(currentDealerIndex === -1)){
-      if(currentDealerIndex === 0) {
-        nextDealerIndex = actives[actives.length - 1];
-      } else {
-        nextDealerIndex  = currentDealerIndex - 1;
-      }
-    }
-
-    if(!nextDealerIndex) {
+    if(actives.includes(currentDealerIndex)) {
+      console.log(`index ${currentDealerIndex} was on active list`);
       if(actives.indexOf(currentDealerIndex) === 0) {
+        console.log('0 -> last active index');
         nextDealerIndex = actives[actives.length - 1];
       } else {
         nextDealerIndex = actives[actives.indexOf(currentDealerIndex) - 1];
+        console.log(`set to index ${nextDealerIndex}`);
+      }
+    } else {
+      console.log(`index ${currentDealerIndex} inactive`);
+      if(currentDealerIndex === 0) {
+        console.log('0 -> last active index');
+        nextDealerIndex = actives[actives.length - 1];
+      } else {
+        nextDealerIndex = currentDealerIndex - 1;
+        console.log(`Check index ${nextDealerIndex}`);
+      }
+
+      if(!actives.includes(nextDealerIndex)){
+        console.log(`index ${nextDealerIndex} also inactive`);
+        if(nextDealerIndex === 0) {
+          console.log('0 -> last active index');
+          nextDealerIndex = actives[actives.length - 1];
+        } else {
+          nextDealerIndex  = nextDealerIndex - 1;
+          console.log(`set to index ${nextDealerIndex}`);
+        }
       }
     }
+
+
+    console.log(`---Next Dealer Index: ${nextDealerIndex}---`);
+    const nextDealer = nextDealerIndex + 1;
+    return nextDealer;
+
   }
 
   endBettingRound(){
@@ -714,10 +728,21 @@ class Game extends React.Component {
       activeIndex = actives.indexOf(dealerIndex) - 1;
       //utgI = Under The Gun (First Player to bet post-flop) Index
     } else {
-      activeIndex = actives.indexOf(utgI) - 1;
+      if(actives.includes(utgI)){
+        activeIndex = actives.indexOf(utgI) - 1;
+      } else {
+        utgI --;
+        if(actives.includes(utgI)) {
+          activeIndex = utgI;
+        } else {
+          utgI -- ;
+          activeIndex = utgI;
+        }
+      }
     }
     utgI = (activeIndex < 0) ? actives[actives.length - 1] : actives[actives.indexOf(activeIndex)];
     turn = utgI + 1;
+    console.log(`Under The Gun Index: ${utgI}`);
     this.setState({
       bet: bet,
       contributions: con,
