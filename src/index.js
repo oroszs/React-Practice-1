@@ -579,7 +579,6 @@ class Game extends React.Component {
       }
     }
     const currentDeck = this.createDeck();
-    console.log(`New Actives (in End Round): ${actives}`);
     const nextDealer = this.findNextDealer(actives);
     const turn = this.preFlopFirstTurn(actives, nextDealer);
     const round = 'blinds';
@@ -665,7 +664,6 @@ class Game extends React.Component {
   }
 
   findNextDealer(actives){
-    console.log(`new Actives (in Find Dealer): ${actives}`);
     const currentDealerIndex = this.state.dealer - 1;
     let nextDealerIndex;
     console.log(`---Current Dealer Index: ${currentDealerIndex}---`);
