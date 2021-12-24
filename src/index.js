@@ -191,7 +191,7 @@ class Game extends React.Component {
 
   bet(playerTurn){
     const maxMoney = this.props.money;
-    const raiseTimes = 3;
+    const raiseTimes = 1;
     const raiseMult = maxMoney / 10;
     let turnIndex = playerTurn - 1;
     const player = this.props.playerList[turnIndex];
@@ -516,20 +516,15 @@ class Game extends React.Component {
             if(stopTheRound){
               this.endBettingRound();
               clearInterval(id);
-              this.setState({
-                round: null,
-              }, () => {
-                let startBut = document.getElementById('startAgain');
-                startBut.style.display = 'block';
-                return;
-              });
+              setTimeout(() => {
+                this.winner()
+              }, turnTime);
             } else {
               this.bet(turn);
               turn = this.findNextTurn(turn, actives);
             }
           }, turnTime);
           break;
-  
         default :
         break;
       }
@@ -627,11 +622,14 @@ class Game extends React.Component {
           break;
         case 'river' :
           board.push(this.dealCard());
+          round = 'winner';
+          break;
+        case 'winner' :
           round = null;
+          this.winner();
+          clearInterval(id);
           break;
         default:
-          //TODO determine winner
-          clearInterval(id);
           break;
       }
       this.setState({
@@ -643,6 +641,32 @@ class Game extends React.Component {
         }
       });
     }, time);
+  }
+
+  winner(){
+    const actives = this.state.activePlayers;
+    const pot = this.state.pot;
+    const players = this.props.players;
+    const activeIndex = Math.floor(Math.random() * actives.length);
+    const windex = actives[activeIndex];
+    let blindTitles = [];
+    let moneyList = this.state.moneyList;
+    moneyList[windex] += pot;
+    for(let x = 0; x < players; x++){
+      if(x === windex){
+        blindTitles[x] = 'Winner';
+      } else {
+        blindTitles[x] = '';
+      }
+    }
+    console.log(`Active Index: ${activeIndex}, Winner Index: ${windex}`);
+    this.setState({
+      blindTitles: blindTitles,
+      moneyList: moneyList,
+    }, () => {
+      let startBut = document.getElementById('startAgain');
+      startBut.style.display = 'block';
+    });
   }
 
   startNextRound(){
