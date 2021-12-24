@@ -628,9 +628,10 @@ class Game extends React.Component {
         case 'river' :
           board.push(this.dealCard());
           round = null;
-          clearInterval(id);
           break;
         default:
+          //TODO determine winner
+          clearInterval(id);
           break;
       }
       this.setState({
