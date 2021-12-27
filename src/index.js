@@ -88,6 +88,7 @@ class Menu extends React.Component{
     const big = (val <= 500 ? 50 : 100);
     return(
       <div>
+        {gameStart ? <Game players={p} money={val} playerList={playerList} smallBlind={small} bigBlind={big} turnTime={time}/> :
         <div id='menu'>
           <button id='startButton' onClick={() => this.start()}>Start Game</button>
           <div id='moneyDiv'> Starting Chip Value: {val}
@@ -99,7 +100,7 @@ class Menu extends React.Component{
             <button className='pNum' onClick={() => this.more()}>&gt;</button>
           </div>
         </div>
-        {gameStart ? <Game players={p} money={val} playerList={playerList} smallBlind={small} bigBlind={big} turnTime={time}/> : null}
+        }
       </div>
     );
   }
@@ -132,7 +133,7 @@ class Game extends React.Component {
       blindTitles: Array(props.players).fill(null),
       activePlayers: actives,
       foldIndex: null,
-      gameIsOver: false,
+      gameIsOver: true,
     }
     this.dealCard = this.dealCard.bind(this);
   }
@@ -192,7 +193,7 @@ class Game extends React.Component {
 
   bet(playerTurn){
     const maxMoney = this.props.money;
-    const raiseTimes = 1;
+    const raiseTimes = 5;
     const raiseMult = maxMoney / 10;
     let turnIndex = playerTurn - 1;
     const player = this.props.playerList[turnIndex];
@@ -635,11 +636,6 @@ class Game extends React.Component {
       }
       this.setState({
         board: board,
-      }, () => {
-        if(round === null){
-          let startBut = document.getElementById('startAgain');
-          startBut.style.display = 'block';
-        }
       });
     }, time);
   }
@@ -666,6 +662,7 @@ class Game extends React.Component {
       moneyList: moneyList,
     }, () => {
       const over = this.gameOverCheck();
+      console.log(`gameOver=${over}`);
       if(over){
         let overBut = document.getElementById('gameOver');
         overBut.style.display= 'block';
@@ -677,19 +674,25 @@ class Game extends React.Component {
   }
 
   gameOverCheck(){
-    let conditions;
-    if(conditions){
+    const moneyList = this.state.moneyList;
+    let activeNum = 0;
+    moneyList.forEach((money) => {
+      if(money > 0) {
+        activeNum++;
+      }
+    });
+    console.log(`active player count: ${activeNum}`);
+    if(activeNum === 1){
       return true;
     }
     return false;
   }
 
   gameOver(){
+    let overBut = document.getElementById('gameOver');
+    overBut.style.display = 'none';
     this.setState({
       gameIsOver: true,
-    }, () => {
-      let overBut = document.getElementById('gameOver');
-      overBut.style.display = 'none';
     });
   }
 
@@ -799,13 +802,17 @@ class Game extends React.Component {
     const paused = this.state.pause;
     const finished = this.state.finish;
     const blindTitles = this.state.blindTitles;
+    const actives = this.state.activePlayers;
+    const gameIsOver = this.state.gameIsOver;
     return(
       <div>
         {gameIsOver ? 
           <div id='gameOverDisplay'>
-            <div id='winnerTitle'>Player X Wins!</div>
-            <button>Play Again</button>
-            <button>Quit</button>
+            <div id='winnerTitle'>Player {actives[0]} Wins!</div>
+            <div id='menuButtonDiv'>
+              <button className='menuButton'>Play Again</button>
+              <button className='menuButton'>Quit</button>
+            </div>
           </div> :
           <div id='cardDisplay'>
             <button id='gameOver' onClick={()=>{this.gameOver()}} style={{display:'none'}} className='roundButton'>Game Over</button>
