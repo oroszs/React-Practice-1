@@ -132,6 +132,7 @@ class Game extends React.Component {
       blindTitles: Array(props.players).fill(null),
       activePlayers: actives,
       foldIndex: null,
+      gameIsOver: false,
     }
     this.dealCard = this.dealCard.bind(this);
   }
@@ -664,8 +665,31 @@ class Game extends React.Component {
       blindTitles: blindTitles,
       moneyList: moneyList,
     }, () => {
-      let startBut = document.getElementById('startAgain');
-      startBut.style.display = 'block';
+      const over = this.gameOverCheck();
+      if(over){
+        let overBut = document.getElementById('gameOver');
+        overBut.style.display= 'block';
+      } else {
+        let startBut = document.getElementById('startAgain');
+        startBut.style.display = 'block';
+      }
+    });
+  }
+
+  gameOverCheck(){
+    let conditions;
+    if(conditions){
+      return true;
+    }
+    return false;
+  }
+
+  gameOver(){
+    this.setState({
+      gameIsOver: true,
+    }, () => {
+      let overBut = document.getElementById('gameOver');
+      overBut.style.display = 'none';
     });
   }
 
@@ -777,19 +801,27 @@ class Game extends React.Component {
     const blindTitles = this.state.blindTitles;
     return(
       <div>
-        <div id='cardDisplay'>
-          <button id='startAgain' onClick={()=>{this.startNextRound()}} style={{display:'none'}} className='roundButton'>Start Next Round</button>
-          {finished ? <button id='finishRoundButton' onClick={() => {this.finishRoundEarly()}} className='roundButton'>Finish Round</button> : null}
-          {(paused  && !finished) ? <button onClick={()=>{this.handleTurn()}} className='roundButton'>Start Round</button> : null}
-          <div id='board' className='cardHolder'>{board}</div>
-          <div id='pot'>Pot: {pot} Ante: {ante}</div>
-          <div id='playersArea'>
-              {p1 ? <Player player='1' hand={p1} money={moneyList[0]} choice={choices[0]} blindTitle={blindTitles[0]}/> : null}
-              {p2 ? <Player player='2' hand={p2} money={moneyList[1]} choice={choices[1]} blindTitle={blindTitles[1]}/> : null}    
-              {p3 ? <Player player='3' hand={p3} money={moneyList[2]} choice={choices[2]} blindTitle={blindTitles[2]}/> : null}
-              {p4 ? <Player player='4' hand={p4} money={moneyList[3]} choice={choices[3]} blindTitle={blindTitles[3]}/> : null}        
+        {gameIsOver ? 
+          <div id='gameOverDisplay'>
+            <div id='winnerTitle'>Player X Wins!</div>
+            <button>Play Again</button>
+            <button>Quit</button>
+          </div> :
+          <div id='cardDisplay'>
+            <button id='gameOver' onClick={()=>{this.gameOver()}} style={{display:'none'}} className='roundButton'>Game Over</button>
+            <button id='startAgain' onClick={()=>{this.startNextRound()}} style={{display:'none'}} className='roundButton'>Start Next Round</button>
+            {finished ? <button id='finishRoundButton' onClick={() => {this.finishRoundEarly()}} className='roundButton'>Finish Round</button> : null}
+            {(paused  && !finished) ? <button onClick={()=>{this.handleTurn()}} className='roundButton'>Start Round</button> : null}
+            <div id='board' className='cardHolder'>{board}</div>
+            <div id='pot'>Pot: {pot} Ante: {ante}</div>
+            <div id='playersArea'>
+                {p1 ? <Player player='1' hand={p1} money={moneyList[0]} choice={choices[0]} blindTitle={blindTitles[0]}/> : null}
+                {p2 ? <Player player='2' hand={p2} money={moneyList[1]} choice={choices[1]} blindTitle={blindTitles[1]}/> : null}    
+                {p3 ? <Player player='3' hand={p3} money={moneyList[2]} choice={choices[2]} blindTitle={blindTitles[2]}/> : null}
+                {p4 ? <Player player='4' hand={p4} money={moneyList[3]} choice={choices[3]} blindTitle={blindTitles[3]}/> : null}        
+            </div>
           </div>
-        </div>
+        }
       </div>
     );
   }
