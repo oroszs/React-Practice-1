@@ -88,19 +88,35 @@
   color: black;
   width: 90%;
   height: 675px;
-  background: pink;
+  background: #b0eaff;
   border: 2px solid black;
   border-radius: 5px;
   min-width: 1000px;
 }
-#winnerTitle{
+#winnerDiv{
   position: relative;
   margin: auto;
   top: 75px;
   width: 85%;
-  height: 300px;
-  line-height: 300px;
-  background: yellow;
+  height: 50%;
+  background: rgb(147, 88, 255);
+  border-radius: 5px;
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  text-align: center;
+  box-shadow: rgb(63, 63, 63) 10px 10px 10px;
+  border: solid #361963 5px;
+}
+.winText{
+  padding: 10px;
+  width: fit-content;
+  margin: auto;
+  flex: none;
+  color: black;
+  font-size: 35pt;
+  background: rgb(253, 251, 255);
+  border: solid #361963 5px;
   border-radius: 5px;
 }
 #menuButtonDiv{
@@ -110,8 +126,8 @@
   position: relative;
   margin: auto;
   background: grey;
-  width: 250px;
-  height: 100px;
+  width: 20%;
+  height: 15%;
   top: 200px;
   border: 2px olid black;
   border-radius: 5px;

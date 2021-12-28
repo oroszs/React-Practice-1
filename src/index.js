@@ -804,11 +804,15 @@ class Game extends React.Component {
     const blindTitles = this.state.blindTitles;
     const actives = this.state.activePlayers;
     const gameIsOver = this.state.gameIsOver;
+    const winnerMoney = moneyList[actives[0]];
     return(
       <div>
         {gameIsOver ? 
           <div id='gameOverDisplay'>
-            <div id='winnerTitle'>Player {actives[0]} Wins!</div>
+            <div id='winnerDiv'>
+              <span className='winText'>Player {actives[0]} Wins</span>
+              <span className='winText'>${winnerMoney}</span>
+            </div>
             <div id='menuButtonDiv'>
               <button className='menuButton'>Play Again</button>
               <button className='menuButton'>Quit</button>
