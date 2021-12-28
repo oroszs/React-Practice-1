@@ -3,7 +3,6 @@ import ReactDOM from 'react-dom';
 import './index.css';
 
 class App extends React.Component {
-
   render() {
     return(
       <div id='wrapper'>
@@ -21,6 +20,7 @@ class Menu extends React.Component{
       players: 4,
       money: 500,
     }
+    this.restart = this.restart.bind(this);
   }
 
   start() {
@@ -28,6 +28,12 @@ class Menu extends React.Component{
     but.style.display = 'none';
     this.setState({
       game: true,
+    });
+  }
+
+  restart() {
+    this.setState({
+      game: false,
     });
   }
 
@@ -88,7 +94,7 @@ class Menu extends React.Component{
     const big = (val <= 500 ? 50 : 100);
     return(
       <div>
-        {gameStart ? <Game players={p} money={val} playerList={playerList} smallBlind={small} bigBlind={big} turnTime={time}/> :
+        {gameStart ? <Game players={p} money={val} playerList={playerList} smallBlind={small} bigBlind={big} turnTime={time} restart={this.restart}/> :
         <div id='menu'>
           <button id='startButton' onClick={() => this.start()}>Start Game</button>
           <div id='moneyDiv'> Starting Chip Value: {val}
@@ -777,6 +783,10 @@ class Game extends React.Component {
     });
   }
 
+  quit(){
+    window.open('', '_self', '').close();
+  }
+
   render(){
     const board = this.state.board;
     let p1 = this.state.p1;
@@ -814,8 +824,8 @@ class Game extends React.Component {
               <span className='winText'>${winnerMoney}</span>
             </div>
             <div id='menuButtonDiv'>
-              <button className='menuButton'>Play Again</button>
-              <button className='menuButton'>Quit</button>
+              <button className='menuButton' onClick={() => {this.props.restart()}}>Play Again</button>
+              <button className='menuButton' onClick={()=> {this.quit()}}>Quit</button>
             </div>
           </div> :
           <div id='cardDisplay'>
