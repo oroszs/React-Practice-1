@@ -148,7 +148,7 @@ class Game extends React.Component {
       blindTitles: Array(props.players).fill(null),
       activePlayers: actives,
       foldIndex: null,
-      gameIsOver: true,
+      gameIsOver: false,
     }
     this.dealCard = this.dealCard.bind(this);
   }
@@ -659,8 +659,11 @@ class Game extends React.Component {
     const actives = this.state.activePlayers;
     const pot = this.state.pot;
     const players = this.props.players;
-    const activeIndex = Math.floor(Math.random() * actives.length);
-    const windex = actives[activeIndex];
+    let handValues = [];
+    actives.forEach((index) => {
+      handValues.push(this.getBestHand(index));
+    });
+    const windex = this.getWinningHand(handValues);
     let blindTitles = [];
     let moneyList = this.state.moneyList;
     moneyList[windex] += pot;
@@ -686,6 +689,18 @@ class Game extends React.Component {
         startBut.style.display = 'block';
       }
     });
+  }
+
+  getBestHand(handIndex){
+    let hand = [2];
+    hand[0] = handRank;
+    hand[1] = kickerRank;
+    return hand;
+  }
+
+  getWinningHand(handValues) {
+    let winningIndex;
+    return winningIndex;
   }
 
   gameOverCheck(){
