@@ -21,6 +21,7 @@ class Menu extends React.Component{
       money: 500,
     }
     this.restart = this.restart.bind(this);
+    this.setup = this.setup.bind(this);
   }
 
   start() {
@@ -34,6 +35,8 @@ class Menu extends React.Component{
   restart() {
     this.setState({
       game: false,
+      players: 4,
+      money: 500,
     });
   }
 
@@ -77,11 +80,15 @@ class Menu extends React.Component{
     });
   }
 
-  componentDidMount(){
+  setup(){
     let el = document.getElementById('moneySlider');
     el.value = this.state.money;
     let p = this.state.players;
     this.list(p);
+  }
+
+  componentDidMount(){
+    this.setup();
   }
 
   render() {
@@ -94,7 +101,7 @@ class Menu extends React.Component{
     const big = (val <= 500 ? 50 : 100);
     return(
       <div>
-        {gameStart ? <Game players={p} money={val} playerList={playerList} smallBlind={small} bigBlind={big} turnTime={time} restart={this.restart}/> :
+        {gameStart ? <Game players={p} money={val} playerList={playerList} smallBlind={small} bigBlind={big} turnTime={time} restart={this.restart} setup={this.setup}/> :
         <div id='menu'>
           <button id='startButton' onClick={() => this.start()}>Start Game</button>
           <div id='moneyDiv'> Starting Chip Value: {val}
