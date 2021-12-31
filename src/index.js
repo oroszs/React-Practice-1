@@ -831,7 +831,10 @@ class Game extends React.Component {
               <span className='winText'>${winnerMoney}</span>
             </div>
             <div id='menuButtonDiv'>
-              <button className='menuButton' onClick={() => {this.props.restart()}}>Play Again</button>
+              <button className='menuButton' onClick={() => {
+                this.props.restart();
+                setTimeout(() => {this.props.setup()}, 10);
+                }}>Play Again</button>
               <button className='menuButton' onClick={()=> {this.quit()}}>Quit</button>
             </div>
           </div> :
