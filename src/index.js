@@ -4,9 +4,11 @@ import './index.css';
 
 class App extends React.Component {
   render() {
+    const p = 4;
+    const m = 500;
     return(
       <div id='wrapper'>
-        <Menu />
+        <Menu startingMoney={m} startingPlayers={p}/>
       </div>
     );
   }
@@ -17,8 +19,8 @@ class Menu extends React.Component{
     super (props);
     this.state = {
       game: false,
-      players: 4,
-      money: 500,
+      players: this.props.startingPlayers,
+      money: this.props.startingMoney,
     }
     this.restart = this.restart.bind(this);
     this.setup = this.setup.bind(this);
@@ -35,8 +37,8 @@ class Menu extends React.Component{
   restart() {
     this.setState({
       game: false,
-      players: 4,
-      money: 500,
+      players: this.props.startingPlayers,
+      money: this.props.startingMoney,
     });
   }
 
