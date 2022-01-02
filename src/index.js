@@ -208,7 +208,7 @@ class Game extends React.Component {
 
   bet(playerTurn){
     const maxMoney = this.props.money;
-    const raiseTimes = 5;
+    const raiseTimes = 3;
     const raiseMult = maxMoney / 10;
     let turnIndex = playerTurn - 1;
     const player = this.props.playerList[turnIndex];
@@ -705,6 +705,7 @@ class Game extends React.Component {
     });
     let allMatches = [];
     let matchedIndexes = [];
+    //Check for Pair, Two Pair, Three of a Kind, Four of a Kind, and Full House
     for (let x = 0; x < 7; x++){
       let matched = false;
       let matches = [[]];
@@ -728,21 +729,76 @@ class Game extends React.Component {
     let num = 1;
     let pairLength;
     let pairs = 0;
+    console.log(`Player ${handIndex + 1} Matches:`);
     allMatches.forEach(match => {
+      let specialMatch = [];
+      let fullHouse = false;
       if(match.length === 2) {
         pairLength = 'One Pair';
         pairs++;
       } else if (match.length === 3) {
-        pairLength = 'Three Of a Kind';
+        allMatches.forEach(match => {
+          if(match.length === 2) {
+            fullHouse = true;
+            specialMatch.push(match);
+          }
+        });
+        if(fullHouse) {
+          pairLength = 'Full House';
+          specialMatch.unshift(match);
+        } else {
+          pairLength = 'Three Of a Kind';
+        }
       } else if (match.length === 4) {
         pairLength = 'Four of a Kind';
       }
       if(pairs > 1) {
         pairLength = 'Two Pair';
       }
-      console.log(`Match ${num}: ${pairLength} (${match})`);
+      console.log(`Match ${num}: ${pairLength} (${fullHouse ? specialMatch : match})`);
       num++;
     });
+    //Check for Straight
+    let values = [];
+    const faces = ['A', '2', '3', '4', '5', '6', '7', '8', '9', '10', 'J', 'Q', 'K'];
+    //TODO Account for Ace value of 1 and 13
+    for(let x = 0; x < 7; x++) {
+      values.push(faces.indexOf(allCards[x][0]));
+    }
+    const cardValues = values.sort((a, b) => a - b);
+    console.log(cardValues);
+    let straight = [];
+    let started = false;
+    for(let x = 0; x < 6; x++){
+      if(cardValues[x + 1] === (cardValues[x] + 1)) {
+        if(!started) {
+          straight.push(faces[cardValues[x]]);
+          started = true;
+        }
+        straight.push(faces[cardValues[x + 1]]);
+      } else {
+        if(straight.length < 5) {
+          straight = [];
+          started = false;
+        }
+      }
+    }
+    if(straight.length >= 5) {
+      console.log(`Straight: ${straight}`);
+    } else {
+      straight = [];
+    }
+    if(allMatches.length === 0 && straight.length === 0) {
+      let highCard = allCards[0][0];
+      let fullHighCard = [`${allCards[0][0]} ${allCards[0][1]}`];
+      for(let x = 0; x < 6; x++) {
+        if((allCards[x + 1][0]) > highCard){
+          highCard = allCards[x + 1][0];
+          fullHighCard = [`${allCards[x + 1][0]} ${allCards[x + 1][1]}`];
+        }
+      }
+      console.log(`High Card: ${fullHighCard}`);
+    }
     let handRank, fullHand;
     bestHand[0] = handRank;
     bestHand[1] = fullHand;
@@ -895,7 +951,7 @@ class Game extends React.Component {
         {gameIsOver ? 
           <div id='gameOverDisplay'>
             <div id='winnerDiv'>
-              <span className='winText'>Player {actives[0]} Wins</span>
+              <span className='winText'>Player {actives[0] + 1} Wins</span>
               <span className='winText'>${winnerMoney}</span>
             </div>
             <div id='menuButtonDiv'>
