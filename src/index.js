@@ -136,7 +136,7 @@ class Game extends React.Component {
     this.state = {
       currentDeck: this.createDeck(),
       board: [],
-      round: 'blinds',
+      round: 'river',
       turn: turn,
       dealer: dealer,
       moneyList: list,
@@ -332,10 +332,6 @@ class Game extends React.Component {
         activePlayers: actives,
       });
     }
-  }
-
-  componentDidMount(){
-    this.initialDeal();
   }
 
   initialDeal(){
@@ -577,8 +573,40 @@ class Game extends React.Component {
     return false;
   }
 
+  createCard(face, suit) {
+    const string = `${face} ${suit}`;
+    return (
+      <div className='cardContainer' key={string}>
+        <div className='card'>
+          <div className='cardText'>{string}</div>
+        </div>
+      </div>
+    );
+  }
+
   endRound(){
-    const board = [];
+    /*
+    const faces = ['2', '3', '4', '5', '6', '7', '8', '9', '10', 'J', 'Q', 'K', 'A'];
+    const suits = ['\u2660', '\u2663', '\u2665', '\u2666'];
+
+    (
+      <div className='cardContainer' key={card}>
+        <div className='card'>
+          <div className='cardText'>{card}</div>
+        </div>
+      </div>
+    );
+
+
+    (
+      <div className='cardContainer' key={'8 \u2666'}>
+        <div className='card'>
+          <div className='cardText'>8 \u2666</div>
+        </div>
+      </div>
+    )
+    */
+    const board = [[this.createCard('9', '\u2663')], [this.createCard('J', '\u2666')], [this.createCard('K', '\u2666')], [this.createCard('Q', '\u2666')], [this.createCard('8', '\u2666')]];
     let actives = [];
     const moneyList = this.state.moneyList;
     for(let x = 0; x < moneyList.length; x++){
@@ -586,16 +614,11 @@ class Game extends React.Component {
         actives.push(x);
       }
     }
-    let hands = [[],[],[],[]];
-    for(let x = 0; x < actives.length; x++){
-      for(let y = 0; y < 2; y++){
-        hands[actives[x]].push(this.dealCard());
-      }
-    }
+    let hands = [[[this.createCard('10', '\u2666')], [this.createCard('A', '\u2666')]],[[this.createCard('3', '\u2666')], [this.createCard('4', '\u2666')]],[[this.createCard('5', '\u2666')], [this.createCard('3', '\u2666')]],[[this.createCard('J', '\u2666')], [this.createCard('10', '\u2666')]]];
     const currentDeck = this.createDeck();
     const nextDealer = this.findNextDealer(actives);
     const turn = this.preFlopFirstTurn(actives, nextDealer);
-    const round = 'blinds';
+    const round = 'winner';
     const nullArray = Array(4).fill(null);
     const choices = Array(4).fill('Thinking');
     this.setState({
@@ -612,7 +635,7 @@ class Game extends React.Component {
       blindTitles: nullArray,
       turnChoices: choices,
       activePlayers: actives,
-      finish: false,
+      finish: true,
       p1: hands[0],
       p2: hands[1],
       p3: hands[2],
@@ -698,11 +721,11 @@ class Game extends React.Component {
     const board = this.state.board;
     const allCards = [];
     hands[handIndex].forEach(card => {
-      const parts = card.key.split(' ');
+      const parts = card[0].key.split(' ');
       allCards.push([parts[0], parts[1]]);
     });
     board.forEach(card => {
-      const parts = card.key.split(' ');
+      const parts = card[0].key.split(' ');
       allCards.push([parts[0], parts[1]]);
     });
     let allMatches = [];
@@ -970,7 +993,7 @@ class Game extends React.Component {
             <button id='gameOver' onClick={()=>{this.gameOver()}} style={{display:'none'}} className='roundButton'>Game Over</button>
             <button id='startAgain' onClick={()=>{this.startNextRound()}} style={{display:'none'}} className='roundButton'>Start Next Round</button>
             {finished ? <button id='finishRoundButton' onClick={() => {this.finishRoundEarly()}} className='roundButton'>Finish Round</button> : null}
-            {(paused  && !finished) ? <button onClick={()=>{this.handleTurn()}} className='roundButton'>Start Round</button> : null}
+            {(paused  && !finished) ? <button onClick={()=>{this.startNextRound()}} className='roundButton'>Start Round</button> : null}
             <div id='board' className='cardHolder'>{board}</div>
             <div id='pot'>Pot: {pot} Ante: {ante}</div>
             <div id='playersArea'>
