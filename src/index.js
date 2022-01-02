@@ -696,12 +696,53 @@ class Game extends React.Component {
     const board = this.state.board;
     const allCards = [];
     hands[handIndex].forEach(card => {
-      allCards.push(card.key);
+      const parts = card.key.split(' ');
+      allCards.push([parts[0], parts[1]]);
     });
     board.forEach(card => {
-      allCards.push(card.key);
+      const parts = card.key.split(' ');
+      allCards.push([parts[0], parts[1]]);
     });
-    console.log(`Player ${handIndex} 7-Card Hand: ${allCards}`);
+    let allMatches = [];
+    let matchedIndexes = [];
+    for (let x = 0; x < 7; x++){
+      let matched = false;
+      let matches = [[]];
+      for (let y = 0; y < 7; y ++){
+        if(allCards[x][0] === allCards[y][0] && x !== y && matchedIndexes.indexOf(x) === -1){
+          if(!matched){
+            matched = true;
+            matches[0].push(allCards[x][0]);
+          }
+          matches[0].push(allCards[y][0]);
+          matchedIndexes.push(y);
+        }
+      }
+      if(matches[0].length > 0) {
+        matches.forEach(match => {
+        allMatches.push(match);
+        });
+      }
+      matches = [];
+    }
+    let num = 1;
+    let pairLength;
+    let pairs = 0;
+    allMatches.forEach(match => {
+      if(match.length === 2) {
+        pairLength = 'One Pair';
+        pairs++;
+      } else if (match.length === 3) {
+        pairLength = 'Three Of a Kind';
+      } else if (match.length === 4) {
+        pairLength = 'Four of a Kind';
+      }
+      if(pairs > 1) {
+        pairLength = 'Two Pair';
+      }
+      console.log(`Match ${num}: ${pairLength} (${match})`);
+      num++;
+    });
     let handRank, fullHand;
     bestHand[0] = handRank;
     bestHand[1] = fullHand;
