@@ -2,6 +2,8 @@ import React from 'react';
 import ReactDOM from 'react-dom';
 import './index.css';
 
+//DEBUG BRANCH
+
 class App extends React.Component {
   render() {
     const p = 4;
@@ -761,15 +763,17 @@ class Game extends React.Component {
     //Check for Straight
     let values = [];
     const faces = ['A', '2', '3', '4', '5', '6', '7', '8', '9', '10', 'J', 'Q', 'K'];
-    //TODO Account for Ace value of 1 and 13
     for(let x = 0; x < 7; x++) {
       values.push(faces.indexOf(allCards[x][0]));
+    }
+    if(values.indexOf(0) !== -1) {
+      values.push(13);
     }
     const cardValues = values.sort((a, b) => a - b);
     console.log(cardValues);
     let straight = [];
     let started = false;
-    for(let x = 0; x < 6; x++){
+    for(let x = 0; x < cardValues.length - 1; x++){
       if(cardValues[x + 1] === (cardValues[x] + 1)) {
         if(!started) {
           straight.push(faces[cardValues[x]]);
