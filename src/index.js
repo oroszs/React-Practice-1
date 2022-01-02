@@ -659,11 +659,11 @@ class Game extends React.Component {
     const actives = this.state.activePlayers;
     const pot = this.state.pot;
     const players = this.props.players;
-    let handValues = [];
+    let bestHands = [];
     actives.forEach((index) => {
-      handValues.push(this.getBestHand(index));
+      bestHands.push(this.getBestHand(index));
     });
-    const windex = this.getWinningHand(handValues);
+    const windex = this.getWinningHand(bestHands);
     let blindTitles = [];
     let moneyList = this.state.moneyList;
     moneyList[windex] += pot;
@@ -674,7 +674,6 @@ class Game extends React.Component {
         blindTitles[x] = '';
       }
     }
-    console.log(`Active Index: ${activeIndex}, Winner Index: ${windex}`);
     this.setState({
       blindTitles: blindTitles,
       moneyList: moneyList,
@@ -692,10 +691,21 @@ class Game extends React.Component {
   }
 
   getBestHand(handIndex){
-    let hand = [2];
-    hand[0] = handRank;
-    hand[1] = kickerRank;
-    return hand;
+    let bestHand = [2];
+    const hands = [this.state.p1, this.state.p2, this.state.p3, this.state.p4];
+    const board = this.state.board;
+    const allCards = [];
+    hands[handIndex].forEach(card => {
+      allCards.push(card.key);
+    });
+    board.forEach(card => {
+      allCards.push(card.key);
+    });
+    console.log(`Player ${handIndex} 7-Card Hand: ${allCards}`);
+    let handRank, fullHand;
+    bestHand[0] = handRank;
+    bestHand[1] = fullHand;
+    return bestHand;
   }
 
   getWinningHand(handValues) {
