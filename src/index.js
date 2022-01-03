@@ -606,7 +606,7 @@ class Game extends React.Component {
       </div>
     )
     */
-    const board = [[this.createCard('9', '\u2663')], [this.createCard('J', '\u2666')], [this.createCard('K', '\u2666')], [this.createCard('Q', '\u2666')], [this.createCard('8', '\u2666')]];
+    const board = [[this.createCard('9', '\u2663')], [this.createCard('9', '\u2666')], [this.createCard('K', '\u2666')], [this.createCard('Q', '\u2666')], [this.createCard('8', '\u2666')]];
     let actives = [];
     const moneyList = this.state.moneyList;
     for(let x = 0; x < moneyList.length; x++){
@@ -614,7 +614,7 @@ class Game extends React.Component {
         actives.push(x);
       }
     }
-    let hands = [[[this.createCard('10', '\u2666')], [this.createCard('A', '\u2666')]],[[this.createCard('3', '\u2666')], [this.createCard('4', '\u2666')]],[[this.createCard('5', '\u2666')], [this.createCard('3', '\u2666')]],[[this.createCard('J', '\u2666')], [this.createCard('10', '\u2666')]]];
+    let hands = [[[this.createCard('9', '\u2660')], [this.createCard('K', '\u2660')]],[[this.createCard('3', '\u2666')], [this.createCard('4', '\u2666')]],[[this.createCard('5', '\u2666')], [this.createCard('8', '\u2660')]],[[this.createCard('J', '\u2666')], [this.createCard('10', '\u2666')]]];
     const currentDeck = this.createDeck();
     const nextDealer = this.findNextDealer(actives);
     const turn = this.preFlopFirstTurn(actives, nextDealer);
@@ -716,7 +716,7 @@ class Game extends React.Component {
   }
 
   getBestHand(handIndex){
-    let bestHand = [2];
+    let bestHand = [];
     const hands = [this.state.p1, this.state.p2, this.state.p3, this.state.p4];
     const board = this.state.board;
     const allCards = [];
@@ -730,24 +730,27 @@ class Game extends React.Component {
     });
     let allMatches = [];
     let matchedIndexes = [];
+    let allFormattedMatches = [];
     //Check for Pair, Two Pair, Three of a Kind, Four of a Kind, and Full House
     for (let x = 0; x < 7; x++){
       let matched = false;
       let matches = [[]];
+      let formattedMatch = [[]];
       for (let y = 0; y < 7; y ++){
         if(allCards[x][0] === allCards[y][0] && x !== y && matchedIndexes.indexOf(x) === -1){
           if(!matched){
             matched = true;
             matches[0].push(allCards[x][0]);
+            formattedMatch[0].push(`${allCards[x][0]} ${allCards[x][1]}`);
           }
           matches[0].push(allCards[y][0]);
+          formattedMatch[0].push(`${allCards[y][0]} ${allCards[y][1]}`);
           matchedIndexes.push(y);
         }
       }
       if(matches[0].length > 0) {
-        matches.forEach(match => {
-        allMatches.push(match);
-        });
+        allMatches.push(matches[0]);
+        allFormattedMatches.push(formattedMatch[0]);
       }
       matches = [];
     }
@@ -755,80 +758,87 @@ class Game extends React.Component {
     let pairLength;
     let pairs = 0;
     console.log(`Player ${handIndex + 1} Matches:`);
-    allMatches.forEach(match => {
-      let specialMatch = [];
+    for(let x = 0; x < allMatches.length; x++){
       let fullHouse = false;
-      if(match.length === 2) {
+      let specialMatch = [];
+      let specialForm = [];
+      if(allMatches[x].length === 2) {
         pairLength = 'One Pair';
         pairs++;
-      } else if (match.length === 3) {
-        allMatches.forEach(match => {
-          if(match.length === 2) {
+      } else if(allMatches[x].length === 3) {
+        for(let y = 0; y < allMatches.length; y++) {
+          if(allMatches[y].length === 2) {
             fullHouse = true;
-            specialMatch.push(match);
+            specialMatch.push(allMatches[y]);
+            specialForm.push(allFormattedMatches[y]);
           }
-        });
+        }
         if(fullHouse) {
           pairLength = 'Full House';
-          specialMatch.unshift(match);
+          specialMatch.unshift(allMatches[x]);
+          specialForm.unshift(allFormattedMatches[x]);
         } else {
-          pairLength = 'Three Of a Kind';
+          pairLength = 'Three of a Kind';
         }
-      } else if (match.length === 4) {
+      } else if (allMatches[x].length === 4) {
         pairLength = 'Four of a Kind';
       }
       if(pairs > 1) {
         pairLength = 'Two Pair';
       }
-      console.log(`Match ${num}: ${pairLength} (${fullHouse ? specialMatch : match})`);
-      num++;
-    });
+      console.log(`Match ${num}: ${pairLength} (${fullHouse ? specialForm : allFormattedMatches[x]})`);
+      num ++;
+    }
     //Check for Straight
     let values = [];
-    const faces = ['A', '2', '3', '4', '5', '6', '7', '8', '9', '10', 'J', 'Q', 'K'];
+    const faces = ['A', '2', '3', '4', '5', '6', '7', '8', '9', '10', 'J', 'Q', 'K', 'A'];
     for(let x = 0; x < 7; x++) {
-      values.push(faces.indexOf(allCards[x][0]));
+      values.push([[faces.indexOf(allCards[x][0])], [allCards[x][1]]]);
     }
-    if(values.indexOf(0) !== -1) {
-      values.push(13);
+    let ace = false;
+    for(let x = 0; x < values.length; x++){
+      if(values[x][0][0] === 0 && !ace) {
+        ace = true;
+        values.push([[13], [allCards[x][1]]]);
+      }
     }
-    const cardValues = values.sort((a, b) => a - b);
-    console.log(cardValues);
+    const cardValues = values.sort((a, b) => a[0] - b[0]);
     let straight = [];
     let started = false;
     for(let x = 0; x < cardValues.length - 1; x++){
-      if(cardValues[x + 1] === (cardValues[x] + 1)) {
+      if(cardValues[x + 1][0][0] === (cardValues[x][0][0] + 1)) {
         if(!started) {
-          straight.push(faces[cardValues[x]]);
+          straight.push([faces[cardValues[x][0]], [cardValues[x][1]]]);
           started = true;
         }
-        straight.push(faces[cardValues[x + 1]]);
-      } else {
+        straight.push([faces[cardValues[x + 1][0]], [cardValues[x + 1][1]]]);
+      } else if (cardValues[x + 1][0][0] !== cardValues[x][0][0]) {
         if(straight.length < 5) {
           straight = [];
           started = false;
         }
       }
     }
-    if(straight.length >= 5) {
-      console.log(`Straight: ${straight}`);
+    if(straight.length > 5) {
+      const extra = straight.length - 5;
+      for(let x = 0; x < extra; x++) {
+        straight.shift();
+      }
+    }
+    if(straight.length === 5) {
+      let formattedStraight = [];
+      for(let x = 0; x < straight.length; x++) {
+        formattedStraight.push(`${straight[x][0]} ${straight[x][1]}`);
+      }
+      console.log(`Straight: ${formattedStraight}`);
     } else {
       straight = [];
     }
+    //TODO Check for Flush
     if(allMatches.length === 0 && straight.length === 0) {
-      let highCard = allCards[0][0];
-      let fullHighCard = [`${allCards[0][0]} ${allCards[0][1]}`];
-      for(let x = 0; x < 6; x++) {
-        if((allCards[x + 1][0]) > highCard){
-          highCard = allCards[x + 1][0];
-          fullHighCard = [`${allCards[x + 1][0]} ${allCards[x + 1][1]}`];
-        }
-      }
-      console.log(`High Card: ${fullHighCard}`);
+      const highCard = `${faces[cardValues[cardValues.length - 1][0]]} ${cardValues[cardValues.length - 1][1]}`;
+      console.log(`High Card: ${highCard}`);
     }
-    let handRank, fullHand;
-    bestHand[0] = handRank;
-    bestHand[1] = fullHand;
     return bestHand;
   }
 
