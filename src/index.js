@@ -585,28 +585,8 @@ class Game extends React.Component {
   }
 
   endRound(){
-    /*
-    const faces = ['2', '3', '4', '5', '6', '7', '8', '9', '10', 'J', 'Q', 'K', 'A'];
     const suits = ['\u2660', '\u2663', '\u2665', '\u2666'];
-
-    (
-      <div className='cardContainer' key={card}>
-        <div className='card'>
-          <div className='cardText'>{card}</div>
-        </div>
-      </div>
-    );
-
-
-    (
-      <div className='cardContainer' key={'8 \u2666'}>
-        <div className='card'>
-          <div className='cardText'>8 \u2666</div>
-        </div>
-      </div>
-    )
-    */
-    const board = [[this.createCard('10', '\u2663')], [this.createCard('9', '\u2666')], [this.createCard('K', '\u2666')], [this.createCard('Q', '\u2666')], [this.createCard('8', '\u2666')]];
+    const board = [[this.createCard('8', suits[3])], [this.createCard('J', suits[0])], [this.createCard('Q', suits[1])], [this.createCard('A', suits[1])], [this.createCard('7', suits[1])]];
     let actives = [];
     const moneyList = this.state.moneyList;
     for(let x = 0; x < moneyList.length; x++){
@@ -614,7 +594,7 @@ class Game extends React.Component {
         actives.push(x);
       }
     }
-    let hands = [[[this.createCard('9', '\u2660')], [this.createCard('9', '\u2665')]],[[this.createCard('3', '\u2666')], [this.createCard('4', '\u2666')]],[[this.createCard('5', '\u2666')], [this.createCard('2', '\u2660')]],[[this.createCard('J', '\u2666')], [this.createCard('A', '\u2666')]]];
+    let hands = [[[this.createCard('9', suits[2])], [this.createCard('10', suits[3])]],[[this.createCard('3', suits[1])], [this.createCard('4', suits[1])]],[[this.createCard('5', suits[1])], [this.createCard('2', suits[1])]],[[this.createCard('J', suits[3])], [this.createCard('A', suits[1])]]];
     const currentDeck = this.createDeck();
     const nextDealer = this.findNextDealer(actives);
     const turn = this.preFlopFirstTurn(actives, nextDealer);
@@ -754,7 +734,6 @@ class Game extends React.Component {
       }
       matches = [];
     }
-    let num = 1;
     let pairLength;
     let pairs = 0;
     console.log(`Player ${handIndex + 1} Matches:`);
@@ -786,8 +765,7 @@ class Game extends React.Component {
       if(pairs > 1) {
         pairLength = 'Two Pair';
       }
-      console.log(`Match ${num}: ${pairLength} (${fullHouse ? specialForm : allFormattedMatches[x]})`);
-      num ++;
+      console.log(`${pairLength} (${fullHouse ? specialForm : allFormattedMatches[x]})`);
     }
     //Check for Straight
     let values = [];
@@ -834,7 +812,30 @@ class Game extends React.Component {
     } else {
       straight = [];
     }
-    //TODO Check for Flush
+    //Check for Flush
+    let flush;
+    let oldSuit;
+    for(let x = 0; x < allCards.length; x++) {
+      let suit = allCards[x][1];
+      flush = [`${allCards[x][0]} ${allCards[x][1]}`];
+      for(let y = 0; y < allCards.length; y++) {
+        if(suit === allCards[y][1] && x !== y) {
+          flush.push([`${allCards[y][0]} ${allCards[y][1]}`]);
+        }
+      }
+      if(flush.length > 5) {
+        let extra = flush.length - 5;
+        for(let z = 0; z < extra; z++) {
+          flush.shift();
+        }
+      }
+      if(flush.length === 5 && suit !== oldSuit) {
+        oldSuit = suit;
+        console.log(`Flush: ${flush}`);
+      } else {
+        flush = [];
+      }
+    }
     if(allMatches.length === 0 && straight.length === 0) {
       const highCard = `${faces[cardValues[cardValues.length - 1][0]]} ${cardValues[cardValues.length - 1][1]}`;
       console.log(`High Card: ${highCard}`);
