@@ -606,7 +606,7 @@ class Game extends React.Component {
       </div>
     )
     */
-    const board = [[this.createCard('9', '\u2663')], [this.createCard('9', '\u2666')], [this.createCard('K', '\u2666')], [this.createCard('Q', '\u2666')], [this.createCard('8', '\u2666')]];
+    const board = [[this.createCard('10', '\u2663')], [this.createCard('9', '\u2666')], [this.createCard('K', '\u2666')], [this.createCard('Q', '\u2666')], [this.createCard('8', '\u2666')]];
     let actives = [];
     const moneyList = this.state.moneyList;
     for(let x = 0; x < moneyList.length; x++){
@@ -614,7 +614,7 @@ class Game extends React.Component {
         actives.push(x);
       }
     }
-    let hands = [[[this.createCard('9', '\u2660')], [this.createCard('K', '\u2660')]],[[this.createCard('3', '\u2666')], [this.createCard('4', '\u2666')]],[[this.createCard('5', '\u2666')], [this.createCard('8', '\u2660')]],[[this.createCard('J', '\u2666')], [this.createCard('10', '\u2666')]]];
+    let hands = [[[this.createCard('9', '\u2660')], [this.createCard('9', '\u2665')]],[[this.createCard('3', '\u2666')], [this.createCard('4', '\u2666')]],[[this.createCard('5', '\u2666')], [this.createCard('2', '\u2660')]],[[this.createCard('J', '\u2666')], [this.createCard('A', '\u2666')]]];
     const currentDeck = this.createDeck();
     const nextDealer = this.findNextDealer(actives);
     const turn = this.preFlopFirstTurn(actives, nextDealer);
