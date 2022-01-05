@@ -2,6 +2,9 @@ import React from 'react';
 import ReactDOM from 'react-dom';
 import './index.css';
 
+//Debug: Winner is set to random, Choice is set to Check/Call
+//TODO Fix Ace value in flush and straight
+
 class App extends React.Component {
   render() {
     const p = 4;
@@ -243,7 +246,8 @@ class Game extends React.Component {
         turnChoice = '';
       }
       if(turnChoice !== 'Good' && turnChoice !== 'Fold' && turnChoice !== 'All In'){
-        let choice = Math.floor(Math.random() * 3);
+        //let choice = Math.floor(Math.random() * 3);
+        let choice = 0;
         switch (choice) {
           case 0:
             //Check / Call
@@ -663,7 +667,8 @@ class Game extends React.Component {
     actives.forEach((index) => {
       bestHands.push(this.getBestHand(index));
     });
-    const windex = this.getWinningHand(bestHands);
+    //const windex = this.getWinningHand(bestHands);
+    const windex = Math.floor(Math.random() * actives.length);
     let blindTitles = [];
     let moneyList = this.state.moneyList;
     moneyList[windex] += pot;
