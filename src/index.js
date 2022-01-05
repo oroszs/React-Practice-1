@@ -586,7 +586,7 @@ class Game extends React.Component {
 
   endRound(){
     const suits = ['\u2660', '\u2663', '\u2665', '\u2666'];
-    const board = [[this.createCard('8', suits[3])], [this.createCard('9', suits[3])], [this.createCard('10', suits[3])], [this.createCard('J', suits[3])], [this.createCard('Q', suits[0])]];
+    const board = [[this.createCard('3', suits[3])], [this.createCard('4', suits[3])], [this.createCard('5', suits[3])], [this.createCard('6', suits[3])], [this.createCard('Q', suits[0])]];
     let actives = [];
     const moneyList = this.state.moneyList;
     for(let x = 0; x < moneyList.length; x++){
@@ -594,7 +594,7 @@ class Game extends React.Component {
         actives.push(x);
       }
     }
-    let hands = [[[this.createCard('K', suits[3])], [this.createCard('7', suits[3])]],[[this.createCard('3', suits[3])], [this.createCard('4', suits[0])]],[[this.createCard('A', suits[0])], [this.createCard('2', suits[1])]],[[this.createCard('6', suits[3])], [this.createCard('A', suits[3])]]];
+    let hands = [[[this.createCard('2', suits[3])], [this.createCard('A', suits[3])]],[[this.createCard('3', suits[1])], [this.createCard('4', suits[2])]],[[this.createCard('A', suits[0])], [this.createCard('2', suits[1])]],[[this.createCard('7', suits[3])], [this.createCard('5', suits[2])]]];
     const currentDeck = this.createDeck();
     const nextDealer = this.findNextDealer(actives);
     const turn = this.preFlopFirstTurn(actives, nextDealer);
@@ -827,10 +827,11 @@ class Game extends React.Component {
         if(straight.length < 5) {
           straight = [];
           started = false;
+        } else {
+          break;
         }
       }
     }
-
     oldSuit = null;
     for(let x = 0; x < straight.length; x++) {
       let suit = straight[x][1][0][0];
