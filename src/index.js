@@ -153,7 +153,7 @@ class Game extends React.Component {
       foldIndex: null,
       gameIsOver: false,
     }
-    this.dealCard = this.dealCard.bind(this);
+    this.dealCards = this.dealCards.bind(this);
   }
 
   preFlopFirstTurn(actives, dealer) {
@@ -189,24 +189,29 @@ class Game extends React.Component {
     return fullDeck;
   }
 
-  dealCard(){
+  dealCards(num){
+    let cards = [];
     const deck = this.state.currentDeck;
-    let index = Math.floor(Math.random() * deck.length);
-    let card = deck[index];
-    deck.splice(index, 1);
-
+    let index;
+    let card;
+    for(let x = 0; x < num; x++) {
+      index = Math.floor(Math.random() * deck.length);
+      card = deck[index];
+      deck.splice(index, 1);
+      cards.push(
+        <div className='cardContainer' key={card}>
+          <div className='card'>
+            {card.includes('\u2665') || card.includes('\u2666') ?
+            <div className='cardText'>{card.split(' ')[0]} <span style={{color: 'red'}}>{card.split(' ')[1]}</span></div> :
+            <div className='cardText'>{card}</div>}
+          </div>
+        </div>
+      );
+    }
     this.setState({
       currentDeck: deck,
     });
-    return (
-      <div className='cardContainer' key={card}>
-        <div className='card'>
-          {card.includes('\u2665') || card.includes('\u2666') ?
-          <div className='cardText'>{card.split(' ')[0]} <span style={{color: 'red'}}>{card.split(' ')[1]}</span></div> :
-          <div className='cardText'>{card}</div>}
-        </div>
-      </div>
-    );
+    return cards;
   }
 
   bet(playerTurn){
@@ -246,8 +251,8 @@ class Game extends React.Component {
         turnChoice = '';
       }
       if(turnChoice !== 'Good' && turnChoice !== 'Fold' && turnChoice !== 'All In'){
-        //let choice = Math.floor(Math.random() * 3);
-        let choice = 0;
+        let choice = Math.floor(Math.random() * 3);
+        //let choice = 0;
         switch (choice) {
           case 0:
             //Check / Call
@@ -321,7 +326,7 @@ class Game extends React.Component {
       moneyList[turnIndex] = money;
       turnChoices[turnIndex] = turnChoice;
       diff = ante - roundAmt;
-      console.log(`${turnChoice} ${turnAmt} Diff: ${diff} ${foldIndex}`);
+      console.log(`${turnChoice} ${turnAmt} Diff: ${diff}`);
       cons[turnIndex] = roundAmt;
       this.setState({
         foldIndex: foldIndex,
@@ -343,9 +348,13 @@ class Game extends React.Component {
   initialDeal(){
     let hands = [[],[],[],[]];
     const actives = this.state.activePlayers;
-    for(let x = 0; x < actives.length; x++){
-      for(let y = 0; y < 2; y++){
-        hands[actives[x]].push(this.dealCard());
+    let numCards = actives.length * 2;
+    const cards = this.dealCards(numCards);
+    let x = 0;
+    for(let player = 0; player < actives.length; player++){
+      for(let card = 0; card < 2; card++){
+        hands[player].push(cards[x]);
+        x++;
       }
     }
     this.setState({
@@ -398,7 +407,6 @@ class Game extends React.Component {
               }
               blindTitles[finalSmallIndex] = 'Dealer / Small Blind';
               blindTitles[finalBigIndex] = 'Big Blind';
-              console.log(`Dealer Index: ${dealerIndex}, Small Index: ${finalSmallIndex}, Big Index: ${finalBigIndex}`);
             } else {
                 blindTitles[actives[actives.indexOf(dealerIndex)]] = 'Dealer';
                 let smallIndex = actives.indexOf(dealerIndex) - 1;
@@ -466,14 +474,16 @@ class Game extends React.Component {
                 this.endBettingRound();
                 clearInterval(id);
                 if(!finish) {
-                  for(let x = 0; x < 3; x++){
-                    board.push(this.dealCard());
+                  const cards = this.dealCards(3);
+                  for(let x = 0; x < cards.length; x++){
+                    board.push(cards[x]);
                   }
                 }
                 this.setState({
                   finish: finish,
                   round: 'flop',
                   pause: true,
+                  board: board,
                 }, () => {
                   return;
                 });
@@ -492,11 +502,15 @@ class Game extends React.Component {
             if(stopTheRound){
               this.endBettingRound();
               clearInterval(id);
-              if(!finish){board.push(this.dealCard());}
+              if(!finish){
+                const card = this.dealCards(1);
+                board.push(card[0]);
+              }
               this.setState({
                 finish: finish,
                 round: 'turn',
                 pause: true,
+                board: board,
               }, () => {
                 return;
               });
@@ -515,11 +529,15 @@ class Game extends React.Component {
             if(stopTheRound){
               this.endBettingRound();
               clearInterval(id);
-              if(!finish){board.push(this.dealCard());}
+              if(!finish){
+                const card = this.dealCards(1);
+                board.push(card[0]);
+              }
               this.setState({
                 finish: finish,
                 round: 'river',
                 pause: true,
+                board: board,
               }, () => {
                 return;
               });
@@ -589,9 +607,13 @@ class Game extends React.Component {
       }
     }
     let hands = [[],[],[],[]];
-    for(let x = 0; x < actives.length; x++){
-      for(let y = 0; y < 2; y++){
-        hands[actives[x]].push(this.dealCard());
+    let numCards = actives.length * 2;
+    const cards = this.dealCards(numCards);
+    let x = 0;
+    for(let player = 0; player < actives.length; player++){
+      for(let card = 0; card < 2; card++){
+        hands[player].push(cards[x]);
+        x++;
       }
     }
     const currentDeck = this.createDeck();
@@ -629,20 +651,24 @@ class Game extends React.Component {
     let board = this.state.board;
     let but = document.getElementById('finishRoundButton');
     but.style.display = 'none';
+    let cards;
     const id = setInterval(() => {
       switch (round) {
         case 'flop' :
-          for(let x = 0; x < 3; x++){
-            board.push(this.dealCard());
+          cards = this.dealCards(3);
+          for(let x = 0; x < cards.length; x++){
+            board.push(cards[x]);
           }
           round = 'turn';
           break;
         case 'turn' :
-          board.push(this.dealCard());
+          cards = this.dealCards(1);
+          board.push(cards[0]);
           round = 'river';
           break;
         case 'river' :
-          board.push(this.dealCard());
+          cards = this.dealCards(1);
+          board.push(cards[0]);
           round = 'winner';
           break;
         case 'winner' :
@@ -668,7 +694,7 @@ class Game extends React.Component {
       bestHands.push(this.getBestHand(index));
     });
     //const windex = this.getWinningHand(bestHands);
-    const windex = Math.floor(Math.random() * actives.length);
+    const windex = actives[Math.floor(Math.random() * actives.length)];
     let blindTitles = [];
     let moneyList = this.state.moneyList;
     moneyList[windex] += pot;
@@ -684,7 +710,6 @@ class Game extends React.Component {
       moneyList: moneyList,
     }, () => {
       const over = this.gameOverCheck();
-      console.log(`gameOver=${over}`);
       if(over){
         let overBut = document.getElementById('gameOver');
         overBut.style.display= 'block';
@@ -895,7 +920,6 @@ class Game extends React.Component {
         activeNum++;
       }
     });
-    console.log(`active player count: ${activeNum}`);
     if(activeNum === 1){
       return true;
     }
@@ -932,41 +956,28 @@ class Game extends React.Component {
   findNextDealer(actives){
     const currentDealerIndex = this.state.dealer - 1;
     let nextDealerIndex;
-    console.log(`---Current Dealer Index: ${currentDealerIndex}---`);
 
     if(actives.includes(currentDealerIndex)) {
-      console.log(`index ${currentDealerIndex} was on active list`);
       if(actives.indexOf(currentDealerIndex) === 0) {
-        console.log('0 -> last active index');
         nextDealerIndex = actives[actives.length - 1];
       } else {
         nextDealerIndex = actives[actives.indexOf(currentDealerIndex) - 1];
-        console.log(`set to index ${nextDealerIndex}`);
       }
     } else {
-      console.log(`index ${currentDealerIndex} inactive`);
       if(currentDealerIndex === 0) {
-        console.log('0 -> last active index');
         nextDealerIndex = actives[actives.length - 1];
       } else {
         nextDealerIndex = currentDealerIndex - 1;
-        console.log(`Check index ${nextDealerIndex}`);
       }
 
       if(!actives.includes(nextDealerIndex)){
-        console.log(`index ${nextDealerIndex} also inactive`);
         if(nextDealerIndex === 0) {
-          console.log('0 -> last active index');
           nextDealerIndex = actives[actives.length - 1];
         } else {
           nextDealerIndex  = nextDealerIndex - 1;
-          console.log(`set to index ${nextDealerIndex}`);
         }
       }
     }
-
-
-    console.log(`---Next Dealer Index: ${nextDealerIndex}---`);
     const nextDealer = nextDealerIndex + 1;
     return nextDealer;
 
@@ -982,7 +993,6 @@ class Game extends React.Component {
     con = Array(players).fill(0);
     last = null;
     const turn = this.findNextDealer(actives);
-    console.log(`Under The Gun Index: ${turn - 1}`);
     this.setState({
       bet: bet,
       contributions: con,
