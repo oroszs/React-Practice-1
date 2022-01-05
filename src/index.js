@@ -586,7 +586,7 @@ class Game extends React.Component {
 
   endRound(){
     const suits = ['\u2660', '\u2663', '\u2665', '\u2666'];
-    const board = [[this.createCard('8', suits[3])], [this.createCard('J', suits[3])], [this.createCard('Q', suits[3])], [this.createCard('4', suits[3])], [this.createCard('7', suits[3])]];
+    const board = [[this.createCard('8', suits[3])], [this.createCard('9', suits[3])], [this.createCard('10', suits[3])], [this.createCard('J', suits[3])], [this.createCard('Q', suits[0])]];
     let actives = [];
     const moneyList = this.state.moneyList;
     for(let x = 0; x < moneyList.length; x++){
@@ -594,7 +594,7 @@ class Game extends React.Component {
         actives.push(x);
       }
     }
-    let hands = [[[this.createCard('9', suits[2])], [this.createCard('10', suits[3])]],[[this.createCard('3', suits[3])], [this.createCard('4', suits[0])]],[[this.createCard('A', suits[0])], [this.createCard('2', suits[1])]],[[this.createCard('6', suits[3])], [this.createCard('A', suits[3])]]];
+    let hands = [[[this.createCard('K', suits[3])], [this.createCard('7', suits[3])]],[[this.createCard('3', suits[3])], [this.createCard('4', suits[0])]],[[this.createCard('A', suits[0])], [this.createCard('2', suits[1])]],[[this.createCard('6', suits[3])], [this.createCard('A', suits[3])]]];
     const currentDeck = this.createDeck();
     const nextDealer = this.findNextDealer(actives);
     const turn = this.preFlopFirstTurn(actives, nextDealer);
@@ -828,6 +828,34 @@ class Game extends React.Component {
           straight = [];
           started = false;
         }
+      }
+    }
+
+    oldSuit = null;
+    for(let x = 0; x < straight.length; x++) {
+      let suit = straight[x][1][0][0];
+      let straightFlush = [`${straight[x][0]} ${straight[x][1][0][0]}`];
+      for(let y = x + 1; y < straight.length; y++) {
+        if(suit === straight[y][1][0][0][0]) {
+          straightFlush.push(`${straight[y][0]} ${straight[y][1][0][0]}`);
+        } else if (straightFlush.length < 5) {
+            straightFlush = [];
+          } else {
+            break;
+          }
+        }
+      if(straightFlush.length > 5) {
+        let extra = straightFlush.length - 5;
+        for(let z = 0; z < extra; z++) {
+          straightFlush.shift();
+        }
+      }
+
+      if(straightFlush.length === 5 && suit !== oldSuit) {
+        oldSuit = suit;
+        console.log(`Straight Flush: ${straightFlush}`);
+      } else {
+        straightFlush = [];
       }
     }
     
