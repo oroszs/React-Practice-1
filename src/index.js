@@ -773,6 +773,33 @@ class Game extends React.Component {
     for(let x = 0; x < 7; x++) {
       values.push([[faces.indexOf(allCards[x][0])], [allCards[x][1]]]);
     }
+    //Check for Flush
+    const cardValues = values.sort((a, b) => a[0] - b[0]);
+    
+    //Check for Flush
+    let flush;
+    let oldSuit;
+    for(let x = 0; x < allCards.length; x++) {
+      let suit = allCards[x][1];
+      flush = [`${allCards[x][0]} ${allCards[x][1]}`];
+      for(let y = 0; y < allCards.length; y++) {
+        if(suit === allCards[y][1] && x !== y) {
+          flush.push([`${allCards[y][0]} ${allCards[y][1]}`]);
+        }
+      }
+      if(flush.length > 5) {
+        let extra = flush.length - 5;
+        for(let z = 0; z < extra; z++) {
+          flush.shift();
+        }
+      }
+      if(flush.length === 5 && suit !== oldSuit) {
+        oldSuit = suit;
+        console.log(`Flush: ${flush}`);
+      } else {
+        flush = [];
+      }
+    }
     let ace = false;
     for(let x = 0; x < values.length; x++){
       if(values[x][0][0] === 0 && !ace) {
@@ -812,30 +839,7 @@ class Game extends React.Component {
     } else {
       straight = [];
     }
-    //Check for Flush
-    let flush;
-    let oldSuit;
-    for(let x = 0; x < allCards.length; x++) {
-      let suit = allCards[x][1];
-      flush = [`${allCards[x][0]} ${allCards[x][1]}`];
-      for(let y = 0; y < allCards.length; y++) {
-        if(suit === allCards[y][1] && x !== y) {
-          flush.push([`${allCards[y][0]} ${allCards[y][1]}`]);
-        }
-      }
-      if(flush.length > 5) {
-        let extra = flush.length - 5;
-        for(let z = 0; z < extra; z++) {
-          flush.shift();
-        }
-      }
-      if(flush.length === 5 && suit !== oldSuit) {
-        oldSuit = suit;
-        console.log(`Flush: ${flush}`);
-      } else {
-        flush = [];
-      }
-    }
+
     if(allMatches.length === 0 && straight.length === 0) {
       const highCard = `${faces[cardValues[cardValues.length - 1][0]]} ${cardValues[cardValues.length - 1][1]}`;
       console.log(`High Card: ${highCard}`);
