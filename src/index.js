@@ -696,11 +696,11 @@ class Game extends React.Component {
     const board = this.state.board;
     const allCards = [];
     hands[handIndex].forEach(card => {
-      const parts = card[0].key.split(' ');
+      const parts = card.key.split(' ');
       allCards.push([parts[0], parts[1]]);
     });
     board.forEach(card => {
-      const parts = card[0].key.split(' ');
+      const parts = card.key.split(' ');
       allCards.push([parts[0], parts[1]]);
     });
     let allMatches = [];
