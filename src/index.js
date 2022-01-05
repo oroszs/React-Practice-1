@@ -586,7 +586,7 @@ class Game extends React.Component {
 
   endRound(){
     const suits = ['\u2660', '\u2663', '\u2665', '\u2666'];
-    const board = [[this.createCard('3', suits[3])], [this.createCard('4', suits[3])], [this.createCard('5', suits[3])], [this.createCard('6', suits[3])], [this.createCard('Q', suits[0])]];
+    const board = [[this.createCard('2', suits[0])], [this.createCard('2', suits[3])], [this.createCard('5', suits[3])], [this.createCard('4', suits[3])], [this.createCard('3', suits[0])]];
     let actives = [];
     const moneyList = this.state.moneyList;
     for(let x = 0; x < moneyList.length; x++){
@@ -594,7 +594,7 @@ class Game extends React.Component {
         actives.push(x);
       }
     }
-    let hands = [[[this.createCard('2', suits[3])], [this.createCard('A', suits[3])]],[[this.createCard('3', suits[1])], [this.createCard('4', suits[2])]],[[this.createCard('A', suits[0])], [this.createCard('2', suits[1])]],[[this.createCard('7', suits[3])], [this.createCard('5', suits[2])]]];
+    let hands = [[[this.createCard('3', suits[3])], [this.createCard('A', suits[3])]],[[this.createCard('3', suits[1])], [this.createCard('4', suits[2])]],[[this.createCard('3', suits[0])], [this.createCard('2', suits[1])]],[[this.createCard('7', suits[3])], [this.createCard('5', suits[2])]]];
     const currentDeck = this.createDeck();
     const nextDealer = this.findNextDealer(actives);
     const turn = this.preFlopFirstTurn(actives, nextDealer);
@@ -734,6 +734,7 @@ class Game extends React.Component {
       }
       matches = [];
     }
+    //TODO add pairs to array, sort by value, and return highest two if possible
     let pairLength;
     let pairs = 0;
     console.log(`Player ${handIndex + 1} Matches:`);
@@ -771,19 +772,49 @@ class Game extends React.Component {
     //Check for Flush
 
     let values = [];
-    const flushFaces = ['2', '3', '4', '5', '6', '7', '8', '9', '10', 'J', 'Q', 'K', 'A'];
+    const high = ['A', '2', '3', '4', '5', '6', '7', '8', '9', '10', 'J', 'Q', 'K', 'A'];
     for(let x = 0; x < 7; x++) {
-      values.push([[flushFaces.indexOf(allCards[x][0])], [allCards[x][1]]]);
+      values.push([high.indexOf(allCards[x][0]), allCards[x][1]]);
     }
     let cardValues = values.sort((a, b) => a[0] - b[0]);
     let flush;
     let oldSuit;
+    let sFlush;
     for(let x = 0; x < cardValues.length; x++) {
-      let suit = cardValues[x][1][0];
-      flush = [`${flushFaces[cardValues[x][0][0]]} ${cardValues[x][1][0]}`];
+      flush = [];
+      sFlush = [];
+      flush.push(`${high[cardValues[x][0]]} ${cardValues[x][1]}`);
+      sFlush.push([cardValues[x][0], cardValues[x][1]]);
       for(let y = 0; y < cardValues.length; y++) {
-        if(suit === cardValues[y][1][0] && x !== y) {
-          flush.push([`${flushFaces[cardValues[y][0][0]]} ${cardValues[y][1][0]}`]);
+        if(cardValues[x][1] === cardValues[y][1] && x !== y) {
+          flush.push(`${high[cardValues[y][0]]} ${cardValues[y][1]}`);
+          sFlush.push([cardValues[y][0], cardValues[y][1]]);
+        }
+      }
+      let straightFlush = [];
+      let started = false;
+      for(let y = 0; y < sFlush.length - 1; y++) {
+        if(sFlush[y + 1][0] === sFlush[y][0] + 1) {
+          if(!started){
+            straightFlush.push(`${high[sFlush[y][0]]} ${sFlush[y][1]}`);
+            started= true;
+          }
+          straightFlush.push(`${high[sFlush[y + 1][0]]} ${sFlush[y + 1][1]}`);
+        } else if (sFlush[y + 1][0] !== sFlush[y][0]){
+          if(sFlush.length < 5) {
+            sFlush = [];
+          } else {
+            break;
+          }
+        }
+        if(straightFlush.length > 5) {
+          let extra = straightFlush.length - 5;
+          for(let z = 0; z < extra; z++) {
+            straightFlush.shift();
+          }          
+        }
+        if(straightFlush.length === 5) {
+          console.log(`Straight Flush: ${straightFlush}`);
         }
       }
       if(flush.length > 5) {
@@ -792,8 +823,8 @@ class Game extends React.Component {
           flush.shift();
         }
       }
-      if(flush.length === 5 && suit !== oldSuit) {
-        oldSuit = suit;
+      if(flush.length === 5 && cardValues[x][1] !== oldSuit) {
+        oldSuit = cardValues[x][1];
         console.log(`Flush: ${flush}`);
       } else {
         flush = [];
@@ -803,13 +834,13 @@ class Game extends React.Component {
     const straightFaces = ['A', '2', '3', '4', '5', '6', '7', '8', '9', '10', 'J', 'Q', 'K', 'A'];
     values = [];
     for(let x = 0; x < 7; x++) {
-      values.push([[straightFaces.indexOf(allCards[x][0])], [allCards[x][1]]]);
+      values.push([straightFaces.indexOf(allCards[x][0]), allCards[x][1]]);
     }
     let ace = false;
     for(let x = 0; x < values.length; x++){
-      if(values[x][0][0] === 0 && !ace) {
+      if(values[x][0] === 0 && !ace) {
         ace = true;
-        values.push([[13], [allCards[x][1]]]);
+        values.push([13, allCards[x][1]]);
       }
     }
 
@@ -817,34 +848,35 @@ class Game extends React.Component {
     let straight = [];
     let started = false;
     for(let x = 0; x < cardValues.length - 1; x++){
-      if(cardValues[x + 1][0][0] === (cardValues[x][0][0] + 1)) {
+      if(cardValues[x + 1][0] === (cardValues[x][0] + 1)) {
         if(!started) {
-          straight.push([straightFaces[cardValues[x][0]], [cardValues[x][1]]]);
+          straight.push([straightFaces[cardValues[x][0]], cardValues[x][1]]);
           started = true;
         }
-        straight.push([straightFaces[cardValues[x + 1][0]], [cardValues[x + 1][1]]]);
-      } else if (cardValues[x + 1][0][0] !== cardValues[x][0][0]) {
-        if(straight.length < 5) {
+        straight.push([straightFaces[cardValues[x + 1][0]], cardValues[x + 1][1]]);
+      } else if (cardValues[x + 1][0] !== cardValues[x][0]) {
+          if (straight.length < 5) {
           straight = [];
           started = false;
-        } else {
-          break;
+          } else {
+              break;
+            }
         }
-      }
     }
+/*
     oldSuit = null;
     for(let x = 0; x < straight.length; x++) {
-      let suit = straight[x][1][0][0];
-      let straightFlush = [`${straight[x][0]} ${straight[x][1][0][0]}`];
+      let suit = straight[x][1];
+      let straightFlush = [`${straight[x][0]} ${straight[x][1]}`];
       for(let y = x + 1; y < straight.length; y++) {
-        if(suit === straight[y][1][0][0][0]) {
-          straightFlush.push(`${straight[y][0]} ${straight[y][1][0][0]}`);
+        if(suit === straight[y][1]) {
+          straightFlush.push(`${straight[y][0]} ${straight[y][1]}`);
         } else if (straightFlush.length < 5) {
             straightFlush = [];
           } else {
             break;
           }
-        }
+      }
       if(straightFlush.length > 5) {
         let extra = straightFlush.length - 5;
         for(let z = 0; z < extra; z++) {
@@ -859,7 +891,7 @@ class Game extends React.Component {
         straightFlush = [];
       }
     }
-    
+    */
     if(straight.length > 5) {
       const extra = straight.length - 5;
       for(let x = 0; x < extra; x++) {
