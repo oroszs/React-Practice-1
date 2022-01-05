@@ -2,7 +2,7 @@ import React from 'react';
 import ReactDOM from 'react-dom';
 import './index.css';
 
-//Debug: Winner is set to random, Choice is set to Check/Call
+//Debug: Winner is set to random
 //TODO Fix Ace value in flush and straight
 
 class App extends React.Component {
