@@ -863,35 +863,6 @@ class Game extends React.Component {
             }
         }
     }
-/*
-    oldSuit = null;
-    for(let x = 0; x < straight.length; x++) {
-      let suit = straight[x][1];
-      let straightFlush = [`${straight[x][0]} ${straight[x][1]}`];
-      for(let y = x + 1; y < straight.length; y++) {
-        if(suit === straight[y][1]) {
-          straightFlush.push(`${straight[y][0]} ${straight[y][1]}`);
-        } else if (straightFlush.length < 5) {
-            straightFlush = [];
-          } else {
-            break;
-          }
-      }
-      if(straightFlush.length > 5) {
-        let extra = straightFlush.length - 5;
-        for(let z = 0; z < extra; z++) {
-          straightFlush.shift();
-        }
-      }
-
-      if(straightFlush.length === 5 && suit !== oldSuit) {
-        oldSuit = suit;
-        console.log(`Straight Flush: ${straightFlush}`);
-      } else {
-        straightFlush = [];
-      }
-    }
-    */
     if(straight.length > 5) {
       const extra = straight.length - 5;
       for(let x = 0; x < extra; x++) {
