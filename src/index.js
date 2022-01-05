@@ -696,11 +696,11 @@ class Game extends React.Component {
     const board = this.state.board;
     const allCards = [];
     hands[handIndex].forEach(card => {
-      const parts = card.key.split(' ');
+      const parts = card[0].key.split(' ');
       allCards.push([parts[0], parts[1]]);
     });
     board.forEach(card => {
-      const parts = card.key.split(' ');
+      const parts = card[0].key.split(' ');
       allCards.push([parts[0], parts[1]]);
     });
     let allMatches = [];
@@ -729,7 +729,6 @@ class Game extends React.Component {
       }
       matches = [];
     }
-    let num = 1;
     let pairLength;
     let pairs = 0;
     console.log(`Player ${handIndex + 1} Matches:`);
@@ -761,14 +760,45 @@ class Game extends React.Component {
       if(pairs > 1) {
         pairLength = 'Two Pair';
       }
-      console.log(`Match ${num}: ${pairLength} (${fullHouse ? specialForm : allFormattedMatches[x]})`);
-      num ++;
+      console.log(`${pairLength} (${fullHouse ? specialForm : allFormattedMatches[x]})`);
     }
-    //Check for Straight
+
+    //Check for Flush
+
     let values = [];
-    const faces = ['A', '2', '3', '4', '5', '6', '7', '8', '9', '10', 'J', 'Q', 'K', 'A'];
+    const flushFaces = ['2', '3', '4', '5', '6', '7', '8', '9', '10', 'J', 'Q', 'K', 'A'];
     for(let x = 0; x < 7; x++) {
-      values.push([[faces.indexOf(allCards[x][0])], [allCards[x][1]]]);
+      values.push([[flushFaces.indexOf(allCards[x][0])], [allCards[x][1]]]);
+    }
+    let cardValues = values.sort((a, b) => a[0] - b[0]);
+    let flush;
+    let oldSuit;
+    for(let x = 0; x < cardValues.length; x++) {
+      let suit = cardValues[x][1][0];
+      flush = [`${flushFaces[cardValues[x][0][0]]} ${cardValues[x][1][0]}`];
+      for(let y = 0; y < cardValues.length; y++) {
+        if(suit === cardValues[y][1][0] && x !== y) {
+          flush.push([`${flushFaces[cardValues[y][0][0]]} ${cardValues[y][1][0]}`]);
+        }
+      }
+      if(flush.length > 5) {
+        let extra = flush.length - 5;
+        for(let z = 0; z < extra; z++) {
+          flush.shift();
+        }
+      }
+      if(flush.length === 5 && suit !== oldSuit) {
+        oldSuit = suit;
+        console.log(`Flush: ${flush}`);
+      } else {
+        flush = [];
+      }
+    }
+
+    const straightFaces = ['A', '2', '3', '4', '5', '6', '7', '8', '9', '10', 'J', 'Q', 'K', 'A'];
+    values = [];
+    for(let x = 0; x < 7; x++) {
+      values.push([[straightFaces.indexOf(allCards[x][0])], [allCards[x][1]]]);
     }
     let ace = false;
     for(let x = 0; x < values.length; x++){
@@ -777,16 +807,17 @@ class Game extends React.Component {
         values.push([[13], [allCards[x][1]]]);
       }
     }
-    const cardValues = values.sort((a, b) => a[0] - b[0]);
+
+    cardValues = values.sort((a, b) => a[0] - b[0]);
     let straight = [];
     let started = false;
     for(let x = 0; x < cardValues.length - 1; x++){
       if(cardValues[x + 1][0][0] === (cardValues[x][0][0] + 1)) {
         if(!started) {
-          straight.push([faces[cardValues[x][0]], [cardValues[x][1]]]);
+          straight.push([straightFaces[cardValues[x][0]], [cardValues[x][1]]]);
           started = true;
         }
-        straight.push([faces[cardValues[x + 1][0]], [cardValues[x + 1][1]]]);
+        straight.push([straightFaces[cardValues[x + 1][0]], [cardValues[x + 1][1]]]);
       } else if (cardValues[x + 1][0][0] !== cardValues[x][0][0]) {
         if(straight.length < 5) {
           straight = [];
@@ -794,12 +825,14 @@ class Game extends React.Component {
         }
       }
     }
+    
     if(straight.length > 5) {
       const extra = straight.length - 5;
       for(let x = 0; x < extra; x++) {
         straight.shift();
       }
     }
+    
     if(straight.length === 5) {
       let formattedStraight = [];
       for(let x = 0; x < straight.length; x++) {
@@ -809,9 +842,9 @@ class Game extends React.Component {
     } else {
       straight = [];
     }
-    //TODO Check for Flush
-    if(allMatches.length === 0 && straight.length === 0) {
-      const highCard = `${faces[cardValues[cardValues.length - 1][0]]} ${cardValues[cardValues.length - 1][1]}`;
+
+    if(allMatches.length === 0 && straight.length === 0 && !oldSuit) {
+      const highCard = `${straightFaces[cardValues[cardValues.length - 1][0]]} ${cardValues[cardValues.length - 1][1]}`;
       console.log(`High Card: ${highCard}`);
     }
     return bestHand;
