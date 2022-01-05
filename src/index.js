@@ -586,7 +586,7 @@ class Game extends React.Component {
 
   endRound(){
     const suits = ['\u2660', '\u2663', '\u2665', '\u2666'];
-    const board = [[this.createCard('8', suits[3])], [this.createCard('J', suits[0])], [this.createCard('Q', suits[1])], [this.createCard('A', suits[1])], [this.createCard('7', suits[1])]];
+    const board = [[this.createCard('8', suits[3])], [this.createCard('J', suits[3])], [this.createCard('Q', suits[3])], [this.createCard('4', suits[3])], [this.createCard('7', suits[3])]];
     let actives = [];
     const moneyList = this.state.moneyList;
     for(let x = 0; x < moneyList.length; x++){
@@ -594,7 +594,7 @@ class Game extends React.Component {
         actives.push(x);
       }
     }
-    let hands = [[[this.createCard('9', suits[2])], [this.createCard('10', suits[3])]],[[this.createCard('3', suits[1])], [this.createCard('4', suits[1])]],[[this.createCard('5', suits[1])], [this.createCard('2', suits[1])]],[[this.createCard('J', suits[3])], [this.createCard('A', suits[1])]]];
+    let hands = [[[this.createCard('9', suits[2])], [this.createCard('10', suits[3])]],[[this.createCard('3', suits[3])], [this.createCard('4', suits[0])]],[[this.createCard('A', suits[0])], [this.createCard('2', suits[1])]],[[this.createCard('6', suits[3])], [this.createCard('A', suits[3])]]];
     const currentDeck = this.createDeck();
     const nextDealer = this.findNextDealer(actives);
     const turn = this.preFlopFirstTurn(actives, nextDealer);
@@ -767,24 +767,23 @@ class Game extends React.Component {
       }
       console.log(`${pairLength} (${fullHouse ? specialForm : allFormattedMatches[x]})`);
     }
-    //Check for Straight
+
+    //Check for Flush
+
     let values = [];
-    const faces = ['A', '2', '3', '4', '5', '6', '7', '8', '9', '10', 'J', 'Q', 'K', 'A'];
+    const flushFaces = ['2', '3', '4', '5', '6', '7', '8', '9', '10', 'J', 'Q', 'K', 'A'];
     for(let x = 0; x < 7; x++) {
-      values.push([[faces.indexOf(allCards[x][0])], [allCards[x][1]]]);
+      values.push([[flushFaces.indexOf(allCards[x][0])], [allCards[x][1]]]);
     }
-    //Check for Flush
-    const cardValues = values.sort((a, b) => a[0] - b[0]);
-    
-    //Check for Flush
+    let cardValues = values.sort((a, b) => a[0] - b[0]);
     let flush;
     let oldSuit;
-    for(let x = 0; x < allCards.length; x++) {
-      let suit = allCards[x][1];
-      flush = [`${allCards[x][0]} ${allCards[x][1]}`];
-      for(let y = 0; y < allCards.length; y++) {
-        if(suit === allCards[y][1] && x !== y) {
-          flush.push([`${allCards[y][0]} ${allCards[y][1]}`]);
+    for(let x = 0; x < cardValues.length; x++) {
+      let suit = cardValues[x][1][0];
+      flush = [`${flushFaces[cardValues[x][0][0]]} ${cardValues[x][1][0]}`];
+      for(let y = 0; y < cardValues.length; y++) {
+        if(suit === cardValues[y][1][0] && x !== y) {
+          flush.push([`${flushFaces[cardValues[y][0][0]]} ${cardValues[y][1][0]}`]);
         }
       }
       if(flush.length > 5) {
@@ -800,6 +799,12 @@ class Game extends React.Component {
         flush = [];
       }
     }
+
+    const straightFaces = ['A', '2', '3', '4', '5', '6', '7', '8', '9', '10', 'J', 'Q', 'K', 'A'];
+    values = [];
+    for(let x = 0; x < 7; x++) {
+      values.push([[straightFaces.indexOf(allCards[x][0])], [allCards[x][1]]]);
+    }
     let ace = false;
     for(let x = 0; x < values.length; x++){
       if(values[x][0][0] === 0 && !ace) {
@@ -807,16 +812,17 @@ class Game extends React.Component {
         values.push([[13], [allCards[x][1]]]);
       }
     }
-    const cardValues = values.sort((a, b) => a[0] - b[0]);
+
+    cardValues = values.sort((a, b) => a[0] - b[0]);
     let straight = [];
     let started = false;
     for(let x = 0; x < cardValues.length - 1; x++){
       if(cardValues[x + 1][0][0] === (cardValues[x][0][0] + 1)) {
         if(!started) {
-          straight.push([faces[cardValues[x][0]], [cardValues[x][1]]]);
+          straight.push([straightFaces[cardValues[x][0]], [cardValues[x][1]]]);
           started = true;
         }
-        straight.push([faces[cardValues[x + 1][0]], [cardValues[x + 1][1]]]);
+        straight.push([straightFaces[cardValues[x + 1][0]], [cardValues[x + 1][1]]]);
       } else if (cardValues[x + 1][0][0] !== cardValues[x][0][0]) {
         if(straight.length < 5) {
           straight = [];
@@ -824,12 +830,14 @@ class Game extends React.Component {
         }
       }
     }
+    
     if(straight.length > 5) {
       const extra = straight.length - 5;
       for(let x = 0; x < extra; x++) {
         straight.shift();
       }
     }
+    
     if(straight.length === 5) {
       let formattedStraight = [];
       for(let x = 0; x < straight.length; x++) {
@@ -840,8 +848,8 @@ class Game extends React.Component {
       straight = [];
     }
 
-    if(allMatches.length === 0 && straight.length === 0) {
-      const highCard = `${faces[cardValues[cardValues.length - 1][0]]} ${cardValues[cardValues.length - 1][1]}`;
+    if(allMatches.length === 0 && straight.length === 0 && !oldSuit) {
+      const highCard = `${straightFaces[cardValues[cardValues.length - 1][0]]} ${cardValues[cardValues.length - 1][1]}`;
       console.log(`High Card: ${highCard}`);
     }
     return bestHand;
