@@ -209,7 +209,7 @@ class Game extends React.Component {
   bet(playerTurn){
     const maxMoney = this.props.money;
     const raiseTimes = 3;
-    const raiseMult = maxMoney / 10;
+    const raiseMult = Math.floor(maxMoney / 20);
     let turnIndex = playerTurn - 1;
     const player = this.props.playerList[turnIndex];
     let moneyList = this.state.moneyList;
@@ -696,11 +696,11 @@ class Game extends React.Component {
     const board = this.state.board;
     const allCards = [];
     hands[handIndex].forEach(card => {
-      const parts = card[0].key.split(' ');
+      const parts = card.key.split(' ');
       allCards.push([parts[0], parts[1]]);
     });
     board.forEach(card => {
-      const parts = card[0].key.split(' ');
+      const parts = card.key.split(' ');
       allCards.push([parts[0], parts[1]]);
     });
     let allMatches = [];
