@@ -586,7 +586,7 @@ class Game extends React.Component {
 
   endRound(){
     const suits = ['\u2660', '\u2663', '\u2665', '\u2666'];
-    const board = [this.createCard('2', suits[0]), this.createCard('2', suits[3]), this.createCard('5', suits[3]), this.createCard('4', suits[3]), this.createCard('3', suits[0])];
+    const board = [this.createCard('3', suits[1]), this.createCard('3', suits[2]), this.createCard('4', suits[0]), this.createCard('4', suits[3]), this.createCard('7', suits[0])];
     let actives = [];
     const moneyList = this.state.moneyList;
     for(let x = 0; x < moneyList.length; x++){
@@ -594,7 +594,7 @@ class Game extends React.Component {
         actives.push(x);
       }
     }
-    let hands = [[this.createCard('3', suits[3]), this.createCard('A', suits[3])], [this.createCard('3', suits[1]), this.createCard('4', suits[2])], [this.createCard('3', suits[0]), this.createCard('2', suits[1])], [this.createCard('7', suits[3]), this.createCard('5', suits[2])]];
+    let hands = [[this.createCard('7', suits[3]), this.createCard('3', suits[0])], [this.createCard('6', suits[1]), this.createCard('4', suits[2])], [this.createCard('4', suits[1]), this.createCard('3', suits[1])], [this.createCard('7', suits[3]), this.createCard('5', suits[2])]];
     const currentDeck = this.createDeck();
     const nextDealer = this.findNextDealer(actives);
     const turn = this.preFlopFirstTurn(actives, nextDealer);
@@ -684,7 +684,6 @@ class Game extends React.Component {
       moneyList: moneyList,
     }, () => {
       const over = this.gameOverCheck();
-      console.log(`gameOver=${over}`);
       if(over){
         let overBut = document.getElementById('gameOver');
         overBut.style.display= 'block';
@@ -696,20 +695,119 @@ class Game extends React.Component {
   }
 
   getBestHand(handIndex){
+    console.log(`----- Player ${handIndex + 1} -----`);
+    const high = ['A', '2', '3', '4', '5', '6', '7', '8', '9', '10', 'J', 'Q', 'K', 'A'];
     let bestHand = [];
     const hands = [this.state.p1, this.state.p2, this.state.p3, this.state.p4];
     const board = this.state.board;
     const allCards = [];
     hands[handIndex].forEach(card => {
-      console.log(card);
       const parts = card.key.split(' ');
       allCards.push([parts[0], parts[1]]);
     });
     board.forEach(card => {
-      console.log(card);
       const parts = card.key.split(' ');
       allCards.push([parts[0], parts[1]]);
     });
+
+    let pairs = [];
+    let trips = [];
+    let quads = [];
+
+    let values = [];
+    for(let x = 0; x < 7; x++) {
+      values.push([high.indexOf(allCards[x][0]), allCards[x][1]]);
+    }
+    let cardValues = values.sort((a, b) => a[0] - b[0]);
+    let sorted = [];
+    for(let x = 0; x < cardValues.length; x++) {
+      sorted.push([high[cardValues[x][0]], cardValues[x][1]]);
+    }
+    let matches = [];
+    let match = [];
+    let prev = [];
+    let repeat = false;
+    let added = false;
+    let fullHouse = [];
+    for(let x = 0; x < sorted.length; x++) {
+      added = false;
+      repeat = false;
+      match = [];
+      for(let z = 0; z < prev.length; z++) {
+        if(prev[z] === sorted[x][0]) {
+          repeat = true;
+        }
+      }
+      if(!repeat) {
+        for(let y = 0; y < sorted.length; y++) {
+          if(sorted[x][0] === sorted[y][0] && x !== y) {
+            if(!added) {
+              added = true;
+              match.push([sorted[x][0], sorted[x][1]]);
+              prev.push(sorted[x][0]);
+            }
+            match.push([sorted[y][0], sorted[y][1]]);
+          }
+        }
+        if(added) {
+          matches.push(match);
+        }
+      }
+    }
+    for(let x = 0; x < matches.length; x++) {
+      if(matches[x].length === 2) {
+        pairs.push(matches[x]);
+      }
+      if(matches[x].length === 3) {
+        trips.push(matches[x]);
+      }
+      if(matches[x].length === 4) {
+        quads.push(matches[x]);
+      }
+    }
+    if(pairs.length > 1) {
+      if(pairs.length > 2) {
+        let extra = pairs.length - 2;
+        for(let x = 0 ; x < extra; x++) {
+          pairs.shift();
+        }
+      }
+      console.log(`Two Pair: (${pairs})`);
+    } else if (pairs.length === 1) {
+      console.log(`One Pair: (${pairs})`);
+    }
+    if(trips.length > 0) {
+      if(trips.length > 1) {
+        fullHouse = [trips[1][0], trips[1][1], trips[1][2], trips[0][0], trips[0][1]];
+        console.log(`Full House: (${fullHouse})`);
+      } else {
+        if(pairs.length > 0) {
+          const hPair = pairs[pairs.length - 1];
+          fullHouse = [trips[0][0], trips[0][1], trips[0][2], hPair[0], hPair[1]];
+          console.log(`Full House: (${fullHouse})`);
+        } else {
+          console.log(`Three of a Kind: (${trips})`);
+        }
+      }
+    }
+    if(quads.length > 0) {console.log(`Quads: (${quads})`);}
+    /*
+    for(let x = 0; x < allCards.length; x++) {
+      let repeat = false;
+      for(let y = 0; y < allCards.length; y++) {
+        if(allCards[x][0] === allCards[y][0] && x !== y) {
+          for(let z = 0; z < pairs.length; z++) {
+            if(pairs[z][0][0] === allCards[y][0]) {
+              repeat = true;
+            }
+          }
+          if(!repeat) {
+            pairs.push([[allCards[x][0], allCards[x][1]], [allCards[y][0], allCards[y][1]]]);
+          }
+        }
+      }
+    }
+    console.log(pairs);
     let allMatches = [];
     let matchedIndexes = [];
     let allFormattedMatches = [];
@@ -722,10 +820,10 @@ class Game extends React.Component {
         if(allCards[x][0] === allCards[y][0] && x !== y && matchedIndexes.indexOf(x) === -1){
           if(!matched){
             matched = true;
-            matches[0].push(allCards[x][0]);
+            matches[0].push([allCards[x][0], allCards[x][1]]);
             formattedMatch[0].push(`${allCards[x][0]} ${allCards[x][1]}`);
           }
-          matches[0].push(allCards[y][0]);
+          matches[0].push([allCards[y][0], allCards[y][1]]);
           formattedMatch[0].push(`${allCards[y][0]} ${allCards[y][1]}`);
           matchedIndexes.push(y);
         }
@@ -738,15 +836,14 @@ class Game extends React.Component {
     }
     //TODO add pairs to array, sort by value, and return highest two if possible
     let pairLength;
-    let pairs = 0;
+    let pairArray = [];
     console.log(`Player ${handIndex + 1} Matches:`);
     for(let x = 0; x < allMatches.length; x++){
       let fullHouse = false;
       let specialMatch = [];
       let specialForm = [];
       if(allMatches[x].length === 2) {
-        pairLength = 'One Pair';
-        pairs++;
+        pairArray.push(allMatches[x]);
       } else if(allMatches[x].length === 3) {
         for(let y = 0; y < allMatches.length; y++) {
           if(allMatches[y].length === 2) {
@@ -765,20 +862,37 @@ class Game extends React.Component {
       } else if (allMatches[x].length === 4) {
         pairLength = 'Four of a Kind';
       }
-      if(pairs > 1) {
+      if(pairArray.length === 1) {
+        pairLength = 'One Pair';
+      } if(pairArray.length > 1) {
         pairLength = 'Two Pair';
+        let pairValues = [];
+        for(let x = 0; x < pairArray.length; x++) {
+          let pair = [[high.indexOf(pairArray[x][0][0]), pairArray[x][0][1]], [high.indexOf(pairArray[x][1][0]), pairArray[x][1][1]]];
+          pairValues.push(pair);
+        }
+        const sorted = pairValues.sort((a, b) => {
+          return a[0] - b[0];
+        });
+        console.log(sorted);
+        if(sorted.length > 4) {
+          let extra = sorted.length - 4;
+          for (let x = 0; x < extra; x++) {
+            sorted.shift();
+          }
+        }
+        console.log(sorted);
+        if(sorted.length === 4) {
+          allFormattedMatches[x] = [[high[sorted[0][0]], sorted[0][1]], [high[sorted[1][0]], sorted[1][1]]];
+        }
       }
       console.log(`${pairLength} (${fullHouse ? specialForm : allFormattedMatches[x]})`);
     }
+    */
+
+
 
     //Check for Flush
-
-    let values = [];
-    const high = ['A', '2', '3', '4', '5', '6', '7', '8', '9', '10', 'J', 'Q', 'K', 'A'];
-    for(let x = 0; x < 7; x++) {
-      values.push([high.indexOf(allCards[x][0]), allCards[x][1]]);
-    }
-    let cardValues = values.sort((a, b) => a[0] - b[0]);
     let flush;
     let oldSuit;
     let sFlush;
@@ -791,6 +905,12 @@ class Game extends React.Component {
         if(cardValues[x][1] === cardValues[y][1] && x !== y) {
           flush.push(`${high[cardValues[y][0]]} ${cardValues[y][1]}`);
           sFlush.push([cardValues[y][0], cardValues[y][1]]);
+        }
+      }
+      for(let x = 0 ; x < sFlush.length; x++) {
+        if(sFlush[x][0] === 0) {
+          flush.shift();
+          flush.push(`${high[13]} ${cardValues[x][1]}`);
         }
       }
       let straightFlush = [];
@@ -882,10 +1002,11 @@ class Game extends React.Component {
       straight = [];
     }
 
-    if(allMatches.length === 0 && straight.length === 0 && !oldSuit) {
+    if(straight.length === 0 && !oldSuit) {
       const highCard = `${straightFaces[cardValues[cardValues.length - 1][0]]} ${cardValues[cardValues.length - 1][1]}`;
       console.log(`High Card: ${highCard}`);
     }
+    console.log(`--------------------`);
     return bestHand;
   }
 
@@ -902,7 +1023,6 @@ class Game extends React.Component {
         activeNum++;
       }
     });
-    console.log(`active player count: ${activeNum}`);
     if(activeNum === 1){
       return true;
     }
@@ -939,41 +1059,29 @@ class Game extends React.Component {
   findNextDealer(actives){
     const currentDealerIndex = this.state.dealer - 1;
     let nextDealerIndex;
-    console.log(`---Current Dealer Index: ${currentDealerIndex}---`);
-
     if(actives.includes(currentDealerIndex)) {
-      console.log(`index ${currentDealerIndex} was on active list`);
       if(actives.indexOf(currentDealerIndex) === 0) {
-        console.log('0 -> last active index');
         nextDealerIndex = actives[actives.length - 1];
       } else {
         nextDealerIndex = actives[actives.indexOf(currentDealerIndex) - 1];
-        console.log(`set to index ${nextDealerIndex}`);
       }
     } else {
-      console.log(`index ${currentDealerIndex} inactive`);
       if(currentDealerIndex === 0) {
-        console.log('0 -> last active index');
         nextDealerIndex = actives[actives.length - 1];
       } else {
         nextDealerIndex = currentDealerIndex - 1;
-        console.log(`Check index ${nextDealerIndex}`);
       }
 
       if(!actives.includes(nextDealerIndex)){
-        console.log(`index ${nextDealerIndex} also inactive`);
         if(nextDealerIndex === 0) {
-          console.log('0 -> last active index');
           nextDealerIndex = actives[actives.length - 1];
         } else {
           nextDealerIndex  = nextDealerIndex - 1;
-          console.log(`set to index ${nextDealerIndex}`);
         }
       }
     }
 
 
-    console.log(`---Next Dealer Index: ${nextDealerIndex}---`);
     const nextDealer = nextDealerIndex + 1;
     return nextDealer;
 
