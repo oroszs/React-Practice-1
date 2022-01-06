@@ -586,7 +586,7 @@ class Game extends React.Component {
 
   endRound(){
     const suits = ['\u2660', '\u2663', '\u2665', '\u2666'];
-    const board = [this.createCard('3', suits[1]), this.createCard('3', suits[2]), this.createCard('4', suits[0]), this.createCard('4', suits[3]), this.createCard('7', suits[0])];
+    const board = [this.createCard('Q', suits[0]), this.createCard('J', suits[0]), this.createCard('10', suits[0]), this.createCard('9', suits[0]), this.createCard('7', suits[0])];
     let actives = [];
     const moneyList = this.state.moneyList;
     for(let x = 0; x < moneyList.length; x++){
@@ -594,7 +594,7 @@ class Game extends React.Component {
         actives.push(x);
       }
     }
-    let hands = [[this.createCard('7', suits[3]), this.createCard('3', suits[0])], [this.createCard('6', suits[1]), this.createCard('4', suits[2])], [this.createCard('4', suits[1]), this.createCard('3', suits[1])], [this.createCard('7', suits[3]), this.createCard('5', suits[2])]];
+    let hands = [[this.createCard('A', suits[0]), this.createCard('K', suits[0])], [this.createCard('6', suits[1]), this.createCard('4', suits[2])], [this.createCard('4', suits[1]), this.createCard('3', suits[1])], [this.createCard('7', suits[3]), this.createCard('5', suits[2])]];
     const currentDeck = this.createDeck();
     const nextDealer = this.findNextDealer(actives);
     const turn = this.preFlopFirstTurn(actives, nextDealer);
@@ -791,108 +791,9 @@ class Game extends React.Component {
       }
     }
     if(quads.length > 0) {console.log(`Quads: (${quads})`);}
-    /*
-    for(let x = 0; x < allCards.length; x++) {
-      let repeat = false;
-      for(let y = 0; y < allCards.length; y++) {
-        if(allCards[x][0] === allCards[y][0] && x !== y) {
-          for(let z = 0; z < pairs.length; z++) {
-            if(pairs[z][0][0] === allCards[y][0]) {
-              repeat = true;
-            }
-          }
-          if(!repeat) {
-            pairs.push([[allCards[x][0], allCards[x][1]], [allCards[y][0], allCards[y][1]]]);
-          }
-        }
-      }
-    }
-    console.log(pairs);
-    let allMatches = [];
-    let matchedIndexes = [];
-    let allFormattedMatches = [];
-    //Check for Pair, Two Pair, Three of a Kind, Four of a Kind, and Full House
-    for (let x = 0; x < 7; x++){
-      let matched = false;
-      let matches = [[]];
-      let formattedMatch = [[]];
-      for (let y = 0; y < 7; y ++){
-        if(allCards[x][0] === allCards[y][0] && x !== y && matchedIndexes.indexOf(x) === -1){
-          if(!matched){
-            matched = true;
-            matches[0].push([allCards[x][0], allCards[x][1]]);
-            formattedMatch[0].push(`${allCards[x][0]} ${allCards[x][1]}`);
-          }
-          matches[0].push([allCards[y][0], allCards[y][1]]);
-          formattedMatch[0].push(`${allCards[y][0]} ${allCards[y][1]}`);
-          matchedIndexes.push(y);
-        }
-      }
-      if(matches[0].length > 0) {
-        allMatches.push(matches[0]);
-        allFormattedMatches.push(formattedMatch[0]);
-      }
-      matches = [];
-    }
-    //TODO add pairs to array, sort by value, and return highest two if possible
-    let pairLength;
-    let pairArray = [];
-    console.log(`Player ${handIndex + 1} Matches:`);
-    for(let x = 0; x < allMatches.length; x++){
-      let fullHouse = false;
-      let specialMatch = [];
-      let specialForm = [];
-      if(allMatches[x].length === 2) {
-        pairArray.push(allMatches[x]);
-      } else if(allMatches[x].length === 3) {
-        for(let y = 0; y < allMatches.length; y++) {
-          if(allMatches[y].length === 2) {
-            fullHouse = true;
-            specialMatch.push(allMatches[y]);
-            specialForm.push(allFormattedMatches[y]);
-          }
-        }
-        if(fullHouse) {
-          pairLength = 'Full House';
-          specialMatch.unshift(allMatches[x]);
-          specialForm.unshift(allFormattedMatches[x]);
-        } else {
-          pairLength = 'Three of a Kind';
-        }
-      } else if (allMatches[x].length === 4) {
-        pairLength = 'Four of a Kind';
-      }
-      if(pairArray.length === 1) {
-        pairLength = 'One Pair';
-      } if(pairArray.length > 1) {
-        pairLength = 'Two Pair';
-        let pairValues = [];
-        for(let x = 0; x < pairArray.length; x++) {
-          let pair = [[high.indexOf(pairArray[x][0][0]), pairArray[x][0][1]], [high.indexOf(pairArray[x][1][0]), pairArray[x][1][1]]];
-          pairValues.push(pair);
-        }
-        const sorted = pairValues.sort((a, b) => {
-          return a[0] - b[0];
-        });
-        console.log(sorted);
-        if(sorted.length > 4) {
-          let extra = sorted.length - 4;
-          for (let x = 0; x < extra; x++) {
-            sorted.shift();
-          }
-        }
-        console.log(sorted);
-        if(sorted.length === 4) {
-          allFormattedMatches[x] = [[high[sorted[0][0]], sorted[0][1]], [high[sorted[1][0]], sorted[1][1]]];
-        }
-      }
-      console.log(`${pairLength} (${fullHouse ? specialForm : allFormattedMatches[x]})`);
-    }
-    */
-
-
 
     //Check for Flush
+
     let flush;
     let oldSuit;
     let sFlush;
@@ -910,7 +811,8 @@ class Game extends React.Component {
       for(let x = 0 ; x < sFlush.length; x++) {
         if(sFlush[x][0] === 0) {
           flush.shift();
-          flush.push(`${high[13]} ${cardValues[x][1]}`);
+          flush.push(`${high[13]} ${sFlush[x][1]}`);
+          sFlush.push([13, sFlush[x][1]]);
         }
       }
       let straightFlush = [];
@@ -919,16 +821,18 @@ class Game extends React.Component {
         if(sFlush[y + 1][0] === sFlush[y][0] + 1) {
           if(!started){
             straightFlush.push(`${high[sFlush[y][0]]} ${sFlush[y][1]}`);
-            started= true;
+            started = true;
           }
           straightFlush.push(`${high[sFlush[y + 1][0]]} ${sFlush[y + 1][1]}`);
-        } else if (sFlush[y + 1][0] !== sFlush[y][0]){
+        } else {
           if(sFlush.length < 5) {
             sFlush = [];
+            started = false;
           } else {
             break;
           }
         }
+      }
         if(straightFlush.length > 5) {
           let extra = straightFlush.length - 5;
           for(let z = 0; z < extra; z++) {
@@ -938,7 +842,6 @@ class Game extends React.Component {
         if(straightFlush.length === 5) {
           console.log(`Straight Flush: ${straightFlush}`);
         }
-      }
       if(flush.length > 5) {
         let extra = flush.length - 5;
         for(let z = 0; z < extra; z++) {
