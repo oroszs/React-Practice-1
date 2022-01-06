@@ -250,8 +250,8 @@ class Game extends React.Component {
         turnChoice = '';
       }
       if(turnChoice !== 'Good' && turnChoice !== 'Fold' && turnChoice !== 'All In'){
-        //let choice = Math.floor(Math.random() * 3);
-        let choice = 0;
+        let choice = Math.floor(Math.random() * 3);
+        //let choice = 0;
         switch (choice) {
           case 0:
             //Check / Call
@@ -605,13 +605,14 @@ class Game extends React.Component {
         actives.push(x);
       }
     }
+    console.log(`Actives: ${actives}`);
     let hands = [[],[],[],[]];
     let numCards = actives.length * 2;
     const cards = this.dealCards(numCards);
     let x = 0;
     for(let player = 0; player < actives.length; player++){
       for(let card = 0; card < 2; card++){
-        hands[player].push(cards[x]);
+        hands[actives[player]].push(cards[x]);
         x++;
       }
     }
