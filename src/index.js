@@ -791,6 +791,9 @@ class Game extends React.Component {
         quads.push(matches[x]);
       }
     }
+    let kickerLength;
+    let kickers = [];
+    let inUse = [];
     if(pairs.length > 1) {
       if(pairs.length > 2) {
         let extra = pairs.length - 2;
@@ -798,7 +801,18 @@ class Game extends React.Component {
           pairs.shift();
         }
       }
+      kickerLength = 1;
+      inUse = [pairs[0][0], pairs[0][1], pairs[1][0], pairs[1][1]];
+      for(let x = sorted.length - 1; x > -1; x--){
+        if(inUse.indexOf(sorted[x]) === -1) {
+          kickers.push(sorted[x]);
+          if(kickers.length === kickerLength) {
+            break;
+          }
+        }
+      }
       console.log(`Two Pair: (${pairs[0][0][0]} ${pairs[0][0][1]}, ${pairs[0][1][0]} ${pairs[0][1][1]}), (${pairs[1][0][0]} ${pairs[1][0][1]}, ${pairs[1][1][0]} ${pairs[1][1][1]})`);
+      console.log(kickers);
     } else if (pairs.length === 1) {
       console.log(`One Pair: ${pairs[0][0][0]} ${pairs[0][0][1]}, ${pairs[0][1][0]} ${pairs[0][1][1]}`);
     }
