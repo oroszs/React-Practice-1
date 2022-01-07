@@ -957,7 +957,7 @@ class Game extends React.Component {
     console.log(`--------------------`);
     return bestHand;
   }
-  
+
   getKickers(num, using, notUsing) {
     let kickers = [];
     let inUse;
@@ -972,8 +972,8 @@ class Game extends React.Component {
         kickers.push(notUsing[x]);
         if(kickers.length === num) {
           return kickers;
+        }
       }
-    }
     }
   }
 
