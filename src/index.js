@@ -749,6 +749,12 @@ class Game extends React.Component {
     for(let x = 0; x < cardValues.length; x++) {
       sorted.push([high[cardValues[x][0]], cardValues[x][1]]);
     }
+    for (let x = 0; x < cardValues.length; x++) {
+      if(cardValues[x][0] === 0) {
+        sorted.shift();
+        sorted.push(['A', cardValues[x][1]]);
+      }
+    }
     let matches = [];
     let match = [];
     let prev = [];
@@ -803,18 +809,15 @@ class Game extends React.Component {
       }
       kickerLength = 1;
       inUse = [pairs[0][0], pairs[0][1], pairs[1][0], pairs[1][1]];
-      for(let x = sorted.length - 1; x > -1; x--){
-        if(inUse.indexOf(sorted[x]) === -1) {
-          kickers.push(sorted[x]);
-          if(kickers.length === kickerLength) {
-            break;
-          }
-        }
-      }
+      kickers = this.getKickers(kickerLength, inUse, sorted);
       console.log(`Two Pair: (${pairs[0][0][0]} ${pairs[0][0][1]}, ${pairs[0][1][0]} ${pairs[0][1][1]}), (${pairs[1][0][0]} ${pairs[1][0][1]}, ${pairs[1][1][0]} ${pairs[1][1][1]})`);
-      console.log(kickers);
+      console.log(`Kicker: ${kickers[0][0]} ${kickers[0][1]}`);
     } else if (pairs.length === 1) {
+      kickerLength = 3;
+      inUse = [pairs[0][0], pairs[0][1]];
+      kickers = this.getKickers(kickerLength, inUse, sorted);
       console.log(`One Pair: ${pairs[0][0][0]} ${pairs[0][0][1]}, ${pairs[0][1][0]} ${pairs[0][1][1]}`);
+      console.log(`Kickers: ${kickers[0][0]} ${kickers[0][1]}, ${kickers[1][0]} ${kickers[1][1]}, ${kickers[2][0]} ${kickers[2][1]}`);
     }
     if(trips.length > 0) {
       if(trips.length > 1) {
@@ -826,12 +829,20 @@ class Game extends React.Component {
           fullHouse = [trips[0][0], trips[0][1], trips[0][2], hPair[0], hPair[1]];
           console.log(`Full House: ${fullHouse[0][0]} ${fullHouse[0][1]}, ${fullHouse[1][0]} ${fullHouse[1][1]}, ${fullHouse[2][0]} ${fullHouse[2][1]}, ${fullHouse[3][0]} ${fullHouse[3][1]}, ${fullHouse[4][0]} ${fullHouse[4][1]}`);
         } else {
+          kickerLength = 2;
+          inUse = [trips[0][0], trips[0][1], trips[0][2]];
+          kickers = this.getKickers(kickerLength, inUse, sorted);
           console.log(`Three of a Kind: ${trips[0][0][0]} ${trips[0][0][1]}, ${trips[0][1][0]} ${trips[0][1][1]}, ${trips[0][2][0]} ${trips[0][2][1]}`);
+          console.log(`Kickers: ${kickers[0][0]} ${kickers[0][1]}, ${kickers[1][0]} ${kickers[1][1]}`);
         }
       }
     }
 ;    if(quads.length > 0) {
+      kickerLength = 1;
+      inUse = [quads[0][0], quads[0][1], quads[0][2], quads[0][3]];
+      kickers = this.getKickers(kickerLength, inUse, sorted);
       console.log(`Four of a Kind: ${quads[0][0][0]} ${quads[0][0][1]}, ${quads[0][1][0]} ${quads[0][1][1]}, ${quads[0][2][0]} ${quads[0][2][1]}, ${quads[0][3][0]} ${quads[0][3][1]}`);
+      console.log(`Kicker: ${kickers[0][0]} ${kickers[0][1]}`);
     }
 
     //Check for Flush
@@ -963,11 +974,35 @@ class Game extends React.Component {
 
     if(straight.length === 0 && !oldSuit) {
       const highCard = `${straightFaces[cardValues[cardValues.length - 1][0]]} ${cardValues[cardValues.length - 1][1]}`;
+      kickerLength = 4;
+      inUse = [sorted[sorted.length - 1]];
+      kickers = this.getKickers(kickerLength, inUse, sorted);
       console.log(`High Card: ${highCard}`);
+      console.log(`Kickers: ${kickers[0][0]} ${kickers[0][1]}, ${kickers[1][0]} ${kickers[1][1]}, ${kickers[2][0]} ${kickers[2][1]}, ${kickers[3][0]} ${kickers[3][1]}`);
     }
     console.log(`--------------------`);
     return bestHand;
   }
+
+  getKickers(num, using, notUsing) {
+    let kickers = [];
+    let inUse;
+    for(let x = notUsing.length - 1; x > -1; x--){
+      inUse = false;
+      for(let y = 0; y < using.length; y++) {
+        if(notUsing[x][0] === using[y][0] && notUsing[x][1] === using[y][1]) {
+          inUse = true;
+          }
+      }
+      if(!inUse) {
+        kickers.push(notUsing[x]);
+        if(kickers.length === num) {
+          return kickers;
+        }
+      }
+    }
+  }
+
 
   gameOverCheck(){
     const moneyList = this.state.moneyList;
