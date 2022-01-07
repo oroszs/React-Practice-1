@@ -605,7 +605,6 @@ class Game extends React.Component {
         actives.push(x);
       }
     }
-    console.log(`Actives: ${actives}`);
     let hands = [[],[],[],[]];
     let numCards = actives.length * 2;
     const cards = this.dealCards(numCards);
