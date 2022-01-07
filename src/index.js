@@ -722,7 +722,8 @@ class Game extends React.Component {
   getBestHand(handIndex){
     console.log(`----- Player ${handIndex + 1} -----`);
     const high = ['A', '2', '3', '4', '5', '6', '7', '8', '9', '10', 'J', 'Q', 'K', 'A'];
-    let bestHand = [];
+    const ranks = ['High Card', 'Pair', 'Two Pair', 'Three of a Kind', 'Straight', 'Flush', 'Full House', 'Four of a Kind', 'Straight Flush', 'Royal Flush'];
+    let fullHands = [];
     const hands = [this.state.p1, this.state.p2, this.state.p3, this.state.p4];
     const board = this.state.board;
     const allCards = [];
@@ -811,6 +812,8 @@ class Game extends React.Component {
       kickers = this.getKickers(kickerLength, inUse, sorted);
       console.log(`Two Pair: (${pairs[0][0][0]} ${pairs[0][0][1]}, ${pairs[0][1][0]} ${pairs[0][1][1]}), (${pairs[1][0][0]} ${pairs[1][0][1]}, ${pairs[1][1][0]} ${pairs[1][1][1]})`);
       console.log(`Kicker: ${kickers[0][0]} ${kickers[0][1]}`);
+      fullHands.push([ranks.indexOf('Two Pair'), inUse[0], inUse[1], inUse[2], inUse[3], kickers[0], kickers[1]]);
+      console.log(fullHands);
     } else if (pairs.length === 1) {
       kickerLength = 3;
       inUse = [pairs[0][0], pairs[0][1]];
@@ -980,7 +983,7 @@ class Game extends React.Component {
       console.log(`Kickers: ${kickers[0][0]} ${kickers[0][1]}, ${kickers[1][0]} ${kickers[1][1]}, ${kickers[2][0]} ${kickers[2][1]}, ${kickers[3][0]} ${kickers[3][1]}`);
     }
     console.log(`--------------------`);
-    return bestHand;
+    return fullHands;
   }
 
   getKickers(num, using, notUsing) {
