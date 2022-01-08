@@ -723,6 +723,7 @@ class Game extends React.Component {
     console.log(`----- Player ${handIndex + 1} -----`);
     const high = ['A', '2', '3', '4', '5', '6', '7', '8', '9', '10', 'J', 'Q', 'K', 'A'];
     const ranks = ['High Card', 'Pair', 'Two Pair', 'Three of a Kind', 'Straight', 'Flush', 'Full House', 'Four of a Kind', 'Straight Flush', 'Royal Flush'];
+    console.log('High Card - 0, Pair - 1, Two Pair - 2, Three of a Kind - 3, Straight - 4, Flush - 5, Full House - 6, Four of a Kind - 7, Straight Flush - 8, Royal Flush - 9');
     let fullHands = [];
     const hands = [this.state.p1, this.state.p2, this.state.p3, this.state.p4];
     const board = this.state.board;
@@ -812,34 +813,33 @@ class Game extends React.Component {
       kickers = this.getKickers(kickerLength, inUse, sorted);
       console.log(`Two Pair: (${pairs[0][0][0]} ${pairs[0][0][1]}, ${pairs[0][1][0]} ${pairs[0][1][1]}), (${pairs[1][0][0]} ${pairs[1][0][1]}, ${pairs[1][1][0]} ${pairs[1][1][1]})`);
       console.log(`Kicker: ${kickers[0][0]} ${kickers[0][1]}`);
-      let fullHands2 = [];
       fullHands.push([ranks.indexOf('Two Pair'), inUse[0], inUse[1], inUse[2], inUse[3], kickers[0]]);
-      fullHands2.push([ranks.indexOf('Two Pair'), inUse, kickers]);
-      console.log(fullHands);
-      console.log(fullHands2);
-      console.log(fullHands === fullHands2);
     } else if (pairs.length === 1) {
       kickerLength = 3;
       inUse = [pairs[0][0], pairs[0][1]];
       kickers = this.getKickers(kickerLength, inUse, sorted);
       console.log(`One Pair: ${pairs[0][0][0]} ${pairs[0][0][1]}, ${pairs[0][1][0]} ${pairs[0][1][1]}`);
       console.log(`Kickers: ${kickers[0][0]} ${kickers[0][1]}, ${kickers[1][0]} ${kickers[1][1]}, ${kickers[2][0]} ${kickers[2][1]}`);
+      fullHands.push([ranks.indexOf('Pair'), inUse[0], inUse[1], kickers[0], kickers[1], kickers[2]]);
     }
     if(trips.length > 0) {
       if(trips.length > 1) {
         fullHouse = [trips[1][0], trips[1][1], trips[1][2], trips[0][0], trips[0][1]];
         console.log(`Full House: ${fullHouse[0][0]} ${fullHouse[0][1]}, ${fullHouse[1][0]} ${fullHouse[1][1]}, ${fullHouse[2][0]} ${fullHouse[2][1]}, ${fullHouse[3][0]} ${fullHouse[3][1]}, ${fullHouse[4][0]} ${fullHouse[4][1]}`);
+        fullHands.push([ranks.indexOf('Full House'), fullHouse[0], fullHouse[1], fullHouse[2], fullHouse[3], fullHouse[4]]);
       } else {
         if(pairs.length > 0) {
           const hPair = pairs[pairs.length - 1];
           fullHouse = [trips[0][0], trips[0][1], trips[0][2], hPair[0], hPair[1]];
           console.log(`Full House: ${fullHouse[0][0]} ${fullHouse[0][1]}, ${fullHouse[1][0]} ${fullHouse[1][1]}, ${fullHouse[2][0]} ${fullHouse[2][1]}, ${fullHouse[3][0]} ${fullHouse[3][1]}, ${fullHouse[4][0]} ${fullHouse[4][1]}`);
+          fullHands.push([ranks.indexOf('Full House'), fullHouse[0], fullHouse[1], fullHouse[2], fullHouse[3], fullHouse[4]]);
         } else {
           kickerLength = 2;
           inUse = [trips[0][0], trips[0][1], trips[0][2]];
           kickers = this.getKickers(kickerLength, inUse, sorted);
           console.log(`Three of a Kind: ${trips[0][0][0]} ${trips[0][0][1]}, ${trips[0][1][0]} ${trips[0][1][1]}, ${trips[0][2][0]} ${trips[0][2][1]}`);
           console.log(`Kickers: ${kickers[0][0]} ${kickers[0][1]}, ${kickers[1][0]} ${kickers[1][1]}`);
+          fullHands.push([ranks.indexOf('Three of a Kind'), inUse[0], inUse[1], inUse[2], kickers[0], kickers[1]]);
         }
       }
     }
@@ -849,6 +849,7 @@ class Game extends React.Component {
       kickers = this.getKickers(kickerLength, inUse, sorted);
       console.log(`Four of a Kind: ${quads[0][0][0]} ${quads[0][0][1]}, ${quads[0][1][0]} ${quads[0][1][1]}, ${quads[0][2][0]} ${quads[0][2][1]}, ${quads[0][3][0]} ${quads[0][3][1]}`);
       console.log(`Kicker: ${kickers[0][0]} ${kickers[0][1]}`);
+      fullHands.push([ranks.indexOf('Four of a Kind'), inUse[0], inUse[1], inUse[2], inUse[3], kickers[0]]);
     }
 
     //Check for Flush
@@ -868,10 +869,10 @@ class Game extends React.Component {
     }
     for(let x = 0; x < flushValues.length; x++) {
       flush = [];
-      flush.push(`${high[flushValues[x][0]]} ${flushValues[x][1]}`);
+      flush.push([high[flushValues[x][0]], flushValues[x][1]]);
       for(let y = x; y < flushValues.length; y++) {
         if(flushValues[x][1] === flushValues[y][1] && x !== y) {
-          flush.push(`${high[flushValues[y][0]]} ${flushValues[y][1]}`);
+          flush.push([high[flushValues[y][0]], flushValues[y][1]]);
         }
       }
       if(flush.length > 5) {
@@ -882,7 +883,8 @@ class Game extends React.Component {
       }
       if(flush.length === 5 && cardValues[x][1] !== oldSuit) {
         oldSuit = cardValues[x][1];
-        console.log(`Flush: ${flush}`);
+        console.log(`(Unformatted) Flush: ${flush}`);
+        fullHands.push([ranks.indexOf('Flush'), flush[0], flush[1], flush[2], flush[3], flush[4]]);
       } else {
         flush = [];
       }
@@ -900,10 +902,10 @@ class Game extends React.Component {
       for(let y = 0; y < sFlush.length - 1; y++) {
         if(sFlush[y + 1][0] === sFlush[y][0] + 1) {
           if(!started){
-            straightFlush.push(`${high[sFlush[y][0]]} ${sFlush[y][1]}`);
+            straightFlush.push([high[sFlush[y][0]], sFlush[y][1]]);
             started = true;
           }
-          straightFlush.push(`${high[sFlush[y + 1][0]]} ${sFlush[y + 1][1]}`);
+          straightFlush.push([high[sFlush[y + 1][0]], sFlush[y + 1][1]]);
         } else {
           if(sFlush.length < 5) {
             sFlush = [];
@@ -922,9 +924,11 @@ class Game extends React.Component {
         if(straightFlush.length === 5 && !finished) {
           finished = true;
           if(straightFlush[straightFlush.length - 1][0] === 'A') {
-            console.log(`Royal Flush: ${straightFlush}`);
+            console.log(`(Unformatted) Royal Flush: ${straightFlush}`);
+            fullHands.push([ranks.indexOf('Royal Flush'), straightFlush[0], straightFlush[1], straightFlush[2], straightFlush[3], straightFlush[4]]);
           } else {
-            console.log(`Straight Flush: ${straightFlush}`);
+            console.log(`(Unformatted) Straight Flush: ${straightFlush}`);
+            fullHands.push([ranks.indexOf('Straight Flush'), straightFlush[0], straightFlush[1], straightFlush[2], straightFlush[3], straightFlush[4]]);
           }
         }
     }
@@ -974,6 +978,7 @@ class Game extends React.Component {
         formattedStraight.push(`${straight[x][0]} ${straight[x][1]}`);
       }
       console.log(`Straight: ${formattedStraight}`);
+      fullHands.push([ranks.indexOf('Straight'), straight[0], straight[1], straight[2], straight[3], straight[4]]);
     } else {
       straight = [];
     }
@@ -985,7 +990,9 @@ class Game extends React.Component {
       kickers = this.getKickers(kickerLength, inUse, sorted);
       console.log(`High Card: ${highCard}`);
       console.log(`Kickers: ${kickers[0][0]} ${kickers[0][1]}, ${kickers[1][0]} ${kickers[1][1]}, ${kickers[2][0]} ${kickers[2][1]}, ${kickers[3][0]} ${kickers[3][1]}`);
+      fullHands.push([ranks.indexOf('High Card'), inUse[0], kickers[0], kickers[1], kickers[2], kickers[3]]);
     }
+    console.log(fullHands);
     console.log(`--------------------`);
     return fullHands;
   }
