@@ -992,9 +992,21 @@ class Game extends React.Component {
       console.log(`Kickers: ${kickers[0][0]} ${kickers[0][1]}, ${kickers[1][0]} ${kickers[1][1]}, ${kickers[2][0]} ${kickers[2][1]}, ${kickers[3][0]} ${kickers[3][1]}`);
       fullHands.push([ranks.indexOf('High Card'), inUse[0], kickers[0], kickers[1], kickers[2], kickers[3]]);
     }
-    console.log(fullHands);
     console.log(`--------------------`);
-    return fullHands;
+    let handRanks = [];
+    for(let x = 0; x < fullHands.length; x++) {
+      handRanks.push(fullHands[x][0]);
+    }
+    const bestIndex = Math.max(...handRanks);
+    let bestHand;
+    for(let x = 0; x < fullHands.length; x++) {
+      if(fullHands[x][0] === bestIndex) {
+        bestHand = fullHands[x];
+        break;
+      }
+    }
+    console.log(bestHand);
+    return bestHand;
   }
 
   getKickers(num, using, notUsing) {
