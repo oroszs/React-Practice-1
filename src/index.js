@@ -969,7 +969,20 @@ class Game extends React.Component {
     }
     console.log(fullHands);
     console.log(`--------------------`);
-    return fullHands;
+    let handRanks = [];
+    for(let x = 0; x < fullHands.length; x++) {
+      handRanks.push(fullHands[x][0]);
+    }
+    const bestIndex = Math.max(...handRanks);
+    let bestHand;
+    for(let x = 0; x < fullHands.length; x++) {
+      if(fullHands[x][0] === bestIndex) {
+        bestHand = fullHands[x];
+        break;
+      }
+    }
+    console.log(bestHand);
+    return bestHand;
   }
 
   getKickers(num, using, notUsing) {
