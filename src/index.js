@@ -594,7 +594,7 @@ class Game extends React.Component {
         actives.push(x);
       }
     }
-    let hands = [[this.createCard('A', suits[1]), this.createCard('K', suits[1])], [this.createCard('5', suits[0]), this.createCard('4', suits[0])], [this.createCard('10', suits[2]), this.createCard('3', suits[1])], [this.createCard('7', suits[3]), this.createCard('6', suits[0])]];
+    let hands = [[this.createCard('A', suits[1]), this.createCard('3', suits[0])], [this.createCard('5', suits[0]), this.createCard('4', suits[0])], [this.createCard('10', suits[2]), this.createCard('3', suits[1])], [this.createCard('7', suits[3]), this.createCard('6', suits[0])]];
     const currentDeck = this.createDeck();
     const nextDealer = this.findNextDealer(actives);
     const turn = this.preFlopFirstTurn(actives, nextDealer);
@@ -666,17 +666,24 @@ class Game extends React.Component {
     const players = this.props.players;
     let bestHands = [];
     actives.forEach((index) => {
-      bestHands.push(this.getBestHand(index));
+      bestHands.push([index, this.getBestHand(index)]);
     });
-    const windex = this.getWinningHand(bestHands);
+    let windexes = this.getWinningHand(bestHands);
+    console.log(windexes);
     let blindTitles = [];
     let moneyList = this.state.moneyList;
-    moneyList[windex] += pot;
-    for(let x = 0; x < players; x++){
-      if(x === windex){
-        blindTitles[x] = 'Winner';
-      } else {
-        blindTitles[x] = '';
+    for (let x = 0; x < windexes.length; x++) {
+      moneyList[windexes[x]] += Math.floor(pot / windexes.length);
+      for(let x = 0; x < players; x++){
+        if(windexes.includes(x)){
+          if(windexes.length > 1) {
+            blindTitles[x] = 'Tie';
+          } else {
+            blindTitles[x] = 'Winner';
+          }
+        } else {
+          blindTitles[x] = '';
+        }
       }
     }
     this.setState({
@@ -692,6 +699,23 @@ class Game extends React.Component {
         startBut.style.display = 'block';
       }
     });
+  }
+
+  getWinningHand(hands) {
+    let max = [];
+    let ranks = [];
+    let winners = [];
+    console.log(hands);
+    for(let x = 0; x < hands.length; x++) {
+      ranks.push(hands[x][1][0]);
+    }
+    max = Math.max(...ranks);
+    for(let x = 0 ; x < hands.length; x++) {
+      if(hands[x][1][0] === max) {
+        winners.push(hands[x][0]);
+      }
+    }
+    return winners;
   }
 
   getBestHand(handIndex){
@@ -1002,11 +1026,6 @@ class Game extends React.Component {
         }
       }
     }
-  }
-
-  getWinningHand(handValues) {
-    let winningIndex;
-    return winningIndex;
   }
 
   gameOverCheck(){
