@@ -812,8 +812,12 @@ class Game extends React.Component {
       kickers = this.getKickers(kickerLength, inUse, sorted);
       console.log(`Two Pair: (${pairs[0][0][0]} ${pairs[0][0][1]}, ${pairs[0][1][0]} ${pairs[0][1][1]}), (${pairs[1][0][0]} ${pairs[1][0][1]}, ${pairs[1][1][0]} ${pairs[1][1][1]})`);
       console.log(`Kicker: ${kickers[0][0]} ${kickers[0][1]}`);
+      let fullHands2 = [];
       fullHands.push([ranks.indexOf('Two Pair'), inUse[0], inUse[1], inUse[2], inUse[3], kickers[0]]);
+      fullHands2.push([ranks.indexOf('Two Pair'), inUse, kickers]);
       console.log(fullHands);
+      console.log(fullHands2);
+      console.log(fullHands === fullHands2);
     } else if (pairs.length === 1) {
       kickerLength = 3;
       inUse = [pairs[0][0], pairs[0][1]];
