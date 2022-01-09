@@ -689,19 +689,24 @@ class Game extends React.Component {
     const pot = this.state.pot;
     const players = this.props.players;
     let bestHands = [];
-    actives.forEach((index) => {
-      bestHands.push(this.getBestHand(index));
-    });
-    //const windex = this.getWinningHand(bestHands);
-    const windex = actives[Math.floor(Math.random() * actives.length)];
+    for(let x = 0; x < actives.length; x++) {
+      bestHands.push([actives[x], this.getBestHand(actives[x])]);
+    }
+    let windexes = this.getWinningHand(bestHands);
     let blindTitles = [];
     let moneyList = this.state.moneyList;
-    moneyList[windex] += pot;
-    for(let x = 0; x < players; x++){
-      if(x === windex){
-        blindTitles[x] = 'Winner';
-      } else {
-        blindTitles[x] = '';
+    for (let x = 0; x < windexes.length; x++) {
+      moneyList[windexes[x]] += Math.floor(pot / windexes.length);
+      for(let x = 0; x < players; x++){
+        if(windexes.includes(x)){
+          if(windexes.length > 1) {
+            blindTitles[x] = 'Tie';
+          } else {
+            blindTitles[x] = 'Winner';
+          }
+        } else {
+          blindTitles[x] = '';
+        }
       }
     }
     this.setState({
@@ -717,6 +722,23 @@ class Game extends React.Component {
         startBut.style.display = 'block';
       }
     });
+  }
+
+  getWinningHand(hands) {
+    let max = [];
+    let ranks = [];
+    let winners = [];
+    console.log(hands);
+    for(let x = 0; x < hands.length; x++) {
+      ranks.push(hands[x][1][0]);
+    }
+    max = Math.max(...ranks);
+    for(let x = 0; x < hands.length; x++) {
+      if(hands[x][1][0] === max) {
+        winners.push(hands[x][0]);
+      }
+    }
+    return winners;
   }
 
   getBestHand(handIndex){
@@ -809,9 +831,9 @@ class Game extends React.Component {
         }
       }
       kickerLength = 1;
-      inUse = [pairs[0][0], pairs[0][1], pairs[1][0], pairs[1][1]];
+      inUse = [pairs[1][0], pairs[1][1], pairs[0][0], pairs[0][1]];
       kickers = this.getKickers(kickerLength, inUse, sorted);
-      console.log(`Two Pair: (${pairs[0][0][0]} ${pairs[0][0][1]}, ${pairs[0][1][0]} ${pairs[0][1][1]}), (${pairs[1][0][0]} ${pairs[1][0][1]}, ${pairs[1][1][0]} ${pairs[1][1][1]})`);
+      console.log(`Two Pair: (${pairs[1][0][0]} ${pairs[1][0][1]}, ${pairs[1][1][0]} ${pairs[1][1][1]}), (${pairs[0][0][0]} ${pairs[0][0][1]}, ${pairs[0][1][0]} ${pairs[0][1][1]})`);
       console.log(`Kicker: ${kickers[0][0]} ${kickers[0][1]}`);
       fullHands.push([ranks.indexOf('Two Pair'), inUse[0], inUse[1], inUse[2], inUse[3], kickers[0]]);
     } else if (pairs.length === 1) {
@@ -872,7 +894,7 @@ class Game extends React.Component {
       flush.push([high[flushValues[x][0]], flushValues[x][1]]);
       for(let y = x; y < flushValues.length; y++) {
         if(flushValues[x][1] === flushValues[y][1] && x !== y) {
-          flush.push([high[flushValues[y][0]], flushValues[y][1]]);
+          flush.unshift([high[flushValues[y][0]], flushValues[y][1]]);
         }
       }
       if(flush.length > 5) {
@@ -992,6 +1014,7 @@ class Game extends React.Component {
       console.log(`Kickers: ${kickers[0][0]} ${kickers[0][1]}, ${kickers[1][0]} ${kickers[1][1]}, ${kickers[2][0]} ${kickers[2][1]}, ${kickers[3][0]} ${kickers[3][1]}`);
       fullHands.push([ranks.indexOf('High Card'), inUse[0], kickers[0], kickers[1], kickers[2], kickers[3]]);
     }
+    console.log(fullHands);
     console.log(`--------------------`);
     let handRanks = [];
     for(let x = 0; x < fullHands.length; x++) {
