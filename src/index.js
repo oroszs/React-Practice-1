@@ -705,17 +705,26 @@ class Game extends React.Component {
     let max = [];
     let ranks = [];
     let winners = [];
+    let finalWindexes = [];
     console.log(hands);
     for(let x = 0; x < hands.length; x++) {
       ranks.push(hands[x][1][0]);
     }
     max = Math.max(...ranks);
+    console.log(max);
     for(let x = 0 ; x < hands.length; x++) {
       if(hands[x][1][0] === max) {
-        winners.push(hands[x][0]);
+        winners.push(hands[x]);
       }
     }
-    return winners;
+    if(winners.length > 1) {
+      finalWindexes = this.tieBreaker(winners);
+    }
+    return finalWindexes;
+  }
+
+  tieBreaker(hands) {
+    
   }
 
   getBestHand(handIndex){
