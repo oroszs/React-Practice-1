@@ -729,7 +729,6 @@ class Game extends React.Component {
     let ranks = [];
     let winners = [];
     let finalWindexes = [];
-    console.log(hands);
     for(let x = 0; x < hands.length; x++) {
       ranks.push(hands[x][1][0]);
     }
@@ -741,14 +740,85 @@ class Game extends React.Component {
     }
     if(winners.length > 1) {
       finalWindexes = this.tieBreaker(winners);
-    } else {
-      finalWindexes = winners[0][0];
     }
     return finalWindexes;
   }
 
   tieBreaker(hands) {
-    
+    //[x][0]: index
+    //[x][1][0]: rank
+    //[x][1][1-5]: cards
+    //straight is low -> high
+    //everything else high -> low
+    const high = ['2', '3', '4', '5', '6', '7', '8', '9', '10', 'J', 'Q', 'K', 'A'];
+    let highs = [];
+    let valHand = [];
+    let valHands = [];
+    const rank = hands[0][1][0];
+    let windexes = [];
+    let tie = false;
+    //If the best hand is not a straight or a straight flush...
+    if(rank !== 8 && rank !== 4) {
+      for(let x = 0; x < hands.length; x++) {
+        valHand = [];
+        for(let y = 1; y < 6; y++) {
+          valHand.push(high.indexOf(hands[x][1][y][0]));
+        }
+        valHands.push([valHand]);
+      }
+    }
+    console.log(valHands);
+    //Royal Flush
+    if(rank === 9) {
+      tie = true;
+    }
+    //Straight Flush
+    if(rank === 8) {
+      highs = [];
+      for(let x = 0; x < hands.length; x ++) {
+        if(hands[x][1][5][0] === 'A') {
+          highs.push(13);
+        } else if (hands[x][1][5][0] === 'K') {
+          highs.push(12);
+        } else if (hands[x][1][5][0] === 'Q') {
+          highs.push(11);
+        } else if (hands[x][1][5][0] === 'J') {
+          highs.push(10);
+        } else {
+          highs.push(hands[x][1][5][0]);
+        }
+      }
+      let max = Math.max(...highs);
+      for(let x = 0; x < highs.length; x++) {
+        if(highs[x] === max) {
+          windexes.push(hands[x][0]);
+        }
+      }
+    }
+    //Four of a Kind
+    if(rank === 7) {
+      let highs = [];
+      let bestHands = [];
+      for(let x = 0; x < valHands.length; x++) {
+        highs.push(valHands[x][0][0]);
+      }
+      let max = Math.max(...highs);
+      for(let x = 0; x < highs.length; x++) {
+        if(highs[x] === max) {
+          bestHands.push(valHands[x]);
+        }
+      }
+      console.log(bestHands);
+      //TODO if besthands.length > 1, check kickers
+    }
+    if(tie) {
+      for(let x = 0; x < hands.length; x++) {
+        windexes.push(hands[x][0])
+      }
+    }
+    console.log(hands);
+    console.log(windexes);
+    return windexes;
   }
 
   getBestHand(handIndex){
