@@ -734,7 +734,6 @@ class Game extends React.Component {
       ranks.push(hands[x][1][0]);
     }
     max = Math.max(...ranks);
-    console.log(max);
     for(let x = 0 ; x < hands.length; x++) {
       if(hands[x][1][0] === max) {
         winners.push(hands[x]);
