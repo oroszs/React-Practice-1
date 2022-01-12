@@ -761,13 +761,13 @@ class Game extends React.Component {
     if(rank !== 8 && rank !== 4) {
       for(let x = 0; x < hands.length; x++) {
         valHand = [];
+        valHand.push(hands[x][0]);
         for(let y = 1; y < 6; y++) {
           valHand.push(high.indexOf(hands[x][1][y][0]));
         }
         valHands.push([valHand]);
       }
     }
-    console.log(valHands);
     //Royal Flush
     if(rank === 9) {
       tie = true;
@@ -795,12 +795,12 @@ class Game extends React.Component {
         }
       }
     }
-    //Four of a Kind
-    if(rank === 7) {
+    //Four of a Kind, Full House
+    if(rank === 7 || rank === 6) {
       let highs = [];
       let bestHands = [];
       for(let x = 0; x < valHands.length; x++) {
-        highs.push(valHands[x][0][0]);
+        highs.push(valHands[x][0][1]);
       }
       let max = Math.max(...highs);
       for(let x = 0; x < highs.length; x++) {
@@ -808,18 +808,56 @@ class Game extends React.Component {
           bestHands.push(valHands[x]);
         }
       }
-      console.log(bestHands);
-      //TODO if besthands.length > 1, check kickers
+      if(bestHands.length > 1) {
+        let kickers = [];
+        for(let x = 0; x < bestHands.length; x++) {
+          kickers.push(bestHands[x][0][5]);
+        }
+        let max = Math.max(...kickers);
+        for(let x = 0; x < bestHands.length; x++) {
+          if(bestHands[x][0][5] === max) {
+            windexes.push(bestHands[x][0][0]);
+          }
+        }
+      } else {
+        windexes.push(bestHands[0][0][0]);
+      }
+    }
+    //Flush
+    if(rank === 5) {
+      tie = true;
+      for(let y = 5; y > 0; y--) {
+        let highs = [];
+        let bestHands = [];
+        for (let x = 0; x < valHands.length; x++) {
+          highs.push(valHands[x][0][y]);
+        }
+        let max = Math.max(...highs);
+        for(let x = 0; x < highs.length; x++) {
+          if(highs[x] === max) {
+            bestHands.push(valHands[x]);
+          }
+        }
+        if(bestHands.length === 1 && tie) {
+          console.log(bestHands);
+          windexes.push(bestHands[0][0][0]);
+          tie = false;
+        }
+      }
+    }
+    //Straight
+    if(rank === 4) {
+      
     }
     if(tie) {
       for(let x = 0; x < hands.length; x++) {
         windexes.push(hands[x][0])
       }
     }
-    console.log(hands);
-    console.log(windexes);
+    console.log(`Winners: ${windexes}`);
     return windexes;
   }
+
 
   getBestHand(handIndex){
     console.log(`----- Player ${handIndex + 1} -----`);
@@ -964,7 +1002,7 @@ class Game extends React.Component {
     let sFlushValues = cardValues.slice();
     for (let x = 0; x < cardValues.length; x++) {
       if(cardValues[x][0] === 0) {
-        flushValues.push(`A ${cardValues[x][1]}`);
+        flushValues.push([13, cardValues[x][1]]);
         flushValues.shift();
         sFlushValues.push([13, cardValues[x][1]]);
       }
@@ -974,7 +1012,7 @@ class Game extends React.Component {
       flush.push([high[flushValues[x][0]], flushValues[x][1]]);
       for(let y = x; y < flushValues.length; y++) {
         if(flushValues[x][1] === flushValues[y][1] && x !== y) {
-          flush.unshift([high[flushValues[y][0]], flushValues[y][1]]);
+          flush.push([high[flushValues[y][0]], flushValues[y][1]]);
         }
       }
       if(flush.length > 5) {
@@ -1111,7 +1149,7 @@ class Game extends React.Component {
     console.log(bestHand);
     return bestHand;
   }
-
+  
   getKickers(num, using, notUsing) {
     let kickers = [];
     let inUse;
