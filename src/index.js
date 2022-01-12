@@ -586,7 +586,7 @@ class Game extends React.Component {
 
   endRound(){
     const suits = ['\u2660', '\u2663', '\u2665', '\u2666'];
-    const board = [this.createCard('J', suits[1]), this.createCard('J', suits[0]), this.createCard('Q', suits[2]), this.createCard('Q', suits[3]), this.createCard('2', suits[1])];
+    const board = [this.createCard('K', suits[0]), this.createCard('A', suits[0]), this.createCard('Q', suits[0]), this.createCard('10', suits[0]), this.createCard('5', suits[0])];
     let actives = [];
     const moneyList = this.state.moneyList;
     for(let x = 0; x < moneyList.length; x++){
@@ -594,7 +594,7 @@ class Game extends React.Component {
         actives.push(x);
       }
     }
-    let hands = [[this.createCard('Q', suits[1]), this.createCard('Q', suits[3])], [this.createCard('J', suits[0]), this.createCard('J', suits[0])], [this.createCard('10', suits[2]), this.createCard('3', suits[2])], [this.createCard('7', suits[3]), this.createCard('6', suits[0])]];
+    let hands = [[this.createCard('8', suits[0]), this.createCard('2', suits[0])], [this.createCard('7', suits[0]), this.createCard('3', suits[0])], [this.createCard('6', suits[0]), this.createCard('4', suits[0])], [this.createCard('2', suits[1]), this.createCard('3', suits[3])]];
     const currentDeck = this.createDeck();
     const nextDealer = this.findNextDealer(actives);
     const turn = this.preFlopFirstTurn(actives, nextDealer);
@@ -738,13 +738,13 @@ class Game extends React.Component {
     if(rank !== 8 && rank !== 4) {
       for(let x = 0; x < hands.length; x++) {
         valHand = [];
+        valHand.push(hands[x][0]);
         for(let y = 1; y < 6; y++) {
           valHand.push(high.indexOf(hands[x][1][y][0]));
         }
         valHands.push([valHand]);
       }
     }
-    console.log(valHands);
     //Royal Flush
     if(rank === 9) {
       tie = true;
@@ -772,12 +772,12 @@ class Game extends React.Component {
         }
       }
     }
-    //Four of a Kind
-    if(rank === 7) {
+    //Four of a Kind, Full House
+    if(rank === 7 || rank === 6) {
       let highs = [];
       let bestHands = [];
       for(let x = 0; x < valHands.length; x++) {
-        highs.push(valHands[x][0][0]);
+        highs.push(valHands[x][0][1]);
       }
       let max = Math.max(...highs);
       for(let x = 0; x < highs.length; x++) {
@@ -785,18 +785,56 @@ class Game extends React.Component {
           bestHands.push(valHands[x]);
         }
       }
-      console.log(bestHands);
-      //TODO if besthands.length > 1, check kickers
+      if(bestHands.length > 1) {
+        let kickers = [];
+        for(let x = 0; x < bestHands.length; x++) {
+          kickers.push(bestHands[x][0][5]);
+        }
+        let max = Math.max(...kickers);
+        for(let x = 0; x < bestHands.length; x++) {
+          if(bestHands[x][0][5] === max) {
+            windexes.push(bestHands[x][0][0]);
+          }
+        }
+      } else {
+        windexes.push(bestHands[0][0][0]);
+      }
+    }
+    //Flush
+    if(rank === 5) {
+      tie = true;
+      for(let y = 5; y > 0; y--) {
+        let highs = [];
+        let bestHands = [];
+        for (let x = 0; x < valHands.length; x++) {
+          highs.push(valHands[x][0][y]);
+        }
+        let max = Math.max(...highs);
+        for(let x = 0; x < highs.length; x++) {
+          if(highs[x] === max) {
+            bestHands.push(valHands[x]);
+          }
+        }
+        if(bestHands.length === 1 && tie) {
+          console.log(bestHands);
+          windexes.push(bestHands[0][0][0]);
+          tie = false;
+        }
+      }
+    }
+    //Straight
+    if(rank === 4) {
+      
     }
     if(tie) {
       for(let x = 0; x < hands.length; x++) {
         windexes.push(hands[x][0])
       }
     }
-    console.log(hands);
-    console.log(windexes);
+    console.log(`Winners: ${windexes}`);
     return windexes;
   }
+
 
   getBestHand(handIndex){
     console.log(`----- Player ${handIndex + 1} -----`);
@@ -888,9 +926,9 @@ class Game extends React.Component {
         }
       }
       kickerLength = 1;
-      inUse = [pairs[0][0], pairs[0][1], pairs[1][0], pairs[1][1]];
+      inUse = [pairs[1][0], pairs[1][1], pairs[0][0], pairs[0][1]];
       kickers = this.getKickers(kickerLength, inUse, sorted);
-      console.log(`Two Pair: (${pairs[0][0][0]} ${pairs[0][0][1]}, ${pairs[0][1][0]} ${pairs[0][1][1]}), (${pairs[1][0][0]} ${pairs[1][0][1]}, ${pairs[1][1][0]} ${pairs[1][1][1]})`);
+      console.log(`Two Pair: (${pairs[1][0][0]} ${pairs[1][0][1]}, ${pairs[1][1][0]} ${pairs[1][1][1]}), (${pairs[0][0][0]} ${pairs[0][0][1]}, ${pairs[0][1][0]} ${pairs[0][1][1]})`);
       console.log(`Kicker: ${kickers[0][0]} ${kickers[0][1]}`);
       fullHands.push([ranks.indexOf('Two Pair'), inUse[0], inUse[1], inUse[2], inUse[3], kickers[0]]);
     } else if (pairs.length === 1) {
@@ -941,7 +979,7 @@ class Game extends React.Component {
     let sFlushValues = cardValues.slice();
     for (let x = 0; x < cardValues.length; x++) {
       if(cardValues[x][0] === 0) {
-        flushValues.push(`A ${cardValues[x][1]}`);
+        flushValues.push([13, cardValues[x][1]]);
         flushValues.shift();
         sFlushValues.push([13, cardValues[x][1]]);
       }
