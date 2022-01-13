@@ -586,7 +586,17 @@ class Game extends React.Component {
 
   endRound(){
     const suits = ['\u2660', '\u2663', '\u2665', '\u2666'];
-    const board = [this.createCard('K', suits[0]), this.createCard('A', suits[0]), this.createCard('Q', suits[0]), this.createCard('10', suits[0]), this.createCard('5', suits[0])];
+    //Royal Flush : [this.createCard('K', suits[0]), this.createCard('A', suits[0]), this.createCard('Q', suits[0]), this.createCard('10', suits[0]), this.createCard('J', suits[0])];
+    //Straight Flush : [this.createCard('K', suits[0]), this.createCard('9', suits[0]), this.createCard('Q', suits[0]), this.createCard('10', suits[0]), this.createCard('J', suits[0])];
+    //Four of a Kind : [this.createCard('K', suits[0]), this.createCard('K', suits[1]), this.createCard('K', suits[2]), this.createCard('K', suits[3]), this.createCard('J', suits[0])];
+    //Full House : [this.createCard('K', suits[0]), this.createCard('K', suits[1]), this.createCard('K', suits[2]), this.createCard('Q', suits[3]), this.createCard('Q', suits[0])];
+    //Flush : [this.createCard('K', suits[0]), this.createCard('3', suits[0]), this.createCard('6', suits[0]), this.createCard('8', suits[0]), this.createCard('A', suits[0])];
+    //Straight : [this.createCard('2', suits[2]), this.createCard('3', suits[0]), this.createCard('4', suits[1]), this.createCard('5', suits[3]), this.createCard('6', suits[0])];
+    //Three of a Kind : [this.createCard('2', suits[0]), this.createCard('2', suits[1]), this.createCard('2', suits[2]), this.createCard('3', suits[3]), this.createCard('6', suits[0])];
+    //Two Pair : [this.createCard('2', suits[0]), this.createCard('2', suits[1]), this.createCard('3', suits[2]), this.createCard('3', suits[3]), this.createCard('6', suits[0])];
+    //Pair : [this.createCard('2', suits[0]), this.createCard('A', suits[1]), this.createCard('2', suits[2]), this.createCard('3', suits[3]), this.createCard('6', suits[0])];
+    //High Card : [this.createCard('2', suits[0]), this.createCard('9', suits[1]), this.createCard('3', suits[2]), this.createCard('10', suits[3]), this.createCard('A', suits[0])];
+    const board = [this.createCard('2', suits[0]), this.createCard('9', suits[1]), this.createCard('3', suits[2]), this.createCard('10', suits[3]), this.createCard('A', suits[0])];
     let actives = [];
     const moneyList = this.state.moneyList;
     for(let x = 0; x < moneyList.length; x++){
@@ -594,7 +604,7 @@ class Game extends React.Component {
         actives.push(x);
       }
     }
-    let hands = [[this.createCard('8', suits[0]), this.createCard('2', suits[0])], [this.createCard('7', suits[0]), this.createCard('3', suits[0])], [this.createCard('6', suits[0]), this.createCard('4', suits[0])], [this.createCard('2', suits[1]), this.createCard('3', suits[3])]];
+    let hands = [[this.createCard('Q', suits[0]), this.createCard('7', suits[0])], [this.createCard('Q', suits[2]), this.createCard('8', suits[2])], [this.createCard('8', suits[1]), this.createCard('5', suits[1])], [this.createCard('Q', suits[1]), this.createCard('8', suits[3])]];
     const currentDeck = this.createDeck();
     const nextDealer = this.findNextDealer(actives);
     const turn = this.preFlopFirstTurn(actives, nextDealer);
@@ -717,6 +727,8 @@ class Game extends React.Component {
     }
     if(winners.length > 1) {
       finalWindexes = this.tieBreaker(winners);
+    } else {
+      finalWindexes.push(winners[0][0]);
     }
     return finalWindexes;
   }
@@ -745,87 +757,67 @@ class Game extends React.Component {
         valHands.push([valHand]);
       }
     }
-    //Royal Flush
-    if(rank === 9) {
+    if(rank === 9) { //Royal Flush
       tie = true;
-    }
-    //Straight Flush
-    if(rank === 8) {
-      highs = [];
-      for(let x = 0; x < hands.length; x ++) {
-        if(hands[x][1][5][0] === 'A') {
-          highs.push(13);
-        } else if (hands[x][1][5][0] === 'K') {
-          highs.push(12);
-        } else if (hands[x][1][5][0] === 'Q') {
-          highs.push(11);
-        } else if (hands[x][1][5][0] === 'J') {
-          highs.push(10);
-        } else {
-          highs.push(hands[x][1][5][0]);
-        }
-      }
-      let max = Math.max(...highs);
-      for(let x = 0; x < highs.length; x++) {
-        if(highs[x] === max) {
-          windexes.push(hands[x][0]);
-        }
-      }
-    }
-    //Four of a Kind, Full House
-    if(rank === 7 || rank === 6) {
-      let highs = [];
-      let bestHands = [];
-      for(let x = 0; x < valHands.length; x++) {
-        highs.push(valHands[x][0][1]);
-      }
-      let max = Math.max(...highs);
-      for(let x = 0; x < highs.length; x++) {
-        if(highs[x] === max) {
-          bestHands.push(valHands[x]);
-        }
-      }
-      if(bestHands.length > 1) {
-        let kickers = [];
-        for(let x = 0; x < bestHands.length; x++) {
-          kickers.push(bestHands[x][0][5]);
-        }
-        let max = Math.max(...kickers);
-        for(let x = 0; x < bestHands.length; x++) {
-          if(bestHands[x][0][5] === max) {
-            windexes.push(bestHands[x][0][0]);
+    } else if (rank === 8 || rank === 4) { //Straight Flush & Straight
+        highs = [];
+        for(let x = 0; x < hands.length; x ++) {
+          if(hands[x][1][5][0] === 'A') {
+            highs.push(13);
+          } else if (hands[x][1][5][0] === 'K') {
+            highs.push(12);
+          } else if (hands[x][1][5][0] === 'Q') {
+            highs.push(11);
+          } else if (hands[x][1][5][0] === 'J') {
+            highs.push(10);
+          } else {
+            highs.push(hands[x][1][5][0]);
           }
-        }
-      } else {
-        windexes.push(bestHands[0][0][0]);
-      }
-    }
-    //Flush
-    if(rank === 5) {
-      tie = true;
-      for(let y = 5; y > 0; y--) {
-        let highs = [];
-        let bestHands = [];
-        for (let x = 0; x < valHands.length; x++) {
-          highs.push(valHands[x][0][y]);
         }
         let max = Math.max(...highs);
         for(let x = 0; x < highs.length; x++) {
-          if(highs[x] === max) {
-            bestHands.push(valHands[x]);
+          if(parseInt(highs[x]) === max) {
+            windexes.push(hands[x][0]);
           }
         }
-        if(bestHands.length === 1 && tie) {
-          console.log(bestHands);
-          windexes.push(bestHands[0][0][0]);
-          tie = false;
-        }
-      }
-    }
-    //Straight
-    if(rank === 4) {
-      
-    }
+      } else if (rank === 5) { //Flush
+          tie = true;
+          for(let y = 5; y > 0; y--) {
+            let highs = [];
+            let bestHands = [];
+            for (let x = 0; x < valHands.length; x++) {
+              highs.push(valHands[x][0][y]);
+            }
+            let max = Math.max(...highs);
+            for(let x = 0; x < highs.length; x++) {
+              if(highs[x] === max) {
+                bestHands.push(valHands[x]);
+              }
+            }
+            if(bestHands.length === 1 && tie) {
+              windexes.push(bestHands[0][0][0]);
+              tie = false;
+            }
+          }
+        } else { //Four of a Kind, Full House, Three of a Kind, Two Pair, Pair, High Card
+            let tempHands = valHands.slice();
+            for(let x = 1; x < 6; x++) {
+              let highs = [];
+              for(let y = 0; y < tempHands.length; y++) {
+                highs.push(tempHands[y][0][x]);
+              }
+              let max = Math.max(...highs);
+              for(let y = 0; y < tempHands.length; y++) {
+                if(tempHands[y][0][x] !== max) {
+                  tempHands.splice(y, 1);
+                  y--;
+                }
+              }
+            }
+            for(let y = 0; y < tempHands.length; y++) {
+              windexes.push(tempHands[y][0][0]);
+            }
+          }
     if(tie) {
       for(let x = 0; x < hands.length; x++) {
         windexes.push(hands[x][0])
@@ -840,7 +832,6 @@ class Game extends React.Component {
     console.log(`----- Player ${handIndex + 1} -----`);
     const high = ['A', '2', '3', '4', '5', '6', '7', '8', '9', '10', 'J', 'Q', 'K', 'A'];
     const ranks = ['High Card', 'Pair', 'Two Pair', 'Three of a Kind', 'Straight', 'Flush', 'Full House', 'Four of a Kind', 'Straight Flush', 'Royal Flush'];
-    console.log('High Card - 0, Pair - 1, Two Pair - 2, Three of a Kind - 3, Straight - 4, Flush - 5, Full House - 6, Four of a Kind - 7, Straight Flush - 8, Royal Flush - 9');
     let fullHands = [];
     const hands = [this.state.p1, this.state.p2, this.state.p3, this.state.p4];
     const board = this.state.board;
@@ -1109,8 +1100,7 @@ class Game extends React.Component {
       console.log(`Kickers: ${kickers[0][0]} ${kickers[0][1]}, ${kickers[1][0]} ${kickers[1][1]}, ${kickers[2][0]} ${kickers[2][1]}, ${kickers[3][0]} ${kickers[3][1]}`);
       fullHands.push([ranks.indexOf('High Card'), inUse[0], kickers[0], kickers[1], kickers[2], kickers[3]]);
     }
-    console.log(fullHands);
-    console.log(`--------------------`);
+    console.log(' ');
     let handRanks = [];
     for(let x = 0; x < fullHands.length; x++) {
       handRanks.push(fullHands[x][0]);
@@ -1123,7 +1113,6 @@ class Game extends React.Component {
         break;
       }
     }
-    console.log(bestHand);
     return bestHand;
   }
 
