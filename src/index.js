@@ -232,7 +232,7 @@ class Game extends React.Component {
     let lastBet = this.state.lastBet;
     let actives = this.state.activePlayers;
     let foldIndex = this.state.foldIndex;
-    console.log(`Player: ${playerTurn} - Total: ${roundAmt}, Ante: ${ante}, Diff: ${diff}`);
+    //console.log(`Player: ${playerTurn} - Total: ${roundAmt}, Ante: ${ante}, Diff: ${diff}`);
 
     if(player === 'cpu'){
       if(money === 0){
@@ -325,7 +325,7 @@ class Game extends React.Component {
       moneyList[turnIndex] = money;
       turnChoices[turnIndex] = turnChoice;
       diff = ante - roundAmt;
-      console.log(`${turnChoice} ${turnAmt} Diff: ${diff}`);
+      //console.log(`${turnChoice} ${turnAmt} Diff: ${diff}`);
       cons[turnIndex] = roundAmt;
       this.setState({
         foldIndex: foldIndex,
@@ -709,6 +709,7 @@ class Game extends React.Component {
         }
       }
       windexes.length > 1 ? console.log(`Winners: ${windexes}`) : console.log(`Winner: ${windexes}`);
+      console.log(' ');
     }
     this.setState({
       blindTitles: blindTitles,
