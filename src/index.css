@@ -52,6 +52,28 @@
   justify-content: center;
   align-items: center;
 }
+#playerSelect {
+  display: flex;
+  flex-direction: row;
+  justify-content: space-evenly;
+  align-items: center;
+  position: relative;
+  bottom: 30%;
+  width: fit-content;
+  height: 50px;
+  background: green;
+  border: 2px solid black;
+  border-radius: 5px;
+}
+.playerTypeButton {
+  text-align: center;
+  flex: none;
+  border-radius: 5px;
+  width: 40px;
+  height: 40px;
+  margin: 5px;
+  padding: 0px;
+}
 #pNumHolder{
   flex: none;
   position: relative;

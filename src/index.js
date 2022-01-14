@@ -22,10 +22,13 @@ class Menu extends React.Component{
     this.state = {
       game: false,
       players: this.props.startingPlayers,
+      playerList: ['CPU', 'CPU', 'CPU', 'CPU'],
       money: this.props.startingMoney,
+      humans: 0,
     }
     this.restart = this.restart.bind(this);
     this.setup = this.setup.bind(this);
+    this.changeHumans = this.changeHumans.bind(this);
   }
 
   start() {
@@ -46,13 +49,18 @@ class Menu extends React.Component{
 
   less() {
     let p = this.state.players;
+    const list = this.state.playerList;
+    let humans = this.state.humans;
     if(p > 2){
       p --;
+      if(list[p] === "Player") {
+        humans --;
+      }
     }
     this.setState({
       players: p,
+      humans: humans,
     });
-    this.list(p);
   }
 
   more() {
@@ -62,17 +70,6 @@ class Menu extends React.Component{
     }
     this.setState({
       players: p,
-    });
-    this.list(p);
-  }
-
-  list(p){
-    let list = [];
-    for(let i = 0; i < p; i++){
-      list.push('cpu');
-    }
-    this.setState({
-      playerList: list,
     });
   }
 
@@ -88,11 +85,40 @@ class Menu extends React.Component{
     let el = document.getElementById('moneySlider');
     el.value = this.state.money;
     let p = this.state.players;
-    this.list(p);
   }
 
   componentDidMount(){
     this.setup();
+  }
+
+  getDivs() {
+    const players = this.state.players;
+    let divs = [];
+    for(let x = 0; x < players; x++) {
+      divs.push(this.getCpuDivs(x));
+    }
+    return divs;
+  }
+
+  getCpuDivs(x) {
+    return (
+      <Cpu key={x} num={x + 1} changeHumans={this.changeHumans}/>
+    );
+  }
+
+  changeHumans(action, num){
+    let h = this.state.humans;
+    let list = this.state.playerList;
+    if(action === 'Add') {
+      list[num - 1] = 'Player';
+      h ++;
+    } else if (action === 'Subtract') {
+      list[num - 1] = 'CPU';
+      h --;
+    }
+    this.setState({
+      humans: h,
+    });
   }
 
   render() {
@@ -111,6 +137,9 @@ class Menu extends React.Component{
           <div id='moneyDiv'> Starting Chip Value: {val}
             <input id='moneySlider' type='range' min='100' max='1000' step='50' onChange={() => {this.getVal()}}></input>
           </div>
+          <div id='playerSelect'>
+            {this.getDivs()}
+          </div>
           <div id='pNumHolder'>
             <button className='pNum' onClick={() => this.less()}>&lt;</button>
             <span id='players'>{p} Players</span>
@@ -118,6 +147,41 @@ class Menu extends React.Component{
           </div>
         </div>
         }
+      </div>
+    );
+  }
+}
+
+class Cpu extends React.Component {
+  constructor (props) {
+    super(props);
+    this.state = {
+      type: 'CPU',
+    }
+  }
+
+  changeType() {
+    const currentType = this.state.type;
+    let newType;
+    const num = this.props.num;
+    if(currentType === 'CPU') {
+      this.props.changeHumans('Add', num);
+      newType = `P${num}`;
+    } else {
+      this.props.changeHumans('Subtract', num);
+      newType = 'CPU';
+    }
+
+    this.setState({
+      type: newType,
+    });
+  }
+
+  render() {
+    const type = this.state.type;
+    return (
+      <div>
+        <button className='playerTypeButton' onClick={() => this.changeType()}>{type}</button>
       </div>
     );
   }
