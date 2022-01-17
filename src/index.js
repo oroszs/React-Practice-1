@@ -19,12 +19,16 @@ class App extends React.Component {
 class Menu extends React.Component{
   constructor (props){
     super (props);
+    const p = this.props.startingPlayers;
+    let list = [];
+    for(let x = 0; x < p; x++) {
+      list.push('CPU');
+    }
     this.state = {
       game: false,
       players: this.props.startingPlayers,
-      playerList: ['CPU', 'CPU', 'CPU', 'CPU'],
+      playerList: list,
       money: this.props.startingMoney,
-      humans: 0,
     }
     this.restart = this.restart.bind(this);
     this.setup = this.setup.bind(this);
@@ -50,26 +54,25 @@ class Menu extends React.Component{
   less() {
     let p = this.state.players;
     const list = this.state.playerList;
-    let humans = this.state.humans;
     if(p > 2){
       p --;
-      if(list[p] === "Player") {
-        humans --;
-      }
+      list.splice(p, 1);
     }
     this.setState({
       players: p,
-      humans: humans,
     });
   }
 
   more() {
     let p = this.state.players;
+    let list = this.state.playerList;
     if(p < 4){
       p ++;
+      list.push('CPU');
     }
     this.setState({
       players: p,
+      playerList: list,
     });
   }
 
@@ -107,17 +110,14 @@ class Menu extends React.Component{
   }
 
   changeHumans(action, num){
-    let h = this.state.humans;
     let list = this.state.playerList;
     if(action === 'Add') {
       list[num - 1] = 'Player';
-      h ++;
     } else if (action === 'Subtract') {
       list[num - 1] = 'CPU';
-      h --;
     }
     this.setState({
-      humans: h,
+      playerList: list,
     });
   }
 
