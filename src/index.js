@@ -87,7 +87,6 @@ class Menu extends React.Component{
   setup(){
     let el = document.getElementById('moneySlider');
     el.value = this.state.money;
-    let p = this.state.players;
   }
 
   componentDidMount(){
@@ -298,7 +297,7 @@ class Game extends React.Component {
     let foldIndex = this.state.foldIndex;
     //console.log(`Player: ${playerTurn} - Total: ${roundAmt}, Ante: ${ante}, Diff: ${diff}`);
 
-    if(player === 'cpu'){
+    if(player === 'CPU'){
       if(money === 0){
         if(diff > 0){
           turnChoice = 'Fold';
@@ -400,6 +399,7 @@ class Game extends React.Component {
         contributions: cons,
         lastBet: lastBet,
         activePlayers: actives,
+        turn: turnIndex + 1,
       });
     }
   }
@@ -1335,12 +1335,15 @@ class Game extends React.Component {
     const actives = this.state.activePlayers;
     const gameIsOver = this.state.gameIsOver;
     const winnerMoney = moneyList[actives[0]];
+    const list = this.props.playerList;
+    const winnerPlayer = list[actives[0]];
+    const turn = this.state.turn;
     return(
       <div>
         {gameIsOver ? 
           <div id='gameOverDisplay'>
             <div id='winnerDiv'>
-              <span className='winText'>Player {actives[0] + 1} Wins</span>
+              <span className='winText'>{winnerPlayer} {actives[0] + 1} Wins</span>
               <span className='winText'>${winnerMoney}</span>
             </div>
             <div id='menuButtonDiv'>
@@ -1359,10 +1362,10 @@ class Game extends React.Component {
             <div id='board' className='cardHolder'>{board}</div>
             <div id='pot'>Pot: {pot} Ante: {ante}</div>
             <div id='playersArea'>
-                {p1 ? <Player player='1' hand={p1} money={moneyList[0]} choice={choices[0]} blindTitle={blindTitles[0]}/> : null}
-                {p2 ? <Player player='2' hand={p2} money={moneyList[1]} choice={choices[1]} blindTitle={blindTitles[1]}/> : null}    
-                {p3 ? <Player player='3' hand={p3} money={moneyList[2]} choice={choices[2]} blindTitle={blindTitles[2]}/> : null}
-                {p4 ? <Player player='4' hand={p4} money={moneyList[3]} choice={choices[3]} blindTitle={blindTitles[3]}/> : null}        
+                {p1 ? <Player type={list[0]} player='1' turn={turn} hand={p1} money={moneyList[0]} choice={choices[0]} blindTitle={blindTitles[0]}/> : null}
+                {p2 ? <Player type={list[1]} player='2' turn={turn} hand={p2} money={moneyList[1]} choice={choices[1]} blindTitle={blindTitles[1]}/> : null}    
+                {p3 ? <Player type={list[2]} player='3' turn={turn} hand={p3} money={moneyList[2]} choice={choices[2]} blindTitle={blindTitles[2]}/> : null}
+                {p4 ? <Player type={list[3]} player='4' turn={turn} hand={p4} money={moneyList[3]} choice={choices[3]} blindTitle={blindTitles[3]}/> : null}        
             </div>
           </div>
         }
@@ -1372,23 +1375,63 @@ class Game extends React.Component {
 }
 
 class Player extends React.Component {
+  constructor(props) {
+    super(props);
+    this.state = {
+      show: false,
+    }
+  }
+  getCardBacks() {
+    let cards = [];
+    for (let x = 0; x < 2; x++) {
+      cards.push(
+        <div key={x} className='cardBack'></div>
+      );
+    }
+    return cards;
+  }
+
+  showCards(event) {
+    let show = this.state.show;
+    if(event.type === 'mousedown') {
+      show = true;
+    } else if (event.type === 'mouseup') {
+      show = false;
+    }
+    this.setState({
+      show: show,
+    });
+  }
 
   render(){
+    const type = this.props.type;
     const player = this.props.player;
     const hand = this.props.hand;
+    const handBack = this.getCardBacks();
     const money = this.props.money;
     const title = this.props.title;
     const choice = this.props.choice;
     const blind = this.props.blindTitle;
+    const turn = this.props.turn;
+    let show = false;
+
     return (
-      <div className = {(choice === 'Fold') ? 'foldFade' : null}>
+      <div className = {(choice === 'Fold') ? 'foldFade' : 'playerUI'}>
         {blind ? <span className='blindTitle'>{blind}</span> : null}
         <div className='playerArea'>
+          {type === 'Player' && turn === player ?
+            <div className='turnUI'>
+              <button onMouseDown={this.showCards} onMouseUp={this.showCards}>Show Cards</button>
+            </div> : null
+          }
           <span>{title ? title : null}</span>
-          <span style={{display: 'block'}}>Player {player}</span>
+          <span style={{display: 'block'}}>{type} {player}</span>
           <span>{choice}</span>
           <div className='playerInfo'>{money}</div>
-          <div className='cardHolder'>{hand}</div>
+          {show ?
+            <div className='cardHolder'>{hand}</div> : 
+            <div className='cardHolder'>{handBack}</div>
+          }
         </div>
       </div>
     );
