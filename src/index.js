@@ -214,6 +214,7 @@ class Game extends React.Component {
       activePlayers: actives,
       foldIndex: null,
       gameIsOver: false,
+      showUI: Array(props.players).fill(false),
     }
     this.dealCards = this.dealCards.bind(this);
   }
@@ -276,12 +277,30 @@ class Game extends React.Component {
     return cards;
   }
 
+  playerBet(turn) {
+    const maxMoney = this.props.money;
+    const raiseMult = Math.floor(maxMoney / 20);
+    const turnIndex = turn - 1;
+    let moneyList = this.state.moneyList;
+    let money = moneyList[turnIndex];
+    let cons = this.state.contributions;
+    let roundAmt = cons[turnIndex];
+    let turnAmt = 0;
+    let turnChoices = this.state.turnChoices;
+    let turnChoice = turnChoices[turnIndex];
+    let ante = this.state.bet;
+    let pot = this.state.pot;
+    let diff = ante - roundAmt;
+    let lastBet = this.state.lastBet;
+    let actives = this.state.activePlayers;
+    let foldIndex = this.state.foldIndex;
+  }
+
   bet(playerTurn){
     const maxMoney = this.props.money;
     const raiseTimes = 3;
     const raiseMult = Math.floor(maxMoney / 20);
     let turnIndex = playerTurn - 1;
-    const player = this.props.playerList[turnIndex];
     let moneyList = this.state.moneyList;
     let money = moneyList[turnIndex];
     let cons = this.state.contributions;
@@ -297,94 +316,93 @@ class Game extends React.Component {
     let foldIndex = this.state.foldIndex;
     //console.log(`Player: ${playerTurn} - Total: ${roundAmt}, Ante: ${ante}, Diff: ${diff}`);
 
-    if(player === 'CPU'){
-      if(money === 0){
-        if(diff > 0){
-          turnChoice = 'Fold';
-          foldIndex = turnIndex;
-        }
+    if(money === 0){
+      if(diff > 0){
+        turnChoice = 'Fold';
+        foldIndex = turnIndex;
       }
-      if(diff === 0 && turnChoice !== 'Fold' && turnChoice !== 'Good' && turnChoice !== 'All In'){
-        if(turnChoice === 'Check' || turnChoice === 'Call'){
-          turnChoice = 'Good';
-        }
+    }
+    if(diff === 0 && turnChoice !== 'Fold' && turnChoice !== 'Good' && turnChoice !== 'All In'){
+      if(turnChoice === 'Check' || turnChoice === 'Call'){
+        turnChoice = 'Good';
       }
-      if(diff !== 0 && turnChoice !== 'Fold'){
-        turnChoice = '';
-      }
-      if(turnChoice !== 'Good' && turnChoice !== 'Fold' && turnChoice !== 'All In'){
-        let choice = Math.floor(Math.random() * 3);
-        //let choice = 0;
-        switch (choice) {
-          case 0:
-            //Check / Call
-            if(diff === 0){
-              turnChoice = 'Check';
-            }
-            else if(money <= diff){
-              turnAmt = money;
-              pot += money;
-              money = 0;
-              turnChoice = 'All In';
-            } else if(diff > 0 && money > diff) {
-              pot += diff;
-              money -= diff;
-              turnChoice = 'Call';
-              turnAmt = diff;
+    }
+    if(diff !== 0 && turnChoice !== 'Fold'){
+      turnChoice = '';
+    }
+    if(turnChoice !== 'Good' && turnChoice !== 'Fold' && turnChoice !== 'All In'){
+      let choice = Math.floor(Math.random() * 3);
+      //let choice = 0;
+      switch (choice) {
+        case 0:
+          //Check / Call
+          if(diff === 0){
+            turnChoice = 'Check';
+          }
+          else if(money <= diff){
+            turnAmt = money;
+            pot += money;
+            money = 0;
+            turnChoice = 'All In';
+          } else if(diff > 0 && money > diff) {
+            pot += diff;
+            money -= diff;
+            turnChoice = 'Call';
+            turnAmt = diff;
+          }
+          roundAmt += turnAmt;
+          break;
+        case 1:
+          //Raise
+          if(diff >= money){
+            turnAmt = money;
+            pot += money;
+            money = 0;
+            turnChoice = 'All In';
+          } else {
+              if (lastBet !== turnIndex) {
+                lastBet = turnIndex;
+                let raise = (Math.floor(Math.random() * raiseTimes) + 1) * raiseMult;
+                if((diff + raise) >= money){
+                  raise = (money - diff);
+                  ante += raise;
+                  turnAmt = money;
+                  pot += money;
+                  money = 0;
+                  turnChoice = 'All In';
+                } else {
+                  ante += raise;
+                  turnAmt = diff + raise;
+                  pot += turnAmt;
+                  money -= turnAmt;
+                  turnChoice = 'Raise';
+                  }
+              } else {
+                  if(diff === 0) {
+                    turnChoice = 'Check';
+                  } else {
+                    turnAmt = diff;
+                    money -= diff;
+                    pot += diff;
+                    turnChoice = 'Call';
+                  }
+                }
             }
             roundAmt += turnAmt;
-            break;
-          case 1:
-            //Raise
-              if(diff >= money){
-                turnAmt = money;
-                pot += money;
-                money = 0;
-                turnChoice = 'All In';
-              } else {
-                  if (lastBet !== turnIndex) {
-                    lastBet = turnIndex;
-                    let raise = (Math.floor(Math.random() * raiseTimes) + 1) * raiseMult;
-                    if((diff + raise) >= money){
-                      raise = (money - diff);
-                      ante += raise;
-                      turnAmt = money;
-                      pot += money;
-                      money = 0;
-                      turnChoice = 'All In';
-                    } else {
-                      ante += raise;
-                      turnAmt = diff + raise;
-                      pot += turnAmt;
-                      money -= turnAmt;
-                      turnChoice = 'Raise';
-                      }
-                    } else {
-                      if(diff === 0) {
-                        turnChoice = 'Check';
-                      } else {
-                        turnAmt = diff;
-                        money -= diff;
-                        pot += diff;
-                        turnChoice = 'Call';
-                      }
-                    }
-                  }
-                  roundAmt += turnAmt;
-            break;
-          case 2:
-            //Fold
-            if(diff === 0){
-              turnChoice = 'Check';
-            } else {
-              turnChoice = 'Fold';
-              foldIndex = turnIndex;
-            }
-            break;
-          default:
-            break;
-        }
+          break;
+        case 2:
+          //Fold
+          if(diff === 0){
+            turnChoice = 'Check';
+          } else {
+            turnChoice = 'Fold';
+            foldIndex = turnIndex;
+          }
+          break;
+        default:
+          break;
       }
+    }
       moneyList[turnIndex] = money;
       turnChoices[turnIndex] = turnChoice;
       diff = ante - roundAmt;
@@ -401,7 +419,6 @@ class Game extends React.Component {
         activePlayers: actives,
         turn: turnIndex + 1,
       });
-    }
   }
 
   componentDidMount(){
@@ -446,6 +463,7 @@ class Game extends React.Component {
     let ante = this.state.bet;
     const actives = this.state.activePlayers;
     let choices = this.state.turnChoices;
+    let showUI = [];
     actives.forEach((index)=>{
       if(choices[index] !== 'All In'){
         choices[index] = 'Thinking';
@@ -530,7 +548,6 @@ class Game extends React.Component {
   
         case 'preFlop' : 
             id = setInterval(() => {
-              let actives = this.state.activePlayers;
               const finish = this.finishCheck();
               let stopTheRound = this.stopCheck();
               if(stopTheRound){
@@ -551,9 +568,21 @@ class Game extends React.Component {
                   return;
                 });
               } else {
-              this.bet(turn);
-              turn = this.findNextTurn(turn, actives);
-              }
+                let list = this.props.playerList;
+                console.log(`List[0]: ${list[0]}, List[1]: ${list[1]}, Turn: ${turn}`);
+                  if(list[turn - 1] === 'Player') {
+                    console.log('Interval Cleared');
+                    showUI[turn - 1] = true;
+                    this.setState({
+                      showUI: showUI,
+                    }, () => {
+                      clearInterval(id);
+                    });
+                  } else {
+                      this.bet(turn);
+                      turn = this.findNextTurn(turn, actives);
+                    }
+                }
             }, turnTime);
           break;
   
@@ -1337,7 +1366,7 @@ class Game extends React.Component {
     const winnerMoney = moneyList[actives[0]];
     const list = this.props.playerList;
     const winnerPlayer = list[actives[0]];
-    const turn = this.state.turn;
+    const showUI = this.state.showUI;
     return(
       <div>
         {gameIsOver ? 
@@ -1362,10 +1391,10 @@ class Game extends React.Component {
             <div id='board' className='cardHolder'>{board}</div>
             <div id='pot'>Pot: {pot} Ante: {ante}</div>
             <div id='playersArea'>
-                {p1 ? <Player type={list[0]} player='1' turn={turn} hand={p1} money={moneyList[0]} choice={choices[0]} blindTitle={blindTitles[0]}/> : null}
-                {p2 ? <Player type={list[1]} player='2' turn={turn} hand={p2} money={moneyList[1]} choice={choices[1]} blindTitle={blindTitles[1]}/> : null}    
-                {p3 ? <Player type={list[2]} player='3' turn={turn} hand={p3} money={moneyList[2]} choice={choices[2]} blindTitle={blindTitles[2]}/> : null}
-                {p4 ? <Player type={list[3]} player='4' turn={turn} hand={p4} money={moneyList[3]} choice={choices[3]} blindTitle={blindTitles[3]}/> : null}        
+                {p1 ? <Player type={list[0]} player='1' showUI={showUI[0]} hand={p1} money={moneyList[0]} choice={choices[0]} blindTitle={blindTitles[0]}/> : null}
+                {p2 ? <Player type={list[1]} player='2' showUI={showUI[1]} hand={p2} money={moneyList[1]} choice={choices[1]} blindTitle={blindTitles[1]}/> : null}    
+                {p3 ? <Player type={list[2]} player='3' showUI={showUI[2]} hand={p3} money={moneyList[2]} choice={choices[2]} blindTitle={blindTitles[2]}/> : null}
+                {p4 ? <Player type={list[3]} player='4' showUI={showUI[3]} hand={p4} money={moneyList[3]} choice={choices[3]} blindTitle={blindTitles[3]}/> : null}        
             </div>
           </div>
         }
@@ -1380,6 +1409,7 @@ class Player extends React.Component {
     this.state = {
       show: false,
     }
+    this.showCards = this.showCards.bind(this);
   }
   getCardBacks() {
     let cards = [];
@@ -1392,7 +1422,7 @@ class Player extends React.Component {
   }
 
   showCards(event) {
-    let show = this.state.show;
+    let show;
     if(event.type === 'mousedown') {
       show = true;
     } else if (event.type === 'mouseup') {
@@ -1412,23 +1442,22 @@ class Player extends React.Component {
     const title = this.props.title;
     const choice = this.props.choice;
     const blind = this.props.blindTitle;
-    const turn = this.props.turn;
-    let show = false;
-
+    let showCards = this.state.show;
+    const showUI = this.props.showUI;
     return (
-      <div className = {(choice === 'Fold') ? 'foldFade' : 'playerUI'}>
+      <div className = {(choice === 'Fold') ? 'foldFade playerUI' : 'playerUI'}>
+        {showUI ?
+          <div className='turnUI'>
+            <button className='turnButton' onMouseDown={this.showCards} onMouseUp={this.showCards}>Show Cards</button>
+          </div> : null
+        }
         {blind ? <span className='blindTitle'>{blind}</span> : null}
         <div className='playerArea'>
-          {type === 'Player' && turn === player ?
-            <div className='turnUI'>
-              <button onMouseDown={this.showCards} onMouseUp={this.showCards}>Show Cards</button>
-            </div> : null
-          }
           <span>{title ? title : null}</span>
           <span style={{display: 'block'}}>{type} {player}</span>
           <span>{choice}</span>
           <div className='playerInfo'>{money}</div>
-          {show ?
+          {showCards ?
             <div className='cardHolder'>{hand}</div> : 
             <div className='cardHolder'>{handBack}</div>
           }

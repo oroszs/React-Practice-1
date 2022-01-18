@@ -184,7 +184,7 @@
   position: relative;
   top: 15px;
   width:50%;
-  height: 200px;
+  height: 175px;
   border: solid black 2px;
   border-radius: 5px;
   background: rgb(255, 228, 155);
@@ -266,7 +266,7 @@
 .playerUI {
   position: relative;
   width: 200px;
-  height: 500px;
+  height: 400px;
   display: flex;
   flex-direction: column;
   justify-content: flex-end;
@@ -275,10 +275,20 @@
   padding: 10px;
 }
 .turnUI {
-  width: 100px;
-  height: 100px;
+  width: 175px;
+  height: 125px;
   background: grey;
   border-radius: 5px;
+  position: absolute;
+  top: 0px;
+  display: flex;
+  flex-direction: column;
+  justify-content: space-evenly;
+  align-items: center;
+}
+.turnButton {
+  flex: none;
+  position: relative;
 }
 .cardBack{
   position: relative;
