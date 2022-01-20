@@ -278,6 +278,7 @@ class Game extends React.Component {
   }
 
   playerBet(turn) {
+    let playerUI = this.state.playerUI;
     const maxMoney = this.props.money;
     const raiseMult = Math.floor(maxMoney / 20);
     const turnIndex = turn - 1;
@@ -294,6 +295,14 @@ class Game extends React.Component {
     let lastBet = this.state.lastBet;
     let actives = this.state.activePlayers;
     let foldIndex = this.state.foldIndex;
+    playerUI.raise.min = raiseMult + ante;
+    playerUI.raise.max = maxMoney;
+    playerUI.step = raiseMult;
+    playerUI.checkCall = ante > 0 ? 'Call' : 'Check';
+    playerUI.ante = ante;
+    this.setState({
+      playerUI: playerUI,
+    });
   }
 
   bet(playerTurn){
@@ -1408,6 +1417,7 @@ class Player extends React.Component {
     super(props);
     this.state = {
       show: false,
+      raiseAmt: 0,
     }
     this.showCards = this.showCards.bind(this);
   }
@@ -1432,6 +1442,13 @@ class Player extends React.Component {
       show: show,
     });
   }
+  getVal(){
+    let slider = document.getElementById('raiseSlider');
+    let raiseAmt = slider.value;
+    this.setState({
+      raiseAmt: raiseAmt,
+    });
+  }
 
   render(){
     const type = this.props.type;
@@ -1444,14 +1461,16 @@ class Player extends React.Component {
     const blind = this.props.blindTitle;
     let showCards = this.state.show;
     const showUI = this.props.showUI;
+    const raiseAmt = this.state.raiseAmt;
+
     //<input id='moneySlider' type='range' min='100' max='1000' step='50' onChange={() => {this.getVal()}}></input>
     return (
       <div className = {(choice === 'Fold') ? 'foldFade playerUI' : 'playerUI'}>
         {showUI ?
           <div className='turnUI'>
             <button className='turnButton' onMouseDown={this.showCards} onMouseUp={this.showCards}>Show Cards</button>
-            <button className='turnButton'>Raise</button>
-            <input type='range'></input>
+            <button className='turnButton'>Raise: {raiseAmt}</button>
+            <input id='raiseSlider' type='range' onChange={() => this.getVal()}></input>
             <button className='turnButton'>Check / Call</button>
             <button className='turnButton'>Fold</button>
           </div> : null
