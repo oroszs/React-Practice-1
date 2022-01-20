@@ -1444,11 +1444,16 @@ class Player extends React.Component {
     const blind = this.props.blindTitle;
     let showCards = this.state.show;
     const showUI = this.props.showUI;
+    //<input id='moneySlider' type='range' min='100' max='1000' step='50' onChange={() => {this.getVal()}}></input>
     return (
       <div className = {(choice === 'Fold') ? 'foldFade playerUI' : 'playerUI'}>
         {showUI ?
           <div className='turnUI'>
             <button className='turnButton' onMouseDown={this.showCards} onMouseUp={this.showCards}>Show Cards</button>
+            <button className='turnButton'>Raise</button>
+            <input type='range'></input>
+            <button className='turnButton'>Check / Call</button>
+            <button className='turnButton'>Fold</button>
           </div> : null
         }
         {blind ? <span className='blindTitle'>{blind}</span> : null}

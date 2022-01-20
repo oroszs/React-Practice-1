@@ -266,7 +266,7 @@
 .playerUI {
   position: relative;
   width: 200px;
-  height: 400px;
+  height: 425px;
   display: flex;
   flex-direction: column;
   justify-content: flex-end;
@@ -276,7 +276,7 @@
 }
 .turnUI {
   width: 175px;
-  height: 125px;
+  height: fit-content;
   background: grey;
   border-radius: 5px;
   position: absolute;
@@ -289,6 +289,7 @@
 .turnButton {
   flex: none;
   position: relative;
+  margin: 5px;
 }
 .cardBack{
   position: relative;
