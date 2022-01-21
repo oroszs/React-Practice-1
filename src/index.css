@@ -293,12 +293,12 @@
 }
 .cardBack{
   position: relative;
-  width: 58px;
-  height: 88px;
+  width: 52px;
+  height: 82px;
   background-color: rgb(177, 2, 2);
   outline: solid black 2px;
   border: solid white 5px;
-  border-radius: 5px;
+  border-radius: 4px;
   flex: none;
   margin: 5px;
 }
