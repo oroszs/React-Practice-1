@@ -196,6 +196,17 @@ class Game extends React.Component {
       actives.push(i);
     }
     let turn = this.preFlopFirstTurn(actives, dealer);
+    const mult = Math.floor(props.money / 20);
+    const uiObject = {
+      showUI: false,
+      raise: {
+        min: mult,
+        max: props.money,
+      },
+      step: mult,
+      checkCall: 'Check',
+      diff: 0,
+    };
     this.state = {
       currentDeck: this.createDeck(),
       board: [],
@@ -214,7 +225,7 @@ class Game extends React.Component {
       activePlayers: actives,
       foldIndex: null,
       gameIsOver: false,
-      showUI: Array(props.players).fill(false),
+      playerUI: Array(props.players).fill(uiObject),
     }
     this.dealCards = this.dealCards.bind(this);
   }
@@ -277,7 +288,7 @@ class Game extends React.Component {
     return cards;
   }
 
-  playerBet(turn) {
+  playerUI(turn, id) {
     let playerUI = this.state.playerUI;
     const maxMoney = this.props.money;
     const raiseMult = Math.floor(maxMoney / 20);
@@ -286,23 +297,22 @@ class Game extends React.Component {
     let money = moneyList[turnIndex];
     let cons = this.state.contributions;
     let roundAmt = cons[turnIndex];
-    let turnAmt = 0;
-    let turnChoices = this.state.turnChoices;
-    let turnChoice = turnChoices[turnIndex];
     let ante = this.state.bet;
-    let pot = this.state.pot;
     let diff = ante - roundAmt;
-    let lastBet = this.state.lastBet;
-    let actives = this.state.activePlayers;
-    let foldIndex = this.state.foldIndex;
-    playerUI.raise.min = raiseMult + ante;
-    playerUI.raise.max = maxMoney;
-    playerUI.step = raiseMult;
-    playerUI.checkCall = ante > 0 ? 'Call' : 'Check';
-    playerUI.ante = ante;
+    let uiObj = {
+      showUI: true,
+      raise: {
+        min: raiseMult + ante,
+        max: money,
+      },
+      step: raiseMult,
+      checkCall: diff > 0 ? 'Call' : 'Check',
+      diff: diff,
+    };
+    playerUI[turnIndex] = uiObj;
     this.setState({
       playerUI: playerUI,
-    });
+    }, clearInterval(id));
   }
 
   bet(playerTurn){
@@ -472,7 +482,6 @@ class Game extends React.Component {
     let ante = this.state.bet;
     const actives = this.state.activePlayers;
     let choices = this.state.turnChoices;
-    let showUI = [];
     actives.forEach((index)=>{
       if(choices[index] !== 'All In'){
         choices[index] = 'Thinking';
@@ -581,12 +590,9 @@ class Game extends React.Component {
                 console.log(`List[0]: ${list[0]}, List[1]: ${list[1]}, Turn: ${turn}`);
                   if(list[turn - 1] === 'Player') {
                     console.log('Interval Cleared');
-                    showUI[turn - 1] = true;
-                    this.setState({
-                      showUI: showUI,
-                    }, () => {
-                      clearInterval(id);
-                    });
+                    this.playerUI(turn, id);
+                    let slider = document.getElementById('raiseSlider');
+                    slider.value = Math.floor(this.state.playerUI[turn - 1].raise.max / 2);
                   } else {
                       this.bet(turn);
                       turn = this.findNextTurn(turn, actives);
@@ -1375,7 +1381,7 @@ class Game extends React.Component {
     const winnerMoney = moneyList[actives[0]];
     const list = this.props.playerList;
     const winnerPlayer = list[actives[0]];
-    const showUI = this.state.showUI;
+    const playerUI = this.state.playerUI;
     return(
       <div>
         {gameIsOver ? 
@@ -1400,10 +1406,10 @@ class Game extends React.Component {
             <div id='board' className='cardHolder'>{board}</div>
             <div id='pot'>Pot: {pot} Ante: {ante}</div>
             <div id='playersArea'>
-                {p1 ? <Player type={list[0]} player='1' showUI={showUI[0]} hand={p1} money={moneyList[0]} choice={choices[0]} blindTitle={blindTitles[0]}/> : null}
-                {p2 ? <Player type={list[1]} player='2' showUI={showUI[1]} hand={p2} money={moneyList[1]} choice={choices[1]} blindTitle={blindTitles[1]}/> : null}    
-                {p3 ? <Player type={list[2]} player='3' showUI={showUI[2]} hand={p3} money={moneyList[2]} choice={choices[2]} blindTitle={blindTitles[2]}/> : null}
-                {p4 ? <Player type={list[3]} player='4' showUI={showUI[3]} hand={p4} money={moneyList[3]} choice={choices[3]} blindTitle={blindTitles[3]}/> : null}        
+                {p1 ? <Player type={list[0]} player='1' playerUI={playerUI[0]} hand={p1} money={moneyList[0]} choice={choices[0]} blindTitle={blindTitles[0]} /> : null}
+                {p2 ? <Player type={list[1]} player='2' playerUI={playerUI[1]} hand={p2} money={moneyList[1]} choice={choices[1]} blindTitle={blindTitles[1]} /> : null}    
+                {p3 ? <Player type={list[2]} player='3' playerUI={playerUI[2]} hand={p3} money={moneyList[2]} choice={choices[2]} blindTitle={blindTitles[2]} /> : null}
+                {p4 ? <Player type={list[3]} player='4' playerUI={playerUI[3]} hand={p4} money={moneyList[3]} choice={choices[3]} blindTitle={blindTitles[3]} /> : null}        
             </div>
           </div>
         }
@@ -1417,10 +1423,11 @@ class Player extends React.Component {
     super(props);
     this.state = {
       show: false,
-      raiseAmt: 0,
+      raiseAmt: Math.floor(props.playerUI.raise.max / 2),
     }
     this.showCards = this.showCards.bind(this);
   }
+
   getCardBacks() {
     let cards = [];
     for (let x = 0; x < 2; x++) {
@@ -1460,8 +1467,13 @@ class Player extends React.Component {
     const choice = this.props.choice;
     const blind = this.props.blindTitle;
     let showCards = this.state.show;
-    const showUI = this.props.showUI;
+    const playerUI = this.props.playerUI;
     const raiseAmt = this.state.raiseAmt;
+    const showUI = playerUI.showUI;
+    const raise = playerUI.raise;
+    const raiseStep = playerUI.step;
+    const checkCall = playerUI.checkCall;
+    const diff = playerUI.diff;
 
     //<input id='moneySlider' type='range' min='100' max='1000' step='50' onChange={() => {this.getVal()}}></input>
     return (
@@ -1470,8 +1482,8 @@ class Player extends React.Component {
           <div className='turnUI'>
             <button className='turnButton' onMouseDown={this.showCards} onMouseUp={this.showCards}>Show Cards</button>
             <button className='turnButton'>Raise: {raiseAmt}</button>
-            <input id='raiseSlider' type='range' onChange={() => this.getVal()}></input>
-            <button className='turnButton'>Check / Call</button>
+            <input id='raiseSlider' type='range' min={raise.min} max={raise.max} step={raiseStep} onChange={() => this.getVal()}></input>
+            <button className='turnButton'>{checkCall} {diff}</button>
             <button className='turnButton'>Fold</button>
           </div> : null
         }
