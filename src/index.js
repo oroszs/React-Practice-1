@@ -128,6 +128,7 @@ class Menu extends React.Component{
     const playerList = this.state.playerList;
     const small = (val <= 500 ? 25 : 50);
     const big = (val <= 500 ? 50 : 100);
+
     return(
       <div>
         {gameStart ? <Game players={p} money={val} playerList={playerList} smallBlind={small} bigBlind={big} turnTime={time} restart={this.restart} setup={this.setup}/> :
@@ -199,9 +200,12 @@ class Game extends React.Component {
     const mult = Math.floor(props.money / 20);
     const uiObject = {
       showUI: false,
+      showCheckCall: true,
+      showRaise: true,
+      showAllIn: true,
       raise: {
         min: mult,
-        max: props.money,
+        max: mult * 10,
       },
       step: mult,
       checkCall: 'Check',
@@ -299,16 +303,43 @@ class Game extends React.Component {
     let roundAmt = cons[turnIndex];
     let ante = this.state.bet;
     let diff = ante - roundAmt;
+    /*
+    Possible unique outcomes:
+    (End States are All In, Good, Fold)
+    Money === 0:
+      -diff is > 0 -> You must Fold
+      -diff === 0 -> You may Check or Fold
+
+    Diff > money:
+      -All In
+      -Fold
+    */
     let uiObj = {
       showUI: true,
+      showCheckCall: true,
+      showRaise: true,
+      showAllIn: true,
       raise: {
         min: raiseMult + ante,
-        max: money,
+        max: raiseMult * 10,
       },
       step: raiseMult,
       checkCall: diff > 0 ? 'Call' : 'Check',
       diff: diff,
     };
+    if(money === 0) {
+      if(diff === 0) {
+        uiObj.showRaise = false;
+        uiObj.showAllIn = false;
+      } else {
+        uiObj.showRaise = false;
+        uiObj.showAllIn = false;
+        uiObj.showCheckCall = false;
+      }
+    } else if (diff >= money) {
+      uiObj.showRaise = false;
+      uiObj.showCheckCall = false;
+    }
     playerUI[turnIndex] = uiObj;
     this.setState({
       playerUI: playerUI,
@@ -334,7 +365,6 @@ class Game extends React.Component {
     let actives = this.state.activePlayers;
     let foldIndex = this.state.foldIndex;
     //console.log(`Player: ${playerTurn} - Total: ${roundAmt}, Ante: ${ante}, Diff: ${diff}`);
-
     if(money === 0){
       if(diff > 0){
         turnChoice = 'Fold';
@@ -592,7 +622,7 @@ class Game extends React.Component {
                     console.log('Interval Cleared');
                     this.playerUI(turn, id);
                     let slider = document.getElementById('raiseSlider');
-                    slider.value = Math.floor(this.state.playerUI[turn - 1].raise.max / 2);
+                    if(slider) {slider.value = Math.floor(this.state.playerUI[turn - 1].raise.max / 2)};
                   } else {
                       this.bet(turn);
                       turn = this.findNextTurn(turn, actives);
@@ -1474,16 +1504,22 @@ class Player extends React.Component {
     const raiseStep = playerUI.step;
     const checkCall = playerUI.checkCall;
     const diff = playerUI.diff;
+    const showRaise = playerUI.showRaise;
+    const showCheckCall = playerUI.showCheckCall;
+    const showAllIn = playerUI.showAllIn;
 
-    //<input id='moneySlider' type='range' min='100' max='1000' step='50' onChange={() => {this.getVal()}}></input>
     return (
       <div className = {(choice === 'Fold') ? 'foldFade playerUI' : 'playerUI'}>
         {showUI ?
           <div className='turnUI'>
             <button className='turnButton' onMouseDown={this.showCards} onMouseUp={this.showCards}>Show Cards</button>
-            <button className='turnButton'>Raise: {raiseAmt}</button>
-            <input id='raiseSlider' type='range' min={raise.min} max={raise.max} step={raiseStep} onChange={() => this.getVal()}></input>
-            <button className='turnButton'>{checkCall} {diff}</button>
+            {showAllIn ? <button className='turnButton'>All In: {money}</button> : null}
+            {showRaise ? <button className='turnButton'>Raise: {raiseAmt}</button> : null}
+            {showRaise ? <input id='raiseSlider' type='range' min={raise.min} max={raise.max} step={raiseStep} onChange={() => this.getVal()}></input> : null}
+            {showCheckCall ? 
+              checkCall === 'Call' ? <button className='turnButton'>{checkCall}: {diff}</button>
+              : <button className='turnButton'>{checkCall}</button>
+            : null}
             <button className='turnButton'>Fold</button>
           </div> : null
         }
