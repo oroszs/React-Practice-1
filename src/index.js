@@ -232,6 +232,7 @@ class Game extends React.Component {
       playerUI: Array(props.players).fill(uiObject),
     }
     this.dealCards = this.dealCards.bind(this);
+    this.playerBet = this.playerBet.bind(this);
   }
 
   preFlopFirstTurn(actives, dealer) {
@@ -303,47 +304,111 @@ class Game extends React.Component {
     let roundAmt = cons[turnIndex];
     let ante = this.state.bet;
     let diff = ante - roundAmt;
-    /*
-    Possible unique outcomes:
-    (End States are All In, Good, Fold)
-    Money === 0:
-      -diff is > 0 -> You must Fold
-      -diff === 0 -> You may Check or Fold
-
-    Diff > money:
-      -All In
-      -Fold
-    */
-    let uiObj = {
-      showUI: true,
-      showCheckCall: true,
-      showRaise: true,
-      showAllIn: true,
-      raise: {
-        min: raiseMult + ante,
-        max: raiseMult * 10,
-      },
-      step: raiseMult,
-      checkCall: diff > 0 ? 'Call' : 'Check',
-      diff: diff,
-    };
-    if(money === 0) {
-      if(diff === 0) {
+    let choices = this.state.turnChoices;
+    let choice = choices[turnIndex];
+    let lastBet = this.state.lastBet;
+    if(diff === 0 && choice !== 'Good' && choice !== 'Fold' && choice !== 'All In') {
+      if(choice === 'Check' || choice === 'Call') {
+        choice = 'Good';
+      }
+    }
+    choices[turnIndex] = choice;
+    if(choice !== 'Good' && choice !== 'Fold' && choice !== 'All In') {
+      let uiObj = {
+        showUI: true,
+        showCheckCall: true,
+        showRaise: true,
+        showAllIn: true,
+        raise: {
+          min: raiseMult + ante,
+          max: raiseMult * 10,
+        },
+        step: raiseMult,
+        checkCall: diff > 0 ? 'Call' : 'Check',
+        diff: diff,
+      };
+      if(money === 0) {
+        if(diff === 0) {
+          uiObj.showRaise = false;
+          uiObj.showAllIn = false;
+        } else {
+          uiObj.showRaise = false;
+          uiObj.showAllIn = false;
+          uiObj.showCheckCall = false;
+        }
+      } else if (diff >= money) {
         uiObj.showRaise = false;
-        uiObj.showAllIn = false;
-      } else {
-        uiObj.showRaise = false;
-        uiObj.showAllIn = false;
         uiObj.showCheckCall = false;
       }
-    } else if (diff >= money) {
-      uiObj.showRaise = false;
-      uiObj.showCheckCall = false;
+      if(lastBet === turnIndex) {
+        uiObj.showRaise = false;
+        uiObj.showAllIn = false;
+      }
+      playerUI[turnIndex] = uiObj;
+      this.setState({
+        playerUI: playerUI,
+      }, clearInterval(id));
+    } else {
+      this.setState({
+        turnChoices: choices,
+      }, clearInterval(id));
     }
-    playerUI[turnIndex] = uiObj;
+  }
+
+  playerBet(choice, amt) {
+    let choices;
+    let choice;
+    let moneys = this.state.moneyList;
+    let money = moneys[turnIndex];
+    let cons = this.state.contributions;
+    let roundAmt = cons[turnIndex];
+    let turnAmt = 0;
+    let ante = this.state.bet;
+    let pot = this.state.pot;
+    let lastBet = this.state.lastBet;
+    let foldIndex;
+    const turn = this.state.turn;
+    const turnIndex = turn - 1;
+    switch(choice) {
+      case 'Call' :
+        money -= amt;
+        pot += amt;
+        turnAmt = amt;
+        break;
+      case 'Raise' :
+        lastBet = turnIndex;
+        money -= amt;
+        pot += amt;
+        turnAmt = amt;
+        ante += (amt - ante);
+        break;
+      case 'All In' :
+        if(ante < money) {
+          ante += (money - ante);
+        }
+        pot += money;
+        turnAmt = money;
+        money = 0;
+        break;
+      case 'Fold' :
+        foldIndex = turnIndex;
+        break;
+      default :
+        break;
+    }
+    roundAmt += turnAmt;
+    choices[turnIndex] = choice;
+    cons[turnIndex] = roundAmt;
+    moneys[turnIndex] = money;
     this.setState({
-      playerUI: playerUI,
-    }, clearInterval(id));
+      foldIndex: foldIndex,
+      lastBet: lastBet,
+      turnChoices: choices,
+      contributions: cons,
+      moneyList: moneys,
+      pot: pot,
+      bet: ante,
+    });
   }
 
   bet(playerTurn){
@@ -363,7 +428,7 @@ class Game extends React.Component {
     let diff = ante - roundAmt;
     let lastBet = this.state.lastBet;
     let actives = this.state.activePlayers;
-    let foldIndex = this.state.foldIndex;
+    let foldIndex;
     //console.log(`Player: ${playerTurn} - Total: ${roundAmt}, Ante: ${ante}, Diff: ${diff}`);
     if(money === 0){
       if(diff > 0){
@@ -465,8 +530,6 @@ class Game extends React.Component {
         bet: ante,
         contributions: cons,
         lastBet: lastBet,
-        activePlayers: actives,
-        turn: turnIndex + 1,
       });
   }
 
@@ -1436,10 +1499,10 @@ class Game extends React.Component {
             <div id='board' className='cardHolder'>{board}</div>
             <div id='pot'>Pot: {pot} Ante: {ante}</div>
             <div id='playersArea'>
-                {p1 ? <Player type={list[0]} player='1' playerUI={playerUI[0]} hand={p1} money={moneyList[0]} choice={choices[0]} blindTitle={blindTitles[0]} /> : null}
-                {p2 ? <Player type={list[1]} player='2' playerUI={playerUI[1]} hand={p2} money={moneyList[1]} choice={choices[1]} blindTitle={blindTitles[1]} /> : null}    
-                {p3 ? <Player type={list[2]} player='3' playerUI={playerUI[2]} hand={p3} money={moneyList[2]} choice={choices[2]} blindTitle={blindTitles[2]} /> : null}
-                {p4 ? <Player type={list[3]} player='4' playerUI={playerUI[3]} hand={p4} money={moneyList[3]} choice={choices[3]} blindTitle={blindTitles[3]} /> : null}        
+                {p1 ? <Player type={list[0]} player='1' playerUI={playerUI[0]} hand={p1} money={moneyList[0]} choice={choices[0]} blindTitle={blindTitles[0]} playerBet={this.playerBet} /> : null}
+                {p2 ? <Player type={list[1]} player='2' playerUI={playerUI[1]} hand={p2} money={moneyList[1]} choice={choices[1]} blindTitle={blindTitles[1]} playerBet={this.playerBet} /> : null}    
+                {p3 ? <Player type={list[2]} player='3' playerUI={playerUI[2]} hand={p3} money={moneyList[2]} choice={choices[2]} blindTitle={blindTitles[2]} playerBet={this.playerBet} /> : null}
+                {p4 ? <Player type={list[3]} player='4' playerUI={playerUI[3]} hand={p4} money={moneyList[3]} choice={choices[3]} blindTitle={blindTitles[3]} playerBet={this.playerBet} /> : null}        
             </div>
           </div>
         }
@@ -1507,20 +1570,20 @@ class Player extends React.Component {
     const showRaise = playerUI.showRaise;
     const showCheckCall = playerUI.showCheckCall;
     const showAllIn = playerUI.showAllIn;
-
+    //playerBet(choice, amt)
     return (
       <div className = {(choice === 'Fold') ? 'foldFade playerUI' : 'playerUI'}>
         {showUI ?
           <div className='turnUI'>
             <button className='turnButton' onMouseDown={this.showCards} onMouseUp={this.showCards}>Show Cards</button>
-            {showAllIn ? <button className='turnButton'>All In: {money}</button> : null}
-            {showRaise ? <button className='turnButton'>Raise: {raiseAmt}</button> : null}
+            {showAllIn ? <button className='turnButton' onClick={this.props.playetBet('All In', money)}>All In: {money}</button> : null}
+            {showRaise ? <button className='turnButton' onClick={this.props.playerBet('Raise', raiseAmt)}>Raise: {raiseAmt}</button> : null}
             {showRaise ? <input id='raiseSlider' type='range' min={raise.min} max={raise.max} step={raiseStep} onChange={() => this.getVal()}></input> : null}
             {showCheckCall ? 
-              checkCall === 'Call' ? <button className='turnButton'>{checkCall}: {diff}</button>
-              : <button className='turnButton'>{checkCall}</button>
+              checkCall === 'Call' ? <button className='turnButton' onClick={this.props.playerBet('Call', diff)}>{checkCall}: {diff}</button>
+              : <button className='turnButton' onClick={this.props.playerBet('Check', 0)}>{checkCall}</button>
             : null}
-            <button className='turnButton'>Fold</button>
+            <button className='turnButton' onClick={this.props.playerBet('Fold', 0)}>Fold</button>
           </div> : null
         }
         {blind ? <span className='blindTitle'>{blind}</span> : null}
