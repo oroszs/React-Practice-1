@@ -294,6 +294,7 @@ class Game extends React.Component {
   }
 
   playerUI(turn, id) {
+    const actives = this.state.activePlayers;
     let playerUI = this.state.playerUI;
     const maxMoney = this.props.money;
     const raiseMult = Math.floor(maxMoney / 20);
@@ -350,10 +351,14 @@ class Game extends React.Component {
         playerUI: playerUI,
       }, clearInterval(id));
     } else {
+      let nextTurn = this.findNextTurn(null, turn, actives);
       this.setState({
-        turn: turn,
+        turn: nextTurn,
         turnChoices: choices,
-      }, clearInterval(id));
+      }, () => {
+            clearInterval(id); 
+            this.handleTurn();
+          });
     }
   }
 
@@ -370,7 +375,7 @@ class Game extends React.Component {
     let ante = this.state.bet;
     let pot = this.state.pot;
     let lastBet = this.state.lastBet;
-    let foldIndex;
+    let foldIndex = null;
     let amt = parseInt(amount);
     let playerUI = this.state.playerUI;
     switch(choice) {
@@ -418,7 +423,7 @@ class Game extends React.Component {
       diff: 0,
     };
     playerUI[turnIndex] = uiObj;
-    turn = this.findNextTurn(turn, actives);
+    let nextTurn = this.findNextTurn(foldIndex, turn, actives);
     this.setState({
       playerUI: playerUI,
       foldIndex: foldIndex,
@@ -428,8 +433,8 @@ class Game extends React.Component {
       moneyList: moneys,
       pot: pot,
       bet: ante,
-      turn: turn,
-    }, this.handleTurn());
+      turn: nextTurn,
+    }, () => {this.handleTurn()});
   }
 
   bet(playerTurn){
@@ -448,7 +453,7 @@ class Game extends React.Component {
     let pot = this.state.pot;
     let diff = ante - roundAmt;
     let lastBet = this.state.lastBet;
-    let foldIndex;
+    let foldIndex = null;
     //console.log(`Player: ${playerTurn} - Total: ${roundAmt}, Ante: ${ante}, Diff: ${diff}`);
     if(money === 0){
       if(diff > 0){
@@ -551,6 +556,7 @@ class Game extends React.Component {
         contributions: cons,
         lastBet: lastBet,
       });
+      return foldIndex;
   }
 
   componentDidMount(){
@@ -579,6 +585,7 @@ class Game extends React.Component {
   }
 
   handleTurn(){
+    let foldIndex = null;
     const turnTime = this.props.turnTime;
     let board = this.state.board;
     let turn = this.state.turn;
@@ -695,14 +702,13 @@ class Game extends React.Component {
                 });
               } else {
                 let list = this.props.playerList;
-                console.log(`List[0]: ${list[0]}, List[1]: ${list[1]}, Turn: ${turn}`);
                   if(list[turn - 1] === 'Player') {
                     this.playerUI(turn, id);
                     let slider = document.getElementById('raiseSlider');
                     if(slider) {slider.value = Math.floor(this.state.playerUI[turn - 1].raise.max / 2)};
                   } else {
-                      this.bet(turn);
-                      turn = this.findNextTurn(turn, actives);
+                      foldIndex = this.bet(turn);
+                      turn = this.findNextTurn(foldIndex, turn, actives);
                     }
                 }
             }, turnTime);
@@ -730,14 +736,13 @@ class Game extends React.Component {
               });
             } else {
               let list = this.props.playerList;
-              console.log(`List[0]: ${list[0]}, List[1]: ${list[1]}, Turn: ${turn}`);
                 if(list[turn - 1] === 'Player') {
                   this.playerUI(turn, id);
                   let slider = document.getElementById('raiseSlider');
                   if(slider) {slider.value = Math.floor(this.state.playerUI[turn - 1].raise.max / 2)};
                 } else {
-                    this.bet(turn);
-                    turn = this.findNextTurn(turn, actives);
+                    foldIndex = this.bet(turn);
+                    turn = this.findNextTurn(foldIndex, turn, actives);
                   }
             }
           }, turnTime);
@@ -765,14 +770,13 @@ class Game extends React.Component {
               });
             } else {
               let list = this.props.playerList;
-              console.log(`List[0]: ${list[0]}, List[1]: ${list[1]}, Turn: ${turn}`);
                 if(list[turn - 1] === 'Player') {
                   this.playerUI(turn, id);
                   let slider = document.getElementById('raiseSlider');
                   if(slider) {slider.value = Math.floor(this.state.playerUI[turn - 1].raise.max / 2)};
                 } else {
-                    this.bet(turn);
-                    turn = this.findNextTurn(turn, actives);
+                    foldIndex = this.bet(turn);
+                    turn = this.findNextTurn(foldIndex, turn, actives);
                   }
             }
           }, turnTime);
@@ -790,14 +794,13 @@ class Game extends React.Component {
               }, turnTime);
             } else {
               let list = this.props.playerList;
-              console.log(`List[0]: ${list[0]}, List[1]: ${list[1]}, Turn: ${turn}`);
                 if(list[turn - 1] === 'Player') {
                   this.playerUI(turn, id);
                   let slider = document.getElementById('raiseSlider');
                   if(slider) {slider.value = Math.floor(this.state.playerUI[turn - 1].raise.max / 2)};
                 } else {
-                    this.bet(turn);
-                    turn = this.findNextTurn(turn, actives);
+                    foldIndex = this.bet(turn);
+                    turn = this.findNextTurn(foldIndex, turn, actives);
                   }
             }
           }, turnTime);
@@ -1417,17 +1420,17 @@ class Game extends React.Component {
     this.endRound();
   }
 
-  findNextTurn(turn, actives){
-    let foldIndex = this.state.foldIndex;
+  findNextTurn(foldIndex, turn, actives){
     let turnIndex = turn - 1;
+    console.log(turnIndex);
+    console.log(foldIndex);
+    console.log(actives);
     turnIndex = (actives.indexOf(turnIndex) === 0) ? actives[actives.length - 1] : actives[actives.indexOf(turnIndex) - 1];
     if(foldIndex !== null) {
       actives.splice(actives.indexOf(foldIndex), 1);
-      this.setState({
-        foldIndex: null,
-      });
     }
-    return turnIndex + 1;
+    turnIndex++;
+    return turnIndex;
   }
 
   findNextDealer(actives){
@@ -1470,7 +1473,10 @@ class Game extends React.Component {
     con = Array(players).fill(0);
     last = null;
     const turn = this.findNextDealer(actives);
+    //ToDo This is broken!
+    let choices = Array(players.length).fill('Thinking');
     this.setState({
+      turnChoices: choices,
       bet: bet,
       contributions: con,
       lastBet: last,
