@@ -346,18 +346,22 @@ class Game extends React.Component {
       }
       playerUI[turnIndex] = uiObj;
       this.setState({
+        turn: turn,
         playerUI: playerUI,
       }, clearInterval(id));
     } else {
       this.setState({
+        turn: turn,
         turnChoices: choices,
       }, clearInterval(id));
     }
   }
 
-  playerBet(choice, amt) {
-    let choices;
-    let choice;
+  playerBet(choice, amount) {
+    const actives = this.state.activePlayers;
+    let turn = this.state.turn;
+    const turnIndex = turn - 1;
+    let choices = this.state.turnChoices;
     let moneys = this.state.moneyList;
     let money = moneys[turnIndex];
     let cons = this.state.contributions;
@@ -367,8 +371,8 @@ class Game extends React.Component {
     let pot = this.state.pot;
     let lastBet = this.state.lastBet;
     let foldIndex;
-    const turn = this.state.turn;
-    const turnIndex = turn - 1;
+    let amt = parseInt(amount);
+    let playerUI = this.state.playerUI;
     switch(choice) {
       case 'Call' :
         money -= amt;
@@ -400,7 +404,23 @@ class Game extends React.Component {
     choices[turnIndex] = choice;
     cons[turnIndex] = roundAmt;
     moneys[turnIndex] = money;
+    let uiObj = {
+      showUI: false,
+      showCheckCall: true,
+      showRaise: true,
+      showAllIn: true,
+      raise: {
+        min: 0,
+        max: 0,
+      },
+      step: 0,
+      checkCall: 'Check',
+      diff: 0,
+    };
+    playerUI[turnIndex] = uiObj;
+    turn = this.findNextTurn(turn, actives);
     this.setState({
+      playerUI: playerUI,
       foldIndex: foldIndex,
       lastBet: lastBet,
       turnChoices: choices,
@@ -408,7 +428,8 @@ class Game extends React.Component {
       moneyList: moneys,
       pot: pot,
       bet: ante,
-    });
+      turn: turn,
+    }, this.handleTurn());
   }
 
   bet(playerTurn){
@@ -427,7 +448,6 @@ class Game extends React.Component {
     let pot = this.state.pot;
     let diff = ante - roundAmt;
     let lastBet = this.state.lastBet;
-    let actives = this.state.activePlayers;
     let foldIndex;
     //console.log(`Player: ${playerTurn} - Total: ${roundAmt}, Ante: ${ante}, Diff: ${diff}`);
     if(money === 0){
@@ -575,11 +595,6 @@ class Game extends React.Component {
     let ante = this.state.bet;
     const actives = this.state.activePlayers;
     let choices = this.state.turnChoices;
-    actives.forEach((index)=>{
-      if(choices[index] !== 'All In'){
-        choices[index] = 'Thinking';
-      }
-    });
     this.setState({
       pause: false,
       turnChoices: choices,
@@ -682,7 +697,6 @@ class Game extends React.Component {
                 let list = this.props.playerList;
                 console.log(`List[0]: ${list[0]}, List[1]: ${list[1]}, Turn: ${turn}`);
                   if(list[turn - 1] === 'Player') {
-                    console.log('Interval Cleared');
                     this.playerUI(turn, id);
                     let slider = document.getElementById('raiseSlider');
                     if(slider) {slider.value = Math.floor(this.state.playerUI[turn - 1].raise.max / 2)};
@@ -715,8 +729,16 @@ class Game extends React.Component {
                 return;
               });
             } else {
-              this.bet(turn);
-              turn = this.findNextTurn(turn, actives);
+              let list = this.props.playerList;
+              console.log(`List[0]: ${list[0]}, List[1]: ${list[1]}, Turn: ${turn}`);
+                if(list[turn - 1] === 'Player') {
+                  this.playerUI(turn, id);
+                  let slider = document.getElementById('raiseSlider');
+                  if(slider) {slider.value = Math.floor(this.state.playerUI[turn - 1].raise.max / 2)};
+                } else {
+                    this.bet(turn);
+                    turn = this.findNextTurn(turn, actives);
+                  }
             }
           }, turnTime);
           break;
@@ -742,8 +764,16 @@ class Game extends React.Component {
                 return;
               });
             } else {
-              this.bet(turn);
-              turn = this.findNextTurn(turn, actives);
+              let list = this.props.playerList;
+              console.log(`List[0]: ${list[0]}, List[1]: ${list[1]}, Turn: ${turn}`);
+                if(list[turn - 1] === 'Player') {
+                  this.playerUI(turn, id);
+                  let slider = document.getElementById('raiseSlider');
+                  if(slider) {slider.value = Math.floor(this.state.playerUI[turn - 1].raise.max / 2)};
+                } else {
+                    this.bet(turn);
+                    turn = this.findNextTurn(turn, actives);
+                  }
             }
           }, turnTime);
           break;
@@ -759,8 +789,16 @@ class Game extends React.Component {
                 this.winner()
               }, turnTime);
             } else {
-              this.bet(turn);
-              turn = this.findNextTurn(turn, actives);
+              let list = this.props.playerList;
+              console.log(`List[0]: ${list[0]}, List[1]: ${list[1]}, Turn: ${turn}`);
+                if(list[turn - 1] === 'Player') {
+                  this.playerUI(turn, id);
+                  let slider = document.getElementById('raiseSlider');
+                  if(slider) {slider.value = Math.floor(this.state.playerUI[turn - 1].raise.max / 2)};
+                } else {
+                    this.bet(turn);
+                    turn = this.findNextTurn(turn, actives);
+                  }
             }
           }, turnTime);
           break;
@@ -1576,14 +1614,14 @@ class Player extends React.Component {
         {showUI ?
           <div className='turnUI'>
             <button className='turnButton' onMouseDown={this.showCards} onMouseUp={this.showCards}>Show Cards</button>
-            {showAllIn ? <button className='turnButton' onClick={this.props.playetBet('All In', money)}>All In: {money}</button> : null}
-            {showRaise ? <button className='turnButton' onClick={this.props.playerBet('Raise', raiseAmt)}>Raise: {raiseAmt}</button> : null}
+            {showAllIn ? <button className='turnButton' onClick={() => {this.props.playerBet('All In', money)}}>All In: {money}</button> : null}
+            {showRaise ? <button className='turnButton' onClick={() => {this.props.playerBet('Raise', raiseAmt)}}>Raise: {raiseAmt}</button> : null}
             {showRaise ? <input id='raiseSlider' type='range' min={raise.min} max={raise.max} step={raiseStep} onChange={() => this.getVal()}></input> : null}
             {showCheckCall ? 
-              checkCall === 'Call' ? <button className='turnButton' onClick={this.props.playerBet('Call', diff)}>{checkCall}: {diff}</button>
-              : <button className='turnButton' onClick={this.props.playerBet('Check', 0)}>{checkCall}</button>
+              checkCall === 'Call' ? <button className='turnButton' onClick={() => {this.props.playerBet('Call', diff)}}>{checkCall}: {diff}</button>
+              : <button className='turnButton' onClick={() => {this.props.playerBet('Check', 0)}}>{checkCall}</button>
             : null}
-            <button className='turnButton' onClick={this.props.playerBet('Fold', 0)}>Fold</button>
+            <button className='turnButton' onClick={() => {this.props.playerBet('Fold', 0)}}>Fold</button>
           </div> : null
         }
         {blind ? <span className='blindTitle'>{blind}</span> : null}
