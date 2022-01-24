@@ -1473,8 +1473,12 @@ class Game extends React.Component {
     con = Array(players).fill(0);
     last = null;
     const turn = this.findNextDealer(actives);
-    //ToDo This is broken!
-    let choices = Array(players.length).fill('Thinking');
+    let choices = this.state.turnChoices;
+    actives.forEach(index => {
+      if(choices[index] !== 'All In') {
+        choices[index] = 'Thinking';
+      }
+    });
     this.setState({
       turnChoices: choices,
       bet: bet,
