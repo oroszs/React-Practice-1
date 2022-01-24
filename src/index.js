@@ -2,8 +2,6 @@ import React from 'react';
 import ReactDOM from 'react-dom';
 import './index.css';
 
-//Debug: Winner is set to random
-
 class App extends React.Component {
   render() {
     const p = 4;
@@ -203,6 +201,7 @@ class Game extends React.Component {
       showCheckCall: true,
       showRaise: true,
       showAllIn: true,
+      showFold: true,
       raise: {
         min: mult,
         max: mult * 10,
@@ -227,10 +226,13 @@ class Game extends React.Component {
       pause: true,
       finish: false,
       blindTitles: Array(props.players).fill(null),
+      handTitles: Array(props.players).fill(null),
+      winnerTitles: Array(props.players).fill(null),
       activePlayers: actives,
       foldIndex: null,
       gameIsOver: false,
       playerUI: Array(props.players).fill(uiObject),
+      winnerIndex: null,
     }
     this.dealCards = this.dealCards.bind(this);
     this.playerBet = this.playerBet.bind(this);
@@ -323,6 +325,7 @@ class Game extends React.Component {
         showCheckCall: true,
         showRaise: true,
         showAllIn: true,
+        showFold: true,
         raise: {
           min: min,
           max: max,
@@ -347,6 +350,11 @@ class Game extends React.Component {
       if(lastBet === turnIndex) {
         uiObj.showRaise = false;
         uiObj.showAllIn = false;
+      }
+      if(actives.length === 1) {
+        uiObj.showRaise = false;
+        uiObj.showAllIn = false;
+        uiObj.showFold = false;
       }
       playerUI[turnIndex] = uiObj;
       this.setState({
@@ -430,6 +438,7 @@ class Game extends React.Component {
       showCheckCall: true,
       showRaise: true,
       showAllIn: true,
+      showFold: true,
       raise: {
         min: 0,
         max: 0,
@@ -720,8 +729,8 @@ class Game extends React.Component {
                 let list = this.props.playerList;
                   if(list[turn - 1] === 'Player') {
                     this.playerUI(turn, id);
-                    let slider = document.getElementById('raiseSlider');
-                    if(slider) {slider.value = Math.floor(this.state.playerUI[turn - 1].raise.max / 2)};
+                      let slider = document.getElementById('raiseSlider');
+                      if(slider) {slider.value = Math.floor(this.state.playerUI[turn - 1].raise.max / 2)};
                   } else {
                       foldIndex = this.bet(turn);
                       turn = this.findNextTurn(foldIndex, turn, actives);
@@ -895,7 +904,9 @@ class Game extends React.Component {
       pot: 0,
       lastBet: null,
       contributions: Array(4).fill(0),
-      blindTitles: nullArray,
+      blindTitles: nullArray.slice(),
+      handTitles: nullArray.slice(),
+      winnerTitles: nullArray.slice(),
       turnChoices: choices,
       activePlayers: actives,
       finish: false,
@@ -954,45 +965,53 @@ class Game extends React.Component {
   }
 
   winner(){
+    const ranks = ['High Card', 'Pair', 'Two Pair', 'Three of a Kind', 'Straight', 'Flush', 'Full House', 'Four of a Kind', 'Straight Flush', 'Royal Flush'];
     const actives = this.state.activePlayers;
     const pot = this.state.pot;
     const players = this.props.players;
     let bestHands = [];
     let showCards = this.state.showCards;
+    let handTitles = this.state.handTitles;
     for(let x = 0; x < actives.length; x++) {
       bestHands.push([actives[x], this.getBestHand(actives[x])]);
+      handTitles[actives[x]] = ranks[bestHands[x][1][0]];
     }
     actives.forEach(index => {
       showCards[index] = true;
     });
     let windexes = this.getWinningHand(bestHands);
-    let blindTitles = [];
+    let winnerTitles = [];
     let moneyList = this.state.moneyList;
     for (let x = 0; x < windexes.length; x++) {
       moneyList[windexes[x]] += Math.floor(pot / windexes.length);
       for(let x = 0; x < players; x++){
         if(windexes.includes(x)){
           if(windexes.length > 1) {
-            blindTitles[x] = 'Tie';
+            winnerTitles[x] = 'Tie';
           } else {
-            blindTitles[x] = 'Winner';
+            winnerTitles[x] = 'Winner';
           }
         } else {
-          blindTitles[x] = '';
+          winnerTitles[x] = null;
         }
       }
       windexes.length > 1 ? console.log(`Winners: ${windexes}`) : console.log(`Winner: ${windexes}`);
       console.log(' ');
     }
     this.setState({
-      blindTitles: blindTitles,
+      winnerTitles: winnerTitles,
       moneyList: moneyList,
       showCards: showCards,
+      handTitles: handTitles,
+      blindTitles: Array(4).fill(null),
     }, () => {
-      const over = this.gameOverCheck();
-      if(over){
+      const winners = this.gameOverCheck();
+      if(winners.length === 1){
         let overBut = document.getElementById('gameOver');
         overBut.style.display= 'block';
+        this.setState({
+          winnerIndex: winners[0],
+        });
       } else {
         let startBut = document.getElementById('startAgain');
         startBut.style.display = 'block';
@@ -1426,16 +1445,13 @@ class Game extends React.Component {
 
   gameOverCheck(){
     const moneyList = this.state.moneyList;
-    let activeNum = 0;
-    moneyList.forEach((money) => {
-      if(money > 0) {
-        activeNum++;
+    let winners = [];
+    for(let x = 0; x < moneyList.length; x++) {
+      if(moneyList[x] > 0) {
+        winners.push(x);
       }
-    });
-    if(activeNum === 1){
-      return true;
     }
-    return false;
+    return winners;
   }
 
   gameOver(){
@@ -1454,9 +1470,6 @@ class Game extends React.Component {
 
   findNextTurn(foldIndex, turn, actives){
     let turnIndex = turn - 1;
-    console.log(turnIndex);
-    console.log(foldIndex);
-    console.log(actives);
     turnIndex = (actives.indexOf(turnIndex) === 0) ? actives[actives.length - 1] : actives[actives.indexOf(turnIndex) - 1];
     if(foldIndex !== null) {
       actives.splice(actives.indexOf(foldIndex), 1);
@@ -1551,18 +1564,21 @@ class Game extends React.Component {
     const blindTitles = this.state.blindTitles;
     const actives = this.state.activePlayers;
     const gameIsOver = this.state.gameIsOver;
-    const winnerMoney = moneyList[actives[0]];
+    const winner = this.state.winnerIndex;
+    const winnerMoney = moneyList[winner];
     const list = this.props.playerList;
     const winnerPlayer = list[actives[0]];
     const playerUI = this.state.playerUI;
     const showCards = this.state.showCards;
+    const handTitles = this.state.handTitles;
+    const winnerTitles = this.state.winnerTitles;
     return(
       <div>
         {gameIsOver ? 
           <div id='gameOverDisplay'>
             <div id='winnerDiv'>
-              <span className='winText'>{winnerPlayer} {actives[0] + 1} Wins</span>
-              <span className='winText'>${winnerMoney}</span>
+              <span className='winText'>{winnerPlayer} {winner + 1} Wins!</span>
+              <span className='winMoney'>${winnerMoney}</span>
             </div>
             <div id='menuButtonDiv'>
               <button className='menuButton' onClick={() => {
@@ -1580,10 +1596,10 @@ class Game extends React.Component {
             <div id='board' className='cardHolder'>{board}</div>
             <div id='pot'>Pot: {pot} Ante: {ante}</div>
             <div id='playersArea'>
-                {p1 ? <Player type={list[0]} player='1' playerUI={playerUI[0]} showCards={this.showCards} show={showCards[0]} hand={p1} money={moneyList[0]} choice={choices[0]} blindTitle={blindTitles[0]} playerBet={this.playerBet} /> : null}
-                {p2 ? <Player type={list[1]} player='2' playerUI={playerUI[1]} showCards={this.showCards} show={showCards[1]} hand={p2} money={moneyList[1]} choice={choices[1]} blindTitle={blindTitles[1]} playerBet={this.playerBet} /> : null}    
-                {p3 ? <Player type={list[2]} player='3' playerUI={playerUI[2]} showCards={this.showCards} show={showCards[2]} hand={p3} money={moneyList[2]} choice={choices[2]} blindTitle={blindTitles[2]} playerBet={this.playerBet} /> : null}
-                {p4 ? <Player type={list[3]} player='4' playerUI={playerUI[3]} showCards={this.showCards} show={showCards[3]} hand={p4} money={moneyList[3]} choice={choices[3]} blindTitle={blindTitles[3]} playerBet={this.playerBet} /> : null}        
+                {p1 ? <Player type={list[0]} player='1' playerUI={playerUI[0]} showCards={this.showCards} show={showCards[0]} hand={p1} money={moneyList[0]} choice={choices[0]} handTitle={handTitles[0]} winner={winnerTitles[0]} blindTitle={blindTitles[0]} playerBet={this.playerBet} /> : null}
+                {p2 ? <Player type={list[1]} player='2' playerUI={playerUI[1]} showCards={this.showCards} show={showCards[1]} hand={p2} money={moneyList[1]} choice={choices[1]} handTitle={handTitles[1]} winner={winnerTitles[1]} blindTitle={blindTitles[1]} playerBet={this.playerBet} /> : null}    
+                {p3 ? <Player type={list[2]} player='3' playerUI={playerUI[2]} showCards={this.showCards} show={showCards[2]} hand={p3} money={moneyList[2]} choice={choices[2]} handTitle={handTitles[2]} winner={winnerTitles[2]} blindTitle={blindTitles[2]} playerBet={this.playerBet} /> : null}
+                {p4 ? <Player type={list[3]} player='4' playerUI={playerUI[3]} showCards={this.showCards} show={showCards[3]} hand={p4} money={moneyList[3]} choice={choices[3]} handTitle={handTitles[3]} winner={winnerTitles[3]} blindTitle={blindTitles[3]} playerBet={this.playerBet} /> : null}        
             </div>
           </div>
         }
@@ -1638,7 +1654,9 @@ class Player extends React.Component {
     const showRaise = playerUI.showRaise;
     const showCheckCall = playerUI.showCheckCall;
     const showAllIn = playerUI.showAllIn;
-    //playerBet(choice, amt)
+    const showFold = playerUI.showFold;
+    const handTitle = this.props.handTitle;
+    const winner = this.props.winner;
     return (
       <div className = {(choice === 'Fold') ? 'foldFade playerUI' : 'playerUI'}>
         {showUI ?
@@ -1651,10 +1669,12 @@ class Player extends React.Component {
               checkCall === 'Call' ? <button className='turnButton' onClick={() => {this.props.playerBet('Call', diff)}}>{checkCall}: {diff}</button>
               : <button className='turnButton' onClick={() => {this.props.playerBet('Check', 0)}}>{checkCall}</button>
             : null}
-            <button className='turnButton' onClick={() => {this.props.playerBet('Fold', 0)}}>Fold</button>
+            {showFold ? <button className='turnButton' onClick={() => {this.props.playerBet('Fold', 0)}}>Fold</button> : null}
           </div> : null
         }
         {blind ? <span className='blindTitle'>{blind}</span> : null}
+        {winner ? <span className='winnerTitle'>{winner}</span> : null}
+        {handTitle ? <span className='blindTitle'>{handTitle}</span> : null}
         <div className='playerArea'>
           <span>{title ? title : null}</span>
           <span style={{display: 'block'}}>{type} {player}</span>
