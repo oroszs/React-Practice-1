@@ -449,6 +449,7 @@ class Game extends React.Component {
     };
     playerUI[turnIndex] = uiObj;
     let nextTurn = this.findNextTurn(foldIndex, turn, actives);
+    console.log(`Player: ${turn} - ${choice} Total: ${roundAmt}, Ante: ${ante}, Diff: ${uiObj.diff}`);
     this.setState({
       playerUI: playerUI,
       foldIndex: foldIndex,
@@ -479,7 +480,6 @@ class Game extends React.Component {
     let diff = ante - roundAmt;
     let lastBet = this.state.lastBet;
     let foldIndex = null;
-    //console.log(`Player: ${playerTurn} - Total: ${roundAmt}, Ante: ${ante}, Diff: ${diff}`);
     if(money === 0){
       if(diff > 0){
         turnChoice = 'Fold';
@@ -570,7 +570,6 @@ class Game extends React.Component {
       moneyList[turnIndex] = money;
       turnChoices[turnIndex] = turnChoice;
       diff = ante - roundAmt;
-      //console.log(`${turnChoice} ${turnAmt} Diff: ${diff}`);
       cons[turnIndex] = roundAmt;
       this.setState({
         foldIndex: foldIndex,
@@ -581,6 +580,7 @@ class Game extends React.Component {
         contributions: cons,
         lastBet: lastBet,
       });
+      console.log(`Player: ${playerTurn} - ${turnChoice} Total: ${roundAmt}, Ante: ${ante}, Diff: ${diff}`);
       return foldIndex;
   }
 
@@ -1593,8 +1593,10 @@ class Game extends React.Component {
             <button id='startAgain' onClick={()=>{this.startNextRound()}} style={{display:'none'}} className='roundButton'>Start Next Round</button>
             {finished ? <button id='finishRoundButton' onClick={() => {this.finishRoundEarly()}} className='roundButton'>Finish Round</button> : null}
             {(paused  && !finished) ? <button onClick={()=>{this.handleTurn()}} className='roundButton'>Start Round</button> : null}
-            <div id='board' className='cardHolder'>{board}</div>
-            <div id='pot'>Pot: {pot} Ante: {ante}</div>
+            <div id='board'>
+              <div className='cardHolder'>{board}</div>
+              <div id='pot'>Pot: ${pot}</div>
+            </div>
             <div id='playersArea'>
                 {p1 ? <Player type={list[0]} player='1' playerUI={playerUI[0]} showCards={this.showCards} show={showCards[0]} hand={p1} money={moneyList[0]} choice={choices[0]} handTitle={handTitles[0]} winner={winnerTitles[0]} blindTitle={blindTitles[0]} playerBet={this.playerBet} /> : null}
                 {p2 ? <Player type={list[1]} player='2' playerUI={playerUI[1]} showCards={this.showCards} show={showCards[1]} hand={p2} money={moneyList[1]} choice={choices[1]} handTitle={handTitles[1]} winner={winnerTitles[1]} blindTitle={blindTitles[1]} playerBet={this.playerBet} /> : null}    

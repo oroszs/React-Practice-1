@@ -97,7 +97,7 @@
 }
 .roundButton{
   position: absolute;
-  top: 33.5%;
+  top: 38%;
   left: 50%;
   transform: translate(-50%, -50%);
   z-index: 50;
@@ -208,10 +208,13 @@
   justify-content: center;
 }
 #board{
+  display: flex;
+  flex-direction: column;
+  justify-content: flex-end;
   position: relative;
   top: 15px;
-  width:45%;
-  height: 175px;
+  width:35%;
+  height: 170px;
   border: solid black 2px;
   border-radius: 30%;
   background: rgb(255, 228, 155);
@@ -219,16 +222,12 @@
   transform: translate(-50%, 0);
 }
 #pot{
-  position: absolute;
-  top: 40%;
+  position: relative;
+  bottom: 5px;
   left: 50%;
-  transform: translate(-50%, -45%);
+  transform: translate(-50%, 0);
   width: 30%;
   height: 45px;
-  background:rgb(103, 255, 148);
-  border: solid black 2px;
-  border-radius: 5px;
-  box-shadow: black 5px 5px 5px;
   line-height: 50px;
 }
 #deckDisplay{
