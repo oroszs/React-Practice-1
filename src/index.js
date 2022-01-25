@@ -130,18 +130,21 @@ class Menu extends React.Component{
     return(
       <div>
         {gameStart ? <Game players={p} money={val} playerList={playerList} smallBlind={small} bigBlind={big} turnTime={time} restart={this.restart} setup={this.setup}/> :
-        <div id='menu'>
-          <button id='startButton' onClick={() => this.start()}>Start Game</button>
-          <div id='moneyDiv'> Starting Chip Value: {val}
-            <input id='moneySlider' type='range' min='100' max='1000' step='50' onChange={() => {this.getVal()}}></input>
-          </div>
-          <div id='playerSelect'>
-            {this.getDivs()}
-          </div>
-          <div id='pNumHolder'>
-            <button className='pNum' onClick={() => this.less()}>&lt;</button>
-            <span id='players'>{p} Players</span>
-            <button className='pNum' onClick={() => this.more()}>&gt;</button>
+        <div>
+          <div id='mainTitle'>Texas Holdem</div>
+          <div id='menu'>
+            <button id='startButton' onClick={() => this.start()}>Start Game</button>
+            <div id='moneyDiv'> Buy In: ${val}
+              <input id='moneySlider' type='range' min='100' max='1000' step='50' onChange={() => {this.getVal()}}></input>
+            </div>
+            <div id='playerSelect'>
+              {this.getDivs()}
+            </div>
+            <div id='pNumHolder'>
+              <button className='pNum' onClick={() => this.less()}>&lt;</button>
+              <span id='players'>{p} Players</span>
+              <button className='pNum' onClick={() => this.more()}>&gt;</button>
+            </div>
           </div>
         </div>
         }
@@ -1610,14 +1613,14 @@ class Game extends React.Component {
           </div> :
           <div id='cardDisplay'>
             <button id='gameOver' onClick={()=>{this.gameOver()}} style={{display:'none'}} className='roundButton'>Game Over</button>
-            <button id='startAgain' onClick={()=>{this.startNextRound()}} style={{display:'none'}} className='roundButton'>Start Next Round</button>
+            <button id='startAgain' onClick={()=>{this.startNextRound()}} style={{display:'none'}} className='roundButton'>Next Round</button>
             {finished ? <button id='finishRoundButton' onClick={() => {this.finishRoundEarly()}} className='roundButton'>Finish Round</button> : null}
             {(paused  && !finished) ? <button onClick={()=>{this.handleTurn()}} className='roundButton'>Start Round</button> : null}
-            <div id='board'>
+            <div id='board' className='cardBg'>
               <div className='cardHolder'>{board}</div>
               <div id='pot'>Pot: ${pot}</div>
             </div>
-            <div id='playersArea'>
+            <div id='playersArea' className='cardBg'>
                 {p1 ? <Player type={list[0]} player='1' playerUI={playerUI[0]} showCards={this.showCards} show={showCards[0]} hand={p1} money={moneyList[0]} choice={choices[0]} handTitle={handTitles[0]} winner={winnerTitles[0]} blindTitle={blindTitles[0]} playerBet={this.playerBet} initialRaiseAmt={initialRaiseAmt} /> : null}
                 {p2 ? <Player type={list[1]} player='2' playerUI={playerUI[1]} showCards={this.showCards} show={showCards[1]} hand={p2} money={moneyList[1]} choice={choices[1]} handTitle={handTitles[1]} winner={winnerTitles[1]} blindTitle={blindTitles[1]} playerBet={this.playerBet} initialRaiseAmt={initialRaiseAmt} /> : null}    
                 {p3 ? <Player type={list[2]} player='3' playerUI={playerUI[2]} showCards={this.showCards} show={showCards[2]} hand={p3} money={moneyList[2]} choice={choices[2]} handTitle={handTitles[2]} winner={winnerTitles[2]} blindTitle={blindTitles[2]} playerBet={this.playerBet} initialRaiseAmt={initialRaiseAmt} /> : null}
@@ -1698,10 +1701,9 @@ class Player extends React.Component {
         {winner ? <span className='winnerTitle'>{winner}</span> : null}
         {handTitle ? <span className='blindTitle'>{handTitle}</span> : null}
         <div className='playerArea'>
-          <span>{title ? title : null}</span>
-          <span style={{display: 'block'}}>{type} {player}</span>
-          <span>{choice}</span>
-          <div className='playerInfo'>{money}</div>
+          <span className='playerTitle'>{type} {player}</span>
+          <span className='playerChoice'>{choice}</span>
+          <div className='playerInfo'>${money}</div>
           {showCards ?
             <div className='cardHolder'>{hand}</div> : 
             <div className='cardHolder'>{handBack}</div>

@@ -1,6 +1,6 @@
 #wrapper{
   position: relative;
-  background-color: #06475f;
+  background-color: rgb(165, 237, 250);
   width: 100%;
   height: 700px;
   text-align: center;
@@ -36,6 +36,18 @@
 #moneySlider {
   padding: 5px;
 }
+#mainTitle {
+  font-family: Verdana;
+  position: relative;
+  top: 80px;
+  font-size: 100pt;
+  color:black;
+  box-shadow: rgb(0, 70, 128) 0px 0px 100px;
+  border-radius: 20px;
+  width: fit-content;
+  padding: 25px;
+  margin: auto;
+}
 #menu{
   position: absolute;
   background: rgb(61, 61, 61);
@@ -44,7 +56,7 @@
   border: solid black 5px;
   border-radius: 5px;
   box-shadow: black 5px 5px 5px;
-  top: 50%;
+  top: 70%;
   left: 50%;
   transform: translate(-50%, -50%);
   display: flex;
@@ -61,7 +73,7 @@
   bottom: 30%;
   width: fit-content;
   height: 50px;
-  background: green;
+  background: rgb(31, 248, 255);
   border: 2px solid black;
   border-radius: 5px;
 }
@@ -73,6 +85,7 @@
   height: 40px;
   margin: 5px;
   padding: 0px;
+  cursor: pointer;
 }
 #pNumHolder{
   flex: none;
@@ -80,7 +93,7 @@
   top: 30%;
   width: 150px;
   height: fit-content;
-  background: rgb(150, 212, 231);
+  background: rgb(144, 251, 255);
   margin: 10px;
   border-radius: 5px;
   padding: 10px;
@@ -96,23 +109,33 @@
   color: black;
 }
 .roundButton{
+  font-size: 16pt;
   position: absolute;
   top: 38%;
   left: 50%;
   transform: translate(-50%, -50%);
   z-index: 50;
+  width: 150px;
+  height: 45px;
+  background: rgb(0, 61, 0);
+  color: white;
+  border: none;
+  border-radius: 5px;
+  cursor: pointer;
+  box-shadow: rgb(255, 255, 255) 0px 0px 25px;
+}
+.roundButton:hover {
+  box-shadow: rgb(255, 255, 255) 0px 0px 40px;
 }
 #gameOverDisplay {
-  position: relative;
-  margin: auto;
-  top: 10px;
+  position: absolute;
   font-size: 25pt;
   color: black;
-  width: 90%;
-  height: 675px;
+  top: 0px;
+  bottom: 0px;
+  left: 0px;
+  right: 0px;
   background: #b0eaff;
-  border: 2px solid black;
-  border-radius: 5px;
   min-width: 1000px;
   display: flex;
   flex-direction: column;
@@ -168,37 +191,42 @@
 #menuButtonDiv{
   display: flex;
   flex-direction: column;
-  justify-content: space-evenly;
+  justify-content: center;
   position: relative;
   bottom: 20px;
   margin: auto;
-  background: rgb(0, 41, 75);
-  width: 20%;
-  height: 15%;
-  border: 2px olid black;
+  background: rgb(0, 44, 80);
+  width: 15%;
+  height: 20%;
+  border: 2px solid black;
   border-radius: 5px;
   box-shadow: black 5px 5px 5px;
+  align-items: center;
 }
 .menuButton{
-  background: white;
-  border: solid rgb(207, 207, 207) 3px;
-  border-radius: 2px;
-  margin: auto;
+  font-size: 15pt;
+  background: rgb(0, 247, 255);
+  border: none;
+  border-radius: 5px;
+  margin: 10px;
   flex: none;
   width: fit-content;
   padding: 5px;
+  box-shadow: rgb(79, 249, 255) 0px 0px 10px;
+  outline: solid white 2px;
+  cursor: pointer;
 }
 #cardDisplay{
-  position: relative;
+  position: absolute;
   margin: auto;
   font-size: 20pt;
   color: black;
-  top: 25px;
-  width: 95%;
-  height: 650px;
-  border: solid black 2px;
+  top: 0px;
+  right: 0px;
+  bottom: 0px;
+  left: 0px;
   border-radius: 5px;
-  background: rgb(216, 216, 216);
+  background: radial-gradient(rgb(0, 185, 0), rgb(0, 68, 0));
   min-width: 1020px;
 }
 .cardHolder{
@@ -207,29 +235,36 @@
   align-items: center;
   justify-content: center;
 }
+.cardBg {
+  background: rgb(116, 255, 128);
+}
 #board{
   display: flex;
   flex-direction: column;
   justify-content: flex-end;
   position: relative;
   top: 15px;
-  width:40%;
-  min-width: 410px;
+  width:33%;
+  min-width: 400px;
   height: 185px;
-  border: solid black 2px;
-  border-radius: 30%;
-  background: rgb(255, 228, 155);
+  border-radius: 20px;
   left: 50%;
   transform: translate(-50%, 0);
 }
 #pot{
+  color: white;
   position: relative;
   bottom: 5px;
   left: 50%;
   transform: translate(-50%, 0);
-  width: 40%;
-  height: 45px;
-  line-height: 50px;
+  width: fit-content;
+  height: 20px;
+  padding: 10px;
+  line-height: 20px;
+  border-radius: 5px;
+  background: rgb(0, 61, 0);
+  margin-top: 12.5px;
+  margin-bottom: 5px;
 }
 #deckDisplay{
   position: absolute;
@@ -255,32 +290,38 @@
   left: 50%;
   transform: translate(-50%, 0);
   width: 90%;
-  height: 335px;
-  background: rgb(136, 185, 136);
-  border: solid black 2px;
+  height: 330px;
   border-radius: 5px;
   min-width: 1000px;
 }
 .blindTitle{
-  font-size: 13pt;
-  color: black;
-  background:rgb(185, 253, 255);
+  font-size: 18pt;
+  color: rgb(0, 0, 0);
+  background:rgb(255, 255, 255);
   border-radius: 5px;
   padding: 5px;
 }
-.winnerTitle{
+.playerTitle {
+  display: block;
+  font-size: 15pt;
+}
+.playerChoice {
   font-size: 18pt;
-  color: black;
-  background:rgb(121, 255, 31);
+}
+.winnerTitle{
+  font-size: 30pt;
+  color: rgb(0, 0, 0);
+  background:rgb(255, 255, 0);
+  box-shadow: rgb(255, 253, 143) 0px 0px 30px;
   border-radius: 5px;
   padding: 5px;
-  margin: 10px;
+  margin: 30px;
 }
 .playerArea{
   position: relative;
-  width: 200px;
-  height: 190px;
-  background: green;
+  width: 220px;
+  height: 220px;
+  background: rgb(0, 179, 9);
   flex: none;
   margin: 10px;
   border-radius: 5px;
@@ -290,13 +331,16 @@
   opacity: 50%;
 }
 .playerInfo{
-  font-size: 15pt;
-  color: white;
-  width: 100%;
-  height: 50px;
-  line-height: 50px;
+  font-size: 16pt;
+  color: rgb(255, 255, 255);
+  width: fit-content;
+  height: 15px;
+  line-height: 15px;
   position: relative;
-  margin: auto;
+  margin: 15px auto 10px auto;
+  border-radius: 5px;
+  background: rgb(0, 61, 0);
+  padding: 10px;
 }
 .playerUI {
   position: relative;
@@ -312,16 +356,17 @@
 .turnUI {
   width: 140px;
   height: fit-content;
-  background: rgb(41, 0, 75);
+  background: rgb(0, 30, 75);
   border-radius: 5px;
   position: absolute;
-  bottom: 70%;
+  bottom: 75%;
   display: flex;
   flex-direction: column;
   justify-content: space-evenly;
   align-items: center;
   padding: 5px;
-  outline: solid rgb(129, 129, 129) 5px;
+  outline: solid rgb(0, 195, 255) 5px;
+  box-shadow: rgb(0, 255, 242) 0px 0px 35px;
 }
 .turnButton {
   font-weight: bold;
@@ -332,31 +377,31 @@
 }
 .cardBack{
   position: relative;
-  width: 52px;
-  height: 82px;
+  width: 63.5px;
+  height: 97px;
   background-color: rgb(177, 2, 2);
   outline: solid black 2px;
-  border: solid white 5px;
+  border: solid white 4px;
   border-radius: 4px;
   flex: none;
-  margin: 5px;
+  margin: 7px;
 }
 .card{
   position: relative;
-  width: 60px;
-  height: 90px;
+  width: 70px;
+  height: 105px;
   background-color: white;
   border: solid black 2px;
   border-radius: 5px;
   flex: none;
-  margin: 5px;
+  margin: 6px;
 }
 .cardText{
   margin: 0px;
   position: relative;
   top: 2px;
-  left: 2px;
-  font-size: 12pt;
+  left: 4px;
+  font-size: 15pt;
   width: fit-content;
 }
 .cardContainer{
