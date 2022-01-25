@@ -311,19 +311,28 @@ class Game extends React.Component {
     let choices = this.state.turnChoices;
     let choice = choices[turnIndex];
     let lastBet = this.state.lastBet;
-    let min = raiseMult + ante;
-    let max = raiseMult * 10;
+    let min, max;
+    let showRaise = true;
+    let raiseAmt = diff;
+    if(diff / money < .6) {
+      min = raiseMult + diff;
+      max = raiseMult * 10;
+      raiseAmt = Math.floor(max / 2);
+    } else {
+      showRaise = false;
+    }
     if(diff === 0 && choice !== 'Good' && choice !== 'Fold' && choice !== 'All In') {
       if(choice === 'Check' || choice === 'Call') {
         choice = 'Good';
       }
     }
+    console.log(`Player: ${turn} - Total: ${roundAmt}, Ante: ${ante}, Diff: ${diff}`);
     choices[turnIndex] = choice;
     if(choice !== 'Good' && choice !== 'Fold' && choice !== 'All In') {
       let uiObj = {
         showUI: true,
         showCheckCall: true,
-        showRaise: true,
+        showRaise: showRaise,
         showAllIn: true,
         showFold: true,
         raise: {
@@ -360,6 +369,7 @@ class Game extends React.Component {
       this.setState({
         turn: turn,
         playerUI: playerUI,
+        raiseAmt,
       }, clearInterval(id));
     } else {
       let nextTurn = this.findNextTurn(null, turn, actives);
@@ -402,6 +412,7 @@ class Game extends React.Component {
     let foldIndex = null;
     let amt = parseInt(amount);
     let playerUI = this.state.playerUI;
+    let diff = playerUI[turn - 1].diff;
     switch(choice) {
       case 'Call' :
         money -= amt;
@@ -413,11 +424,11 @@ class Game extends React.Component {
         money -= amt;
         pot += amt;
         turnAmt = amt;
-        ante += (amt - ante);
+        ante += (amt - diff);
         break;
       case 'All In' :
         if(ante < money) {
-          ante += (money - ante);
+          ante += (money - diff);
         }
         pot += money;
         turnAmt = money;
@@ -729,8 +740,6 @@ class Game extends React.Component {
                 let list = this.props.playerList;
                   if(list[turn - 1] === 'Player') {
                     this.playerUI(turn, id);
-                      let slider = document.getElementById('raiseSlider');
-                      if(slider) {slider.value = Math.floor(this.state.playerUI[turn - 1].raise.max / 2)};
                   } else {
                       foldIndex = this.bet(turn);
                       turn = this.findNextTurn(foldIndex, turn, actives);
@@ -763,8 +772,6 @@ class Game extends React.Component {
               let list = this.props.playerList;
                 if(list[turn - 1] === 'Player') {
                   this.playerUI(turn, id);
-                  let slider = document.getElementById('raiseSlider');
-                  if(slider) {slider.value = Math.floor(this.state.playerUI[turn - 1].raise.max / 2)};
                 } else {
                     foldIndex = this.bet(turn);
                     turn = this.findNextTurn(foldIndex, turn, actives);
@@ -797,8 +804,6 @@ class Game extends React.Component {
               let list = this.props.playerList;
                 if(list[turn - 1] === 'Player') {
                   this.playerUI(turn, id);
-                  let slider = document.getElementById('raiseSlider');
-                  if(slider) {slider.value = Math.floor(this.state.playerUI[turn - 1].raise.max / 2)};
                 } else {
                     foldIndex = this.bet(turn);
                     turn = this.findNextTurn(foldIndex, turn, actives);
@@ -821,8 +826,6 @@ class Game extends React.Component {
               let list = this.props.playerList;
                 if(list[turn - 1] === 'Player') {
                   this.playerUI(turn, id);
-                  let slider = document.getElementById('raiseSlider');
-                  if(slider) {slider.value = Math.floor(this.state.playerUI[turn - 1].raise.max / 2)};
                 } else {
                     foldIndex = this.bet(turn);
                     turn = this.findNextTurn(foldIndex, turn, actives);
@@ -1557,7 +1560,6 @@ class Game extends React.Component {
     }
     const moneyList = this.state.moneyList;
     const pot = this.state.pot;
-    const ante = this.state.bet;
     const choices = this.state.turnChoices;
     const paused = this.state.pause;
     const finished = this.state.finish;
