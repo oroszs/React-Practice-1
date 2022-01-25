@@ -316,8 +316,11 @@ class Game extends React.Component {
     let raiseAmt = diff;
     if(diff / money < .6) {
       min = raiseMult + diff;
-      max = raiseMult * 10;
-      raiseAmt = Math.floor(max / 2);
+      max = raiseMult * 9 + diff;
+      raiseAmt = Math.floor(((max - min) / 2) + min);
+      if(min < 10 || max > money) {
+        showRaise = false;
+      }
     } else {
       showRaise = false;
     }
@@ -370,7 +373,22 @@ class Game extends React.Component {
         turn: turn,
         playerUI: playerUI,
         raiseAmt,
-      }, clearInterval(id));
+      }, () => {
+        clearInterval(id);
+        if(showRaise) {
+          let slider = document.getElementById('raiseSlider');
+          if(slider) {
+            slider.value = raiseAmt;
+          } else {
+            setTimeout(() => {
+              slider = document.getElementById('raiseSlider');
+              if(slider) {
+                slider.value = raiseAmt;
+              }
+            }, 500);
+          }
+        }
+      });
     } else {
       let nextTurn = this.findNextTurn(null, turn, actives);
       this.setState({
@@ -427,9 +445,8 @@ class Game extends React.Component {
         ante += (amt - diff);
         break;
       case 'All In' :
-        if(ante < money) {
-          ante += (money - diff);
-        }
+        lastBet = turnIndex;
+        ante += (money - diff);
         pot += money;
         turnAmt = money;
         money = 0;
@@ -1574,6 +1591,7 @@ class Game extends React.Component {
     const showCards = this.state.showCards;
     const handTitles = this.state.handTitles;
     const winnerTitles = this.state.winnerTitles;
+    const initialRaiseAmt = this.state.raiseAmt;
     return(
       <div>
         {gameIsOver ? 
@@ -1600,10 +1618,10 @@ class Game extends React.Component {
               <div id='pot'>Pot: ${pot}</div>
             </div>
             <div id='playersArea'>
-                {p1 ? <Player type={list[0]} player='1' playerUI={playerUI[0]} showCards={this.showCards} show={showCards[0]} hand={p1} money={moneyList[0]} choice={choices[0]} handTitle={handTitles[0]} winner={winnerTitles[0]} blindTitle={blindTitles[0]} playerBet={this.playerBet} /> : null}
-                {p2 ? <Player type={list[1]} player='2' playerUI={playerUI[1]} showCards={this.showCards} show={showCards[1]} hand={p2} money={moneyList[1]} choice={choices[1]} handTitle={handTitles[1]} winner={winnerTitles[1]} blindTitle={blindTitles[1]} playerBet={this.playerBet} /> : null}    
-                {p3 ? <Player type={list[2]} player='3' playerUI={playerUI[2]} showCards={this.showCards} show={showCards[2]} hand={p3} money={moneyList[2]} choice={choices[2]} handTitle={handTitles[2]} winner={winnerTitles[2]} blindTitle={blindTitles[2]} playerBet={this.playerBet} /> : null}
-                {p4 ? <Player type={list[3]} player='4' playerUI={playerUI[3]} showCards={this.showCards} show={showCards[3]} hand={p4} money={moneyList[3]} choice={choices[3]} handTitle={handTitles[3]} winner={winnerTitles[3]} blindTitle={blindTitles[3]} playerBet={this.playerBet} /> : null}        
+                {p1 ? <Player type={list[0]} player='1' playerUI={playerUI[0]} showCards={this.showCards} show={showCards[0]} hand={p1} money={moneyList[0]} choice={choices[0]} handTitle={handTitles[0]} winner={winnerTitles[0]} blindTitle={blindTitles[0]} playerBet={this.playerBet} initialRaiseAmt={initialRaiseAmt} /> : null}
+                {p2 ? <Player type={list[1]} player='2' playerUI={playerUI[1]} showCards={this.showCards} show={showCards[1]} hand={p2} money={moneyList[1]} choice={choices[1]} handTitle={handTitles[1]} winner={winnerTitles[1]} blindTitle={blindTitles[1]} playerBet={this.playerBet} initialRaiseAmt={initialRaiseAmt} /> : null}    
+                {p3 ? <Player type={list[2]} player='3' playerUI={playerUI[2]} showCards={this.showCards} show={showCards[2]} hand={p3} money={moneyList[2]} choice={choices[2]} handTitle={handTitles[2]} winner={winnerTitles[2]} blindTitle={blindTitles[2]} playerBet={this.playerBet} initialRaiseAmt={initialRaiseAmt} /> : null}
+                {p4 ? <Player type={list[3]} player='4' playerUI={playerUI[3]} showCards={this.showCards} show={showCards[3]} hand={p4} money={moneyList[3]} choice={choices[3]} handTitle={handTitles[3]} winner={winnerTitles[3]} blindTitle={blindTitles[3]} playerBet={this.playerBet} initialRaiseAmt={initialRaiseAmt} /> : null}        
             </div>
           </div>
         }
@@ -1616,7 +1634,7 @@ class Player extends React.Component {
   constructor(props) {
     super(props);
     this.state = {
-      raiseAmt: Math.floor(props.playerUI.raise.max / 2),
+      raiseAmt: props.initialRaiseAmt,
     }
   }
 
@@ -1649,7 +1667,7 @@ class Player extends React.Component {
     const blind = this.props.blindTitle;
     let showCards = this.props.show;
     const playerUI = this.props.playerUI;
-    const raiseAmt = this.state.raiseAmt;
+    const raiseAmt = this.state.raiseAmt === undefined ? this.props.initialRaiseAmt : this.state.raiseAmt;
     const showUI = playerUI.showUI;
     const raise = playerUI.raise;
     const raiseStep = playerUI.step;
@@ -1667,7 +1685,7 @@ class Player extends React.Component {
           <div className='turnUI'>
             <button className='turnButton' onMouseDown={this.props.showCards} onMouseUp={this.props.showCards}>Show Cards</button>
             {showAllIn ? <button className='turnButton' onClick={() => {this.props.playerBet('All In', money)}}>All In: {money}</button> : null}
-            {showRaise ? <button className='turnButton' onClick={() => {this.props.playerBet('Raise', raiseAmt)}}>Raise: {raiseAmt}</button> : null}
+            {showRaise ? <button className='turnButton' onClick={() => {this.setState({raiseAmt: undefined});this.props.playerBet('Raise', raiseAmt)}}>Raise: {raiseAmt}</button> : null}
             {showRaise ? <input id='raiseSlider' type='range' min={raise.min} max={raise.max} step={raiseStep} onChange={() => this.getVal()}></input> : null}
             {showCheckCall ? 
               checkCall === 'Call' ? <button className='turnButton' onClick={() => {this.props.playerBet('Call', diff)}}>{checkCall}: {diff}</button>

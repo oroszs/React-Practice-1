@@ -213,8 +213,9 @@
   justify-content: flex-end;
   position: relative;
   top: 15px;
-  width:35%;
-  height: 170px;
+  width:40%;
+  min-width: 410px;
+  height: 185px;
   border: solid black 2px;
   border-radius: 30%;
   background: rgb(255, 228, 155);
