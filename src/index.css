@@ -47,6 +47,7 @@
   width: fit-content;
   padding: 25px;
   margin: auto;
+  min-width: 1000px;
 }
 #menu{
   position: absolute;
@@ -111,7 +112,7 @@
 .roundButton{
   font-size: 16pt;
   position: absolute;
-  top: 38%;
+  top: 42.5%;
   left: 50%;
   transform: translate(-50%, -50%);
   z-index: 50;
@@ -290,16 +291,18 @@
   left: 50%;
   transform: translate(-50%, 0);
   width: 90%;
-  height: 330px;
+  height: 300px;
   border-radius: 5px;
   min-width: 1000px;
 }
+
 .blindTitle{
   font-size: 18pt;
   color: rgb(0, 0, 0);
   background:rgb(255, 255, 255);
   border-radius: 5px;
   padding: 5px;
+  z-index: 10;
 }
 .playerTitle {
   display: block;
@@ -323,9 +326,10 @@
   height: 220px;
   background: rgb(0, 179, 9);
   flex: none;
-  margin: 10px;
+  margin: 7px;
   border-radius: 5px;
   padding: 10px;
+  bottom: 0px;
 }
 .foldFade{
   opacity: 50%;
@@ -350,8 +354,6 @@
   flex-direction: column;
   justify-content: flex-end;
   align-items: center;
-  margin: 10px;
-  padding: 10px;
 }
 .turnUI {
   width: 140px;
@@ -359,14 +361,14 @@
   background: rgb(0, 30, 75);
   border-radius: 5px;
   position: absolute;
-  bottom: 75%;
+  bottom: 74%;
   display: flex;
   flex-direction: column;
   justify-content: space-evenly;
   align-items: center;
   padding: 5px;
   outline: solid rgb(0, 195, 255) 5px;
-  box-shadow: rgb(0, 255, 242) 0px 0px 35px;
+  box-shadow: rgb(0, 255, 242) 0px 0px 30px;
 }
 .turnButton {
   font-weight: bold;
