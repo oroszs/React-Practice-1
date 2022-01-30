@@ -1,0 +1,440 @@
+$light-cyan: rgb(165, 237, 250);
+$cyan: rgb(31, 248, 255);
+$glow: white 0px 0px 25px;
+$glow-large: white 0px 0px 40px;
+$shadow: black 5px 5px 5px;
+#wrapper{
+  position: relative;
+  background-color: $light-cyan;
+  width: 100%;
+  height: 700px;
+  text-align: center;
+}
+#startButton{
+  flex: none;
+  font-size: 12pt;
+  font-family: Cambria, Cochin, Georgia, Times, 'Times New Roman', serif;
+  cursor: pointer;
+  position: relative;
+  margin: 10px;
+  top: 10%;
+  text-decoration: none;
+  width: 100px;
+  height: 50px;
+  background-color: $cyan;
+  border: 2px solid black;
+  border-radius: 5px;
+  box-shadow: $shadow;
+}
+#moneyDiv{
+  color: white;
+  flex: none;
+  width: 70%;
+  height: fit-content;
+  background: rgb(46, 46, 46);
+  position: relative;
+  margin: 10px;
+  top: 20%;
+  border-radius: 5px;
+  border: 2px solid black;
+}
+#moneySlider {
+  padding: 5px;
+}
+#mainTitle {
+  font-family: Verdana;
+  position: relative;
+  top: 80px;
+  font-size: 100pt;
+  color:black;
+  box-shadow: rgb(0, 70, 128) 0px 0px 100px;
+  border-radius: 20px;
+  width: fit-content;
+  padding: 25px;
+  margin: auto;
+  min-width: 1000px;
+}
+#menu{
+  position: absolute;
+  background: rgb(61, 61, 61);
+  width: 300px;
+  height: fit-content;
+  border: solid black 5px;
+  border-radius: 5px;
+  box-shadow: $shadow;
+  top: 70%;
+  left: 50%;
+  transform: translate(-50%, -50%);
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  align-items: center;
+}
+#playerSelect {
+  display: flex;
+  flex-direction: row;
+  justify-content: space-evenly;
+  align-items: center;
+  position: relative;
+  bottom: 30%;
+  width: fit-content;
+  height: 50px;
+  background: $light-cyan;
+  border: 2px solid black;
+  border-radius: 5px;
+}
+.playerTypeButton {
+  text-align: center;
+  flex: none;
+  border-radius: 5px;
+  width: 40px;
+  height: 40px;
+  margin: 5px;
+  padding: 0px;
+  cursor: pointer;
+}
+#pNumHolder{
+  flex: none;
+  position: relative;
+  top: 30%;
+  width: 150px;
+  height: fit-content;
+  background: $light-cyan;
+  margin: 10px;
+  border-radius: 5px;
+  padding: 10px;
+}
+.pNum{
+  position: relative;
+  display: inline;
+}
+#players{
+  padding: 10px;
+  position: relative;
+  font-size: 14pt;
+  color: black;
+}
+.roundButton{
+  font-size: 16pt;
+  position: absolute;
+  top: 42.5%;
+  left: 50%;
+  transform: translate(-50%, -50%);
+  z-index: 50;
+  width: 150px;
+  height: 45px;
+  background: rgb(0, 61, 0);
+  color: white;
+  border: none;
+  border-radius: 5px;
+  cursor: pointer;
+  box-shadow: $glow;
+}
+.roundButton:hover {
+  box-shadow: $glow-large;
+}
+#gameOverDisplay {
+  position: absolute;
+  font-size: 25pt;
+  color: black;
+  top: 0px;
+  bottom: 0px;
+  left: 0px;
+  right: 0px;
+  background: #b0eaff;
+  min-width: 1000px;
+  display: flex;
+  flex-direction: column;
+  align-content: center;
+  justify-content: space-evenly;
+}
+#winnerDiv{
+  position: relative;
+  margin: auto;
+  width: 70%;
+  height: 60%;
+  background: rgb(0, 66, 121);
+  border-radius: 5px;
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  text-align: center;
+  box-shadow: rgb(63, 63, 63) 10px 10px 10px;
+  border: solid #000000 5px;
+}
+.winText{
+  font-family:Impact;
+  padding: 50px;
+  width: fit-content;
+  height: 50px;
+  line-height: 50px;
+  margin: auto;
+  flex: none;
+  color: black;
+  font-size: 50pt;
+  background: rgb(0, 247, 255);
+  outline: solid rgb(255, 255, 255) 5px;
+  border-radius: 5px;
+  position: relative;
+  box-shadow: white 0px 0px 30px;
+}
+.winMoney {
+  font-family:Cochin;
+  font-weight: bold;
+  padding: 50px;
+  width: fit-content;
+  height: 30px;
+  line-height: 30px;
+  margin: auto;
+  flex: none;
+  color: black;
+  font-size: 30pt;
+  background: rgb(63, 255, 143);
+  outline: solid rgb(255, 255, 255) 5px;
+  border-radius: 50%;
+  position: relative;
+}
+#menuButtonDiv{
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  position: relative;
+  bottom: 20px;
+  margin: auto;
+  background: rgb(0, 44, 80);
+  width: 15%;
+  height: 20%;
+  border: 2px solid black;
+  border-radius: 5px;
+  box-shadow: black 5px 5px 5px;
+  align-items: center;
+}
+.menuButton{
+  font-size: 15pt;
+  background: $cyan;
+  border: none;
+  border-radius: 5px;
+  margin: 10px;
+  flex: none;
+  width: fit-content;
+  padding: 5px;
+  box-shadow: $cyan 0px 0px 10px;
+  outline: solid white 2px;
+  cursor: pointer;
+}
+#cardDisplay{
+  position: absolute;
+  margin: auto;
+  font-size: 20pt;
+  color: black;
+  top: 0px;
+  right: 0px;
+  bottom: 0px;
+  left: 0px;
+  border-radius: 5px;
+  background: radial-gradient(rgb(0, 185, 0), rgb(0, 68, 0));
+  min-width: 1020px;
+}
+.cardHolder{
+  display: flex;
+  flex-direction: row;
+  align-items: center;
+  justify-content: center;
+}
+.cardBg {
+  background: rgb(116, 255, 128);
+}
+#board{
+  display: flex;
+  flex-direction: column;
+  justify-content: flex-end;
+  position: relative;
+  top: 15px;
+  width:33%;
+  min-width: 400px;
+  height: 185px;
+  border-radius: 20px;
+  left: 50%;
+  transform: translate(-50%, 0);
+}
+#pot{
+  color: white;
+  position: relative;
+  bottom: 5px;
+  left: 50%;
+  transform: translate(-50%, 0);
+  width: fit-content;
+  height: 20px;
+  padding: 10px;
+  line-height: 20px;
+  border-radius: 5px;
+  background: rgb(0, 61, 0);
+  margin-top: 12.5px;
+  margin-bottom: 5px;
+}
+#deckDisplay{
+  position: absolute;
+  top: 45%;
+  left: 50%;
+  transform:translate(-50%, -45%);
+  width: 90%;
+  height: 100px;
+  border: solid black 2px;
+  border-radius: 5px;
+  background: grey;
+  opacity: 60%;
+  padding : 0px 5px 0px 5px;
+}
+#playersArea{
+  display: flex;
+  flex-direction: row;
+  align-items: flex-end;
+  justify-content: space-evenly;
+  font-size: 10pt;
+  position: absolute;
+  bottom: 10px;
+  left: 50%;
+  transform: translate(-50%, 0);
+  width: 90%;
+  height: 300px;
+  border-radius: 5px;
+  min-width: 1000px;
+}
+
+.blindTitle{
+  font-size: 17pt;
+  color: rgb(0, 0, 0);
+  background:rgb(255, 255, 255);
+  border-radius: 5px;
+  padding: 5px;
+  z-index: 10;
+}
+.playerTitle {
+  display: block;
+  font-size: 15pt;
+}
+.playerChoice {
+  font-size: 18pt;
+}
+.winnerTitle{
+  font-size: 30pt;
+  color: rgb(0, 0, 0);
+  background:rgb(255, 255, 0);
+  box-shadow: rgb(255, 253, 143) 0px 0px 30px;
+  border-radius: 5px;
+  padding: 5px;
+  margin: 30px;
+}
+.playerArea{
+  position: relative;
+  width: 220px;
+  height: 220px;
+  background: rgb(0, 179, 9);
+  flex: none;
+  margin: 7px;
+  border-radius: 5px;
+  padding: 10px;
+  bottom: 0px;
+}
+.foldFade{
+  opacity: 50%;
+}
+.playerInfo{
+  font-size: 16pt;
+  color: rgb(255, 255, 255);
+  width: fit-content;
+  height: 15px;
+  line-height: 15px;
+  position: relative;
+  margin: 15px auto 10px auto;
+  border-radius: 5px;
+  background: rgb(0, 61, 0);
+  padding: 10px;
+}
+.playerUI {
+  position: relative;
+  width: 200px;
+  height: 425px;
+  display: flex;
+  flex-direction: column;
+  justify-content: flex-end;
+  align-items: center;
+}
+.turnUI {
+  width: 140px;
+  height: fit-content;
+  background: rgb(0, 30, 75);
+  border-radius: 5px;
+  position: absolute;
+  bottom: 74%;
+  display: flex;
+  flex-direction: column;
+  justify-content: space-evenly;
+  align-items: center;
+  padding: 5px;
+  outline: solid rgb(0, 195, 255) 5px;
+  box-shadow: rgb(0, 255, 242) 0px 0px 30px;
+}
+.turnButton {
+  font-weight: bold;
+  font-size: 10pt;
+  flex: none;
+  position: relative;
+  margin: 2px;
+}
+.cardBack{
+  position: relative;
+  width: 63.5px;
+  height: 97px;
+  background-color: rgb(177, 2, 2);
+  outline: solid black 2px;
+  border: solid white 4px;
+  border-radius: 4px;
+  flex: none;
+  margin: 7px;
+}
+.card{
+  position: relative;
+  width: 70px;
+  height: 105px;
+  background-color: white;
+  border: solid black 2px;
+  border-radius: 5px;
+  flex: none;
+  margin: 6px;
+}
+.cardText{
+  margin: 0px;
+  position: relative;
+  top: 2px;
+  left: 4px;
+  font-size: 15pt;
+  width: fit-content;
+}
+.cardContainer{
+  overflow-x: hidden;
+}
+.cardContainer:last-child{
+  flex: 0 0 auto;
+}
+.deckCard{
+  font-size: 6pt;
+  position: relative;
+  width: 40px;
+  height: 65px;
+  background-color: white;
+  border: solid black 2px;
+  border-radius: 5px;
+  flex: none;
+}
+.deckCardText{
+  margin: 0px;
+  position: relative;
+  top: 2px;
+  left: 2px;
+  font-size: 8pt;
+  width: fit-content;
+}
+.redSuit{
+  color: red;
+}
