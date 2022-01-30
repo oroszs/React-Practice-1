@@ -1665,7 +1665,6 @@ class Player extends React.Component {
     const hand = this.props.hand;
     const handBack = this.getCardBacks();
     const money = this.props.money;
-    const title = this.props.title;
     const choice = this.props.choice;
     const blind = this.props.blindTitle;
     let showCards = this.props.show;
