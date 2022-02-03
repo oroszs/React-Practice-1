@@ -21,7 +21,7 @@ $shadow: black 5px 5px 5px;
   margin: 10px;
   top: 10%;
   text-decoration: none;
-  width: 100px;
+  width: 10vw;
   height: 50px;
   background-color: $cyan;
   border: 2px solid black;
@@ -41,26 +41,26 @@ $shadow: black 5px 5px 5px;
   border: 2px solid black;
 }
 #moneySlider {
-  padding: 5px;
+  display: block;
+  margin: auto;
+  padding: .5rem;
 }
 #mainTitle {
   font-family: Verdana;
   position: relative;
-  top: 80px;
-  font-size: 100pt;
+  top: 15vh;
+  font-size: 6rem;
+  width: 80vw;
   color:black;
   box-shadow: rgb(0, 70, 128) 0px 0px 100px;
   border-radius: 20px;
-  width: fit-content;
-  padding: 25px;
+  padding: 2vw;
   margin: auto;
-  min-width: 1000px;
 }
 #menu{
   position: absolute;
   background: rgb(61, 61, 61);
-  width: 300px;
-  height: fit-content;
+  width: 20vw;
   border: solid black 5px;
   border-radius: 5px;
   box-shadow: $shadow;
@@ -71,6 +71,39 @@ $shadow: black 5px 5px 5px;
   flex-direction: column;
   justify-content: center;
   align-items: center;
+}
+@media screen and (max-width: 1100px){
+  #mainTitle {
+    font-size: 5rem;
+  }
+  #startButton {
+    width: 15vw;
+  }
+  #menu {
+    width: 37vw;
+  }
+}
+@media screen and (max-width: 700px) {
+  #mainTitle {
+    font-size: 3rem;
+  }
+  #startButton {
+    width: 20vw;
+  }
+  #menu {
+    width: 37vw;
+  }
+}
+@media screen and (max-width: 460px) {
+  #mainTitle {
+    font-size: 2rem;
+  }
+  #startButton {
+    width: 30vw;
+  }
+  #menu {
+    width: 37vw;
+  }
 }
 #playerSelect {
   display: flex;
