@@ -2,10 +2,12 @@
   "name": "practice-1",
   "version": "0.1.0",
   "private": true,
+  "homepage": "https://oroszs.github.io/React-Practice-1",
   "dependencies": {
     "@testing-library/jest-dom": "^5.15.1",
     "@testing-library/react": "^11.2.7",
     "@testing-library/user-event": "^12.8.3",
+    "gh-pages": "^3.2.3",
     "react": "^17.0.2",
     "react-dom": "^17.0.2",
     "react-scripts": "^5.0.0",
@@ -16,7 +18,8 @@
     "start": "react-scripts start",
     "build": "react-scripts build",
     "test": "react-scripts test",
-    "eject": "react-scripts eject"
+    "eject": "react-scripts eject",
+    "deploy": "react-scripts deploy"
   },
   "eslintConfig": {
     "extends": [
