@@ -4,10 +4,12 @@ $glow: white 0px 0px 25px;
 $glow-large: white 0px 0px 40px;
 $shadow: black 5px 5px 5px;
 #wrapper{
-  position: relative;
+  position: absolute;
   background-color: $light-cyan;
-  width: 100%;
-  height: 700px;
+  top: 0px;
+  right: 0px;
+  bottom: 0px;
+  left: 0px;
   text-align: center;
 }
 #startButton{
@@ -231,9 +233,9 @@ $shadow: black 5px 5px 5px;
   right: 0px;
   bottom: 0px;
   left: 0px;
-  border-radius: 5px;
   background: radial-gradient(rgb(0, 185, 0), rgb(0, 68, 0));
-  min-width: 1020px;
+  min-width: 1200px;
+  min-height: 625px;
 }
 .cardHolder{
   display: flex;
