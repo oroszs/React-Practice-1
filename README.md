@@ -1,4 +1,4 @@
-This is a fully funcational Texas Holdem web app created using JavaScript, SCSS, React, and Node JS.
+This is a fully functional Texas Holdem web app created using JavaScript, SCSS, React, and Node JS. You may need to run npm install on the project directory after downloading from GitHub in order for the application to load successfully.
 
 # Getting Started with Create React App
 
