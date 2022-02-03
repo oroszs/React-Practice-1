@@ -18,8 +18,8 @@ class Menu extends React.Component{
   constructor (props){
     super (props);
     const p = this.props.startingPlayers;
-    let list = [];
-    for(let x = 0; x < p; x++) {
+    let list = ['Player'];
+    for(let x = 1; x < p; x++) {
       list.push('CPU');
     }
     this.state = {
@@ -101,8 +101,13 @@ class Menu extends React.Component{
   }
 
   getCpuDivs(x) {
+    const list = this.state.playerList;
+    let type = 'CPU';
+    if(list[x] === 'Player') {
+      type = 'P';
+    }
     return (
-      <Cpu key={x} num={x + 1} changeHumans={this.changeHumans}/>
+      <Cpu type={type} key={x} num={x + 1} changeHumans={this.changeHumans}/>
     );
   }
 
@@ -156,8 +161,11 @@ class Menu extends React.Component{
 class Cpu extends React.Component {
   constructor (props) {
     super(props);
+    let type = this.props.type;
+    let num = this.props.num;
+    let stringType = type === 'P' ? type + num : type;
     this.state = {
-      type: 'CPU',
+      type: stringType,
     }
   }
 
