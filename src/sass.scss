@@ -82,6 +82,9 @@ $shadow: black 5px 5px 5px;
   #menu {
     width: 37vw;
   }
+  #moneySlider{
+    width: 20vw;
+  }
 }
 @media screen and (max-width: 700px) {
   #mainTitle {
@@ -91,7 +94,10 @@ $shadow: black 5px 5px 5px;
     width: 20vw;
   }
   #menu {
-    width: 37vw;
+    width: 50vw;
+  }
+  #moneySlider{
+    width: 25vw;
   }
 }
 @media screen and (max-width: 460px) {
@@ -101,8 +107,11 @@ $shadow: black 5px 5px 5px;
   #startButton {
     width: 30vw;
   }
+  #moneySlider {
+    width: 40vw;
+  }
   #menu {
-    width: 37vw;
+    width: 70vw;
   }
 }
 #playerSelect {
