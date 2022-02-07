@@ -1,4 +1,5 @@
 $light-cyan: rgb(165, 237, 250);
+$light-green: rgb(116, 255, 128);
 $cyan: rgb(31, 248, 255);
 $glow: white 0px 0px 25px;
 $glow-large: white 0px 0px 40px;
@@ -12,7 +13,9 @@ $shadow: black 5px 5px 5px;
   left: 0px;
   text-align: center;
 }
+//Title Screen
 #startButton{
+  color : black;
   flex: none;
   font-size: 12pt;
   font-family: Cambria, Cochin, Georgia, Times, 'Times New Roman', serif;
@@ -161,6 +164,7 @@ $shadow: black 5px 5px 5px;
 .pNum{
   position: relative;
   display: inline;
+  color: black;
 }
 #players{
   padding: 10px;
@@ -168,6 +172,7 @@ $shadow: black 5px 5px 5px;
   font-size: 14pt;
   color: black;
 }
+//Main Game
 .roundButton{
   font-size: 16pt;
   position: absolute;
@@ -276,7 +281,7 @@ $shadow: black 5px 5px 5px;
   outline: solid white 2px;
   cursor: pointer;
 }
-#cardDisplay{
+#cardDisplay{ //Main BG
   position: absolute;
   margin: auto;
   font-size: 20pt;
@@ -286,7 +291,6 @@ $shadow: black 5px 5px 5px;
   bottom: 0px;
   left: 0px;
   background: radial-gradient(rgb(0, 185, 0), rgb(0, 68, 0));
-  min-width: 1200px;
   min-height: 625px;
 }
 .cardHolder{
@@ -296,7 +300,7 @@ $shadow: black 5px 5px 5px;
   justify-content: center;
 }
 .cardBg {
-  background: rgb(116, 255, 128);
+  background: $light-green;
 }
 #board{
   display: flex;
@@ -305,7 +309,6 @@ $shadow: black 5px 5px 5px;
   position: relative;
   top: 15px;
   width:33%;
-  min-width: 400px;
   height: 185px;
   border-radius: 20px;
   left: 50%;
@@ -352,7 +355,6 @@ $shadow: black 5px 5px 5px;
   width: 90%;
   height: 300px;
   border-radius: 5px;
-  min-width: 1000px;
 }
 
 .blindTitle{
