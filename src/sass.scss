@@ -1,9 +1,13 @@
 $light-cyan: rgb(165, 237, 250);
 $light-green: rgb(116, 255, 128);
+$green: rgb(0, 179, 9);
 $cyan: rgb(31, 248, 255);
 $glow: white 0px 0px 25px;
 $glow-large: white 0px 0px 40px;
 $shadow: black 5px 5px 5px;
+button {
+  color: black;
+}
 #wrapper{
   position: absolute;
   background-color: $light-cyan;
@@ -383,11 +387,10 @@ $shadow: black 5px 5px 5px;
 }
 .playerArea{
   position: relative;
-  width: 220px;
+  width: 17vw;
   height: 220px;
-  background: rgb(0, 179, 9);
+  background: $green;
   flex: none;
-  margin: 7px;
   border-radius: 5px;
   padding: 10px;
   bottom: 0px;
@@ -432,6 +435,7 @@ $shadow: black 5px 5px 5px;
   box-shadow: rgb(0, 255, 242) 0px 0px 30px;
 }
 .turnButton {
+  cursor: pointer;
   font-weight: bold;
   font-size: 10pt;
   flex: none;
@@ -440,7 +444,7 @@ $shadow: black 5px 5px 5px;
 }
 .cardBack{
   position: relative;
-  width: 63.5px;
+  width: 5vw;
   height: 97px;
   background-color: rgb(177, 2, 2);
   outline: solid black 2px;
@@ -451,13 +455,21 @@ $shadow: black 5px 5px 5px;
 }
 .card{
   position: relative;
-  width: 70px;
+  width: 5vw;
   height: 105px;
   background-color: white;
   border: solid black 2px;
   border-radius: 5px;
   flex: none;
   margin: 6px;
+}
+@media screen and (max-width: 1100px) {
+  .cardBack{
+
+  }
+  .card{
+
+  }
 }
 .cardText{
   margin: 0px;

@@ -412,14 +412,16 @@ class Game extends React.Component {
     }
   }
 
-  showCards(event) {
+  showCards() {
     let turnIndex = this.state.turn - 1;
     let showCards = this.state.showCards;
-    if(event.type === 'mousedown') {
-      showCards[turnIndex] = true;
-    } else if (event.type === 'mouseup') {
-      showCards[turnIndex] = false;
+    let bool;
+    if(showCards[turnIndex] === true) {
+      bool = false;
+    } else if (showCards[turnIndex] === false) {
+      bool = true;
     }
+    showCards[turnIndex] = bool;
     this.setState({
       showCards: showCards,
     });
@@ -1693,7 +1695,7 @@ class Player extends React.Component {
       <div className = {(choice === 'Fold') ? 'foldFade playerUI' : 'playerUI'}>
         {showUI ?
           <div className='turnUI'>
-            <button className='turnButton' onMouseDown={this.props.showCards} onMouseUp={this.props.showCards}>Show Cards</button>
+            <button className='turnButton' onClick={this.props.showCards}>Show Cards</button>
             {showAllIn ? <button className='turnButton' onClick={() => {this.props.playerBet('All In', money)}}>All In: {money}</button> : null}
             {showRaise ? <button className='turnButton' onClick={() => {this.setState({raiseAmt: undefined});this.props.playerBet('Raise', raiseAmt)}}>Raise: {raiseAmt}</button> : null}
             {showRaise ? <input id='raiseSlider' type='range' min={raise.min} max={raise.max} step={raiseStep} onChange={() => this.getVal()}></input> : null}
