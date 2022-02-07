@@ -386,7 +386,7 @@ button {
   box-shadow: rgb(255, 253, 143) 0px 0px 30px;
   border-radius: 5px;
   padding: 5px;
-  margin: 30px;
+  margin: 40px;
 }
 .playerArea{
   position: relative;
@@ -493,9 +493,17 @@ button {
   .playerArea{
     padding: 5px;
   }
+  .winnerTitle{
+    position: absolute;
+    margin: 0px;
+    bottom: 70%;
+  }
 }
 
 @media screen and (max-width: 660px) {
+  .roundButton{
+    font-size: 12pt;
+  }
   .turnUI {
     left: 5vw;
     width: 10vw;
@@ -536,7 +544,7 @@ button {
     margin: 1px;
   }
   .cardText{
-    font-size: 12pt;
+    font-size: 10pt;
   }
   .playerArea {
     height: 25vh;
@@ -549,7 +557,14 @@ button {
     padding: 0px;
   }
   #board{
+    padding-top: 0px;
     width: 60%;
+  }
+  .winnerTitle{
+    position: absolute;
+    bottom: 65%;
+    font-size: 15pt;
+    margin: 0px;
   }
 }
 .deckCard{
