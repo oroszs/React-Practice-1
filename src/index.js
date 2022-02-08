@@ -1610,6 +1610,9 @@ class Game extends React.Component {
     const handTitles = this.state.handTitles;
     const winnerTitles = this.state.winnerTitles;
     const initialRaiseAmt = this.state.raiseAmt;
+    let height = window.screen.availHeight;
+    let width = window.screen.availWidth;
+    let landscape = width > height;
     return(
       <div>
         {gameIsOver ? 
@@ -1623,7 +1626,7 @@ class Game extends React.Component {
                 this.props.restart();
                 setTimeout(() => {this.props.setup()}, 10);
                 }}>Play Again</button>
-              <button className='menuButton' onClick={()=> {this.quit()}}>Quit</button>
+              {landscape ? <button className='menuButton' onClick={()=> {this.quit()}}>Quit</button> : null}
             </div>
           </div> :
           <div id='cardDisplay'>

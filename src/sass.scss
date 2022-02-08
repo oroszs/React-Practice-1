@@ -196,95 +196,6 @@ button {
 .roundButton:hover {
   box-shadow: $glow-large;
 }
-#gameOverDisplay {
-  position: absolute;
-  font-size: 25pt;
-  color: black;
-  top: 0px;
-  bottom: 0px;
-  left: 0px;
-  right: 0px;
-  background: #b0eaff;
-  min-width: 1000px;
-  display: flex;
-  flex-direction: column;
-  align-content: center;
-  justify-content: space-evenly;
-}
-#winnerDiv{
-  position: relative;
-  margin: auto;
-  width: 70%;
-  height: 60%;
-  background: rgb(0, 66, 121);
-  border-radius: 5px;
-  display: flex;
-  flex-direction: column;
-  justify-content: center;
-  text-align: center;
-  box-shadow: rgb(63, 63, 63) 10px 10px 10px;
-  border: solid #000000 5px;
-}
-.winText{
-  font-family:Impact;
-  padding: 50px;
-  width: fit-content;
-  height: 50px;
-  line-height: 50px;
-  margin: auto;
-  flex: none;
-  color: black;
-  font-size: 50pt;
-  background: rgb(0, 247, 255);
-  outline: solid rgb(255, 255, 255) 5px;
-  border-radius: 5px;
-  position: relative;
-  box-shadow: white 0px 0px 30px;
-}
-.winMoney {
-  font-family:Cochin;
-  font-weight: bold;
-  padding: 50px;
-  width: fit-content;
-  height: 30px;
-  line-height: 30px;
-  margin: auto;
-  flex: none;
-  color: black;
-  font-size: 30pt;
-  background: rgb(63, 255, 143);
-  outline: solid rgb(255, 255, 255) 5px;
-  border-radius: 50%;
-  position: relative;
-}
-#menuButtonDiv{
-  display: flex;
-  flex-direction: column;
-  justify-content: center;
-  position: relative;
-  bottom: 20px;
-  margin: auto;
-  background: rgb(0, 44, 80);
-  width: 15%;
-  height: 20%;
-  border: 2px solid black;
-  border-radius: 5px;
-  box-shadow: black 5px 5px 5px;
-  align-items: center;
-}
-.menuButton{
-  font-size: 15pt;
-  background: $cyan;
-  border: none;
-  border-radius: 5px;
-  margin: 10px;
-  flex: none;
-  width: fit-content;
-  padding: 5px;
-  box-shadow: $cyan 0px 0px 10px;
-  outline: solid white 2px;
-  cursor: pointer;
-}
 #cardDisplay{ //Main BG
   position: absolute;
   margin: auto;
@@ -477,7 +388,99 @@ button {
   font-size: 15pt;
   width: fit-content;
 }
+//Game Over Screen
+#gameOverDisplay {
+  position: absolute;
+  font-size: 25pt;
+  color: black;
+  top: 0px;
+  bottom: 0px;
+  left: 0px;
+  right: 0px;
+  background: #b0eaff;
+  display: flex;
+  flex-direction: column;
+  align-content: center;
+  justify-content: space-evenly;
+}
+#winnerDiv{
+  position: relative;
+  margin: auto;
+  width: 90vw;
+  height: 60vh;
+  background: rgb(0, 66, 121);
+  border-radius: 5px;
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  text-align: center;
+  box-shadow: rgb(63, 63, 63) 10px 10px 10px;
+  border: solid #000000 5px;
+}
+.winText{
+  font-family:Impact;
+  padding: 50px;
+  width: 60vw;
+  height: 50px;
+  line-height: 50px;
+  margin: auto;
+  flex: none;
+  color: black;
+  font-size: 50pt;
+  background: rgb(0, 247, 255);
+  outline: solid rgb(255, 255, 255) 5px;
+  border-radius: 5px;
+  position: relative;
+  box-shadow: white 0px 0px 30px;
+}
+.winMoney {
+  font-family:Cochin;
+  font-weight: bold;
+  padding: 50px;
+  width: fit-content;
+  height: 30px;
+  line-height: 30px;
+  margin: auto;
+  flex: none;
+  color: black;
+  font-size: 30pt;
+  background: radial-gradient($light-green, $green);
+  border: solid white 5px;
+  border-radius: 10px;
+  position: relative;
+}
+#menuButtonDiv{
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  position: relative;
+  bottom: 20px;
+  margin: auto;
+  background: rgb(0, 44, 80);
+  width: 15vw;
+  height: 20%;
+  border: 2px solid black;
+  border-radius: 5px;
+  box-shadow: black 5px 5px 5px;
+  align-items: center;
+}
+.menuButton{
+  font-size: 15pt;
+  background: $cyan;
+  border: none;
+  border-radius: 5px;
+  margin: 10px;
+  flex: none;
+  width: fit-content;
+  padding: 5px;
+  box-shadow: $cyan 0px 0px 10px;
+  outline: solid white 2px;
+  cursor: pointer;
+}
 @media screen and (max-width: 900px) {
+  #menuButtonDiv{
+    width: 25vw;
+  }
   .cardBack{
     width: 40px;
     height: 75px;
@@ -501,6 +504,13 @@ button {
 }
 
 @media screen and (max-width: 660px) {
+  #menuButtonDiv{
+    width: 45vw;
+  }
+  .winText{
+    padding: 25px;
+    font-size: 25pt;
+  }
   .roundButton{
     font-size: 12pt;
   }
