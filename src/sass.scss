@@ -515,7 +515,8 @@ button {
     font-size: 12pt;
   }
   .turnUI {
-    left: 3.25vw;
+    transform: translate(-50%, 0%);
+    left: 50%;
     width: 15vw;
     bottom: 62.5%;
     height: 40%;
