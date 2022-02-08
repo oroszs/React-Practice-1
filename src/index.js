@@ -668,7 +668,12 @@ class Game extends React.Component {
     let ante = this.state.bet;
     const actives = this.state.activePlayers;
     let choices = this.state.turnChoices;
+    let showCards = this.state.showCards;
+    for(let x = 0; x < showCards.length; x++) {
+      showCards[x] = false;
+    }
     this.setState({
+      showCards: showCards,
       pause: false,
       turnChoices: choices,
     }, () => {
