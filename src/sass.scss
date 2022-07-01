@@ -418,7 +418,7 @@ button {
   border: solid #000000 5px;
 }
 .winText{
-  font-family:Impact;
+  font-family:Impact, Haettenschweiler, 'Arial Narrow Bold', sans-serif;
   padding: 50px;
   width: 60vw;
   height: 50px;
@@ -428,7 +428,7 @@ button {
   color: black;
   font-size: 50pt;
   background: rgb(0, 247, 255);
-  outline: solid rgb(255, 255, 255) 5px;
+  border: solid rgb(255, 255, 255) 5px;
   border-radius: 5px;
   position: relative;
   box-shadow: white 0px 0px 30px;
@@ -474,7 +474,7 @@ button {
   width: fit-content;
   padding: 5px;
   box-shadow: $cyan 0px 0px 10px;
-  outline: solid white 2px;
+  border: solid white 2px;
   cursor: pointer;
 }
 @media screen and (max-width: 900px) {
@@ -509,7 +509,7 @@ button {
   }
   .winText{
     padding: 25px;
-    font-size: 25pt;
+    font-size: 22pt;
   }
   .roundButton{
     font-size: 12pt;
