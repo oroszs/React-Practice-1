@@ -18,10 +18,8 @@ class Menu extends React.Component{
   constructor (props){
     super (props);
     const p = this.props.startingPlayers;
-    let list = ['Player'];
-    for(let x = 1; x < p; x++) {
-      list.push('CPU');
-    }
+    let list = Array(p).fill('CPU');
+    list[0] = 'Player';
     this.state = {
       game: false,
       players: this.props.startingPlayers,
